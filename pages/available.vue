@@ -20,7 +20,8 @@ NuxtLayout
 </template>
 
 <script setup lang="ts">
-const { loadInventory, loadLocalRecipes, fetchCocktailDBRecipes, getAvailableRecipes } = useCocktails()
+const { loadInventory, loadLocalRecipes, fetchCocktailDBRecipes, getAvailableRecipes } =
+  useCocktails()
 
 // Load data on mount
 onMounted(async () => {

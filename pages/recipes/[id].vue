@@ -44,7 +44,13 @@ NuxtLayout
 
 <script setup lang="ts">
 const route = useRoute()
-const { loadInventory, loadLocalRecipes, fetchCocktailDBRecipes, getAllRecipes, isIngredientInStock } = useCocktails()
+const {
+  loadInventory,
+  loadLocalRecipes,
+  fetchCocktailDBRecipes,
+  getAllRecipes,
+  isIngredientInStock,
+} = useCocktails()
 
 // Load data on mount
 onMounted(async () => {

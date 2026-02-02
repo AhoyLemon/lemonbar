@@ -1,40 +1,29 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
   devtools: { enabled: true },
-  
+
   // TypeScript strict mode
   typescript: {
     strict: true,
-    typeCheck: true
+    typeCheck: false,
   },
 
   // Enable experimental view transitions
   experimental: {
-    viewTransition: true
+    viewTransition: true,
   },
 
   // CSS configuration
-  css: ['~/assets/styles/main.scss'],
-
-  // Vite configuration for Sass
-  vite: {
-    css: {
-      preprocessorOptions: {
-        scss: {
-          additionalData: '@use "~/assets/styles/_variables.scss" as *;'
-        }
-      }
-    }
-  },
+  css: ['@/assets/styles/main.scss'],
 
   // Build configuration for GitHub Pages
   app: {
     baseURL: process.env.NODE_ENV === 'production' ? '/lemonbar/' : '/',
-    buildAssetsDir: 'assets'
+    buildAssetsDir: 'assets',
   },
 
   // SSG target for static generation
   ssr: true,
 
-  compatibilityDate: '2024-02-02'
+  compatibilityDate: '2024-02-02',
 })

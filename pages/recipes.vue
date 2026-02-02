@@ -33,16 +33,16 @@ NuxtLayout
 </template>
 
 <script setup lang="ts">
-const { 
-  loadInventory, 
-  loadLocalRecipes, 
-  fetchCocktailDBRecipes, 
-  getAllRecipes, 
+const {
+  loadInventory,
+  loadLocalRecipes,
+  fetchCocktailDBRecipes,
+  getAllRecipes,
   getAlcoholicRecipes,
   getNonAlcoholicRecipes,
   getAvailableRecipes,
-  loading, 
-  error 
+  loading,
+  error,
 } = useCocktails()
 
 const searchTerm = ref('')

@@ -1,4 +1,7 @@
 // Global styles
+@use 'sass:color';
+@use 'variables' as *;
+
 *,
 *::before,
 *::after {
@@ -51,7 +54,7 @@ a {
   transition: color 0.3s ease;
 
   &:hover {
-    color: darken($accent-color, 10%);
+    color: color.adjust($accent-color, $lightness: -10%);
   }
 }
 

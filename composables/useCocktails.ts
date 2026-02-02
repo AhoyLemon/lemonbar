@@ -19,31 +19,31 @@ export const useCocktails = () => {
   // Category mapping for inventory tags to API-friendly keys
   // Tags now contain spirit types, so we map those to API ingredient names
   const ingredientMapping: Record<string, string[]> = {
-    'tequila': ['tequila'],
-    'gin': ['gin'],
-    'rum': ['rum', 'white rum', 'dark rum', 'light rum'],
-    'whiskey': ['whiskey', 'bourbon', 'scotch', 'rye'],
-    'bourbon': ['bourbon', 'whiskey'],
-    'vodka': ['vodka'],
-    'liqueur': ['liqueur', 'triple sec', 'cointreau', 'orange liqueur'],
-    'bitters': ['bitters'],
-    'citrus': ['lime', 'lemon', 'orange', 'grapefruit', 'lime juice', 'lemon juice'],
-    'lime': ['lime', 'lime juice', 'fresh lime'],
-    'lemon': ['lemon', 'lemon juice', 'fresh lemon'],
-    'syrup': ['syrup', 'simple syrup', 'sugar'],
+    tequila: ['tequila'],
+    gin: ['gin'],
+    rum: ['rum', 'white rum', 'dark rum', 'light rum'],
+    whiskey: ['whiskey', 'bourbon', 'scotch', 'rye'],
+    bourbon: ['bourbon', 'whiskey'],
+    vodka: ['vodka'],
+    liqueur: ['liqueur', 'triple sec', 'cointreau', 'orange liqueur'],
+    bitters: ['bitters'],
+    citrus: ['lime', 'lemon', 'orange', 'grapefruit', 'lime juice', 'lemon juice'],
+    lime: ['lime', 'lime juice', 'fresh lime'],
+    lemon: ['lemon', 'lemon juice', 'fresh lemon'],
+    syrup: ['syrup', 'simple syrup', 'sugar'],
     'simple syrup': ['simple syrup', 'syrup', 'sugar syrup'],
-    'soda': ['soda', 'club soda', 'soda water'],
+    soda: ['soda', 'club soda', 'soda water'],
     'club soda': ['club soda', 'soda water', 'soda'],
-    'tonic': ['tonic', 'tonic water'],
+    tonic: ['tonic', 'tonic water'],
     'ginger beer': ['ginger beer', 'ginger ale'],
     'ginger-beer': ['ginger beer', 'ginger ale'],
-    'grenadine': ['grenadine', 'pomegranate syrup'],
-    'juice': ['juice', 'orange juice', 'cranberry juice'],
-    'orange': ['orange', 'orange juice'],
-    'beer': ['beer', 'lager', 'ale'],
-    'wine': ['wine', 'red wine', 'white wine'],
-    'water': ['water', 'sparkling water'],
-    'carbonated': ['soda', 'sparkling water', 'tonic', 'club soda']
+    grenadine: ['grenadine', 'pomegranate syrup'],
+    juice: ['juice', 'orange juice', 'cranberry juice'],
+    orange: ['orange', 'orange juice'],
+    beer: ['beer', 'lager', 'ale'],
+    wine: ['wine', 'red wine', 'white wine'],
+    water: ['water', 'sparkling water'],
+    carbonated: ['soda', 'sparkling water', 'tonic', 'club soda'],
   }
 
   // Load inventory from public data
@@ -75,12 +75,12 @@ export const useCocktails = () => {
 
     try {
       // Fetch popular cocktails if no search term
-      const endpoint = searchTerm 
+      const endpoint = searchTerm
         ? `https://www.thecocktaildb.com/api/json/v1/1/search.php?s=${searchTerm}`
         : 'https://www.thecocktaildb.com/api/json/v1/1/search.php?s=margarita' // Default popular drink
 
       const response = await $fetch<{ drinks: CocktailDBDrink[] | null }>(endpoint)
-      
+
       if (response.drinks) {
         const recipes: Recipe[] = response.drinks.map(drink => {
           // Extract ingredients from the drink object
@@ -91,7 +91,7 @@ export const useCocktails = () => {
             if (ingredient && ingredient.trim()) {
               ingredients.push({
                 name: ingredient.trim(),
-                qty: measure?.trim() || 'to taste'
+                qty: measure?.trim() || 'to taste',
               })
             }
           }
@@ -102,7 +102,7 @@ export const useCocktails = () => {
             ingredients,
             instructions: drink.strInstructions,
             imageUrl: drink.strDrinkThumb,
-            category: drink.strCategory
+            category: drink.strCategory,
           }
         })
 
@@ -122,10 +122,13 @@ export const useCocktails = () => {
     const lowerIngredient = ingredientName.toLowerCase()
 
     // Direct name match
-    if (inStockItems.some(item => 
-      item.name.toLowerCase().includes(lowerIngredient) || 
-      lowerIngredient.includes(item.name.toLowerCase())
-    )) {
+    if (
+      inStockItems.some(
+        item =>
+          item.name.toLowerCase().includes(lowerIngredient) ||
+          lowerIngredient.includes(item.name.toLowerCase())
+      )
+    ) {
       return true
     }
 
@@ -133,18 +136,20 @@ export const useCocktails = () => {
     for (const item of inStockItems) {
       for (const tag of item.tags) {
         const lowerTag = tag.toLowerCase()
-        
+
         // Direct tag match
         if (lowerIngredient.includes(lowerTag) || lowerTag.includes(lowerIngredient)) {
           return true
         }
-        
+
         // Check ingredient mapping for this tag
         const mappedIngredients = ingredientMapping[lowerTag]
         if (mappedIngredients) {
-          if (mappedIngredients.some(mapped => 
-            lowerIngredient.includes(mapped) || mapped.includes(lowerIngredient)
-          )) {
+          if (
+            mappedIngredients.some(
+              mapped => lowerIngredient.includes(mapped) || mapped.includes(lowerIngredient)
+            )
+          ) {
             return true
           }
         }
@@ -153,7 +158,9 @@ export const useCocktails = () => {
 
     // Check if ingredient name maps to any tag
     for (const [key, aliases] of Object.entries(ingredientMapping)) {
-      if (aliases.some(alias => lowerIngredient.includes(alias) || alias.includes(lowerIngredient))) {
+      if (
+        aliases.some(alias => lowerIngredient.includes(alias) || alias.includes(lowerIngredient))
+      ) {
         // Check if we have any item with this key in its tags
         if (inStockItems.some(item => item.tags.some(tag => tag.toLowerCase() === key))) {
           return true
@@ -167,13 +174,11 @@ export const useCocktails = () => {
   // Filter recipes where 100% of ingredients are in stock
   const getAvailableRecipes = computed(() => {
     const allRecipes = [...localRecipes.value, ...apiRecipes.value]
-    
+
     return allRecipes.filter(recipe => {
       if (recipe.ingredients.length === 0) return false
-      
-      return recipe.ingredients.every(ingredient => 
-        isIngredientInStock(ingredient.name)
-      )
+
+      return recipe.ingredients.every(ingredient => isIngredientInStock(ingredient.name))
     })
   })
 
@@ -185,19 +190,19 @@ export const useCocktails = () => {
   // Get recipes with missing ingredients count
   const getRecipesWithAvailability = computed(() => {
     const allRecipes = [...localRecipes.value, ...apiRecipes.value]
-    
+
     return allRecipes.map(recipe => {
-      const availableCount = recipe.ingredients.filter(ingredient => 
+      const availableCount = recipe.ingredients.filter(ingredient =>
         isIngredientInStock(ingredient.name)
       ).length
       const totalCount = recipe.ingredients.length
-      
+
       return {
         ...recipe,
         availableIngredients: availableCount,
         totalIngredients: totalCount,
         isFullyAvailable: availableCount === totalCount,
-        availabilityPercentage: totalCount > 0 ? (availableCount / totalCount) * 100 : 0
+        availabilityPercentage: totalCount > 0 ? (availableCount / totalCount) * 100 : 0,
       }
     })
   })
@@ -205,20 +210,22 @@ export const useCocktails = () => {
   // Get non-alcoholic recipes
   const getNonAlcoholicRecipes = computed(() => {
     const allRecipes = [...localRecipes.value, ...apiRecipes.value]
-    return allRecipes.filter(recipe => 
-      recipe.category?.toLowerCase().includes('non-alcoholic') ||
-      recipe.tags?.some(tag => tag.toLowerCase().includes('non-alcoholic')) ||
-      recipe.tags?.some(tag => tag.toLowerCase().includes('mocktail'))
+    return allRecipes.filter(
+      recipe =>
+        recipe.category?.toLowerCase().includes('non-alcoholic') ||
+        recipe.tags?.some(tag => tag.toLowerCase().includes('non-alcoholic')) ||
+        recipe.tags?.some(tag => tag.toLowerCase().includes('mocktail'))
     )
   })
 
   // Get alcoholic recipes
   const getAlcoholicRecipes = computed(() => {
     const allRecipes = [...localRecipes.value, ...apiRecipes.value]
-    return allRecipes.filter(recipe => 
-      !recipe.category?.toLowerCase().includes('non-alcoholic') &&
-      !recipe.tags?.some(tag => tag.toLowerCase().includes('non-alcoholic')) &&
-      !recipe.tags?.some(tag => tag.toLowerCase().includes('mocktail'))
+    return allRecipes.filter(
+      recipe =>
+        !recipe.category?.toLowerCase().includes('non-alcoholic') &&
+        !recipe.tags?.some(tag => tag.toLowerCase().includes('non-alcoholic')) &&
+        !recipe.tags?.some(tag => tag.toLowerCase().includes('mocktail'))
     )
   })
 
@@ -236,6 +243,6 @@ export const useCocktails = () => {
     getRecipesWithAvailability,
     getNonAlcoholicRecipes,
     getAlcoholicRecipes,
-    isIngredientInStock
+    isIngredientInStock,
   }
 }

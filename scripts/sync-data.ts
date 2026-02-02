@@ -14,7 +14,7 @@ interface NotionBottle {
   InStock: { checkbox: boolean }
   BottleSize: { rich_text: Array<{ plain_text: string }> }
   BottleState: { select: { name: string } }
-  Image: { files: Array<{ file?: { url: string }, external?: { url: string } }> }
+  Image: { files: Array<{ file?: { url: string }; external?: { url: string } }> }
 }
 
 async function fetchFromNotion(): Promise<Bottle[]> {
@@ -29,7 +29,7 @@ async function fetchFromNotion(): Promise<Bottle[]> {
   try {
     console.log('📡 Fetching inventory from Notion...')
     const notion = new Client({ auth: apiKey })
-    
+
     const response = await notion.databases.query({
       database_id: databaseId,
     })
@@ -38,7 +38,7 @@ async function fetchFromNotion(): Promise<Bottle[]> {
       const props = page.properties as NotionBottle
       const imageFile = props.Image?.files?.[0]
       const imageUrl = imageFile?.file?.url || imageFile?.external?.url
-      
+
       return {
         id: page.id,
         name: props.Name.title[0]?.plain_text || '',
@@ -46,7 +46,9 @@ async function fetchFromNotion(): Promise<Bottle[]> {
         tags: props.Tags.multi_select.map(tag => tag.name),
         inStock: props.InStock.checkbox,
         bottleSize: props.BottleSize?.rich_text?.[0]?.plain_text || undefined,
-        bottleState: (props.BottleState?.select?.name?.toLowerCase() as 'unopened' | 'opened' | 'empty') || undefined,
+        bottleState:
+          (props.BottleState?.select?.name?.toLowerCase() as 'unopened' | 'opened' | 'empty') ||
+          undefined,
         image: imageUrl || undefined,
       }
     })
@@ -61,7 +63,7 @@ async function fetchFromNotion(): Promise<Bottle[]> {
 
 function parseCSV(): Bottle[] {
   const csvPath = join(DATA_DIR, 'inventory.csv')
-  
+
   if (!existsSync(csvPath)) {
     console.log('⚠️  inventory.csv not found, skipping CSV parsing')
     return []
@@ -82,7 +84,7 @@ function parseCSV(): Bottle[] {
       tags: record.tags.split(',').map((tag: string) => tag.trim()),
       inStock: record.inStock === 'true',
       bottleSize: record.bottleSize || undefined,
-      bottleState: record.bottleState as 'unopened' | 'opened' | 'empty' || undefined,
+      bottleState: (record.bottleState as 'unopened' | 'opened' | 'empty') || undefined,
       image: record.image || undefined,
     }))
 
@@ -96,7 +98,7 @@ function parseCSV(): Bottle[] {
 
 function loadLocalRecipes(): Recipe[] {
   const recipesPath = join(DATA_DIR, 'recipes.json')
-  
+
   if (!existsSync(recipesPath)) {
     console.log('⚠️  recipes.json not found, skipping local recipes')
     return []
@@ -123,12 +125,12 @@ async function syncData() {
 
   // Merge bottles (Notion takes priority, then CSV)
   const bottlesMap = new Map<string, Bottle>()
-  
+
   // Add CSV bottles first
   csvBottles.forEach(bottle => {
     bottlesMap.set(bottle.id, bottle)
   })
-  
+
   // Override with Notion bottles (they take priority)
   notionBottles.forEach(bottle => {
     bottlesMap.set(bottle.id, bottle)
@@ -153,14 +155,8 @@ async function syncData() {
 
   // Write to public directory
   console.log('\n💾 Writing normalized data to public/data/...')
-  writeFileSync(
-    join(PUBLIC_DATA_DIR, 'inventory.json'),
-    JSON.stringify(inventoryData, null, 2)
-  )
-  writeFileSync(
-    join(PUBLIC_DATA_DIR, 'recipes.json'),
-    JSON.stringify(recipesData, null, 2)
-  )
+  writeFileSync(join(PUBLIC_DATA_DIR, 'inventory.json'), JSON.stringify(inventoryData, null, 2))
+  writeFileSync(join(PUBLIC_DATA_DIR, 'recipes.json'), JSON.stringify(recipesData, null, 2))
 
   console.log('✅ Inventory data written to public/data/inventory.json')
   console.log('✅ Recipes data written to public/data/recipes.json')

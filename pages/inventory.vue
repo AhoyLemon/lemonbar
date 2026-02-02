@@ -39,19 +39,19 @@ const outOfStockBottles = computed(() => inventory.value.filter(b => !b.inStock)
 
 const filteredBottles = computed(() => {
   let bottles = inventory.value
-  
+
   // Apply stock filter
   if (filter.value === 'inStock') {
     bottles = inStockBottles.value
   } else if (filter.value === 'outOfStock') {
     bottles = outOfStockBottles.value
   }
-  
+
   // Apply category filter
   if (categoryFilter.value !== 'all') {
     bottles = bottles.filter(b => b.category === categoryFilter.value)
   }
-  
+
   return bottles
 })
 </script>
@@ -102,7 +102,7 @@ const filteredBottles = computed(() => {
 .category-btn {
   font-size: 0.875rem;
   padding: $spacing-xs $spacing-md;
-  
+
   &.active {
     background: $primary-color;
     border-color: $primary-color;

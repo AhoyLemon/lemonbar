@@ -29,13 +29,16 @@ const bottleStateLabel = computed(() => {
   const states = {
     unopened: '🔒 Unopened',
     opened: '🍾 Opened',
-    empty: '⚠️ Empty'
+    empty: '⚠️ Empty',
   }
   return props.bottle.bottleState ? states[props.bottle.bottleState] : ''
 })
 </script>
 
 <style lang="scss" scoped>
+@use 'sass:color';
+@use '@/assets/styles/variables' as *;
+
 .bottle-card {
   container-type: inline-size;
   container-name: bottle-card;
@@ -62,7 +65,11 @@ const bottleStateLabel = computed(() => {
     width: 100%;
     height: 180px;
     overflow: hidden;
-    background: linear-gradient(135deg, $light-bg 0%, darken($light-bg, 5%) 100%);
+    background: linear-gradient(
+      135deg,
+      $light-bg 0%,
+      color.adjust($light-bg, $lightness: -5%) 100%
+    );
     display: flex;
     align-items: center;
     justify-content: center;
@@ -125,18 +132,18 @@ const bottleStateLabel = computed(() => {
     font-weight: 600;
 
     &.state-unopened {
-      background: lighten($accent-color, 40%);
-      color: darken($accent-color, 20%);
+      background: color.adjust($accent-color, $lightness: 40%);
+      color: color.adjust($accent-color, $lightness: -20%);
     }
 
     &.state-opened {
-      background: lighten($primary-color, 35%);
-      color: darken($primary-color, 15%);
+      background: color.adjust($primary-color, $lightness: 35%);
+      color: color.adjust($primary-color, $lightness: -15%);
     }
 
     &.state-empty {
-      background: lighten($secondary-color, 35%);
-      color: darken($secondary-color, 10%);
+      background: color.adjust($secondary-color, $lightness: 35%);
+      color: color.adjust($secondary-color, $lightness: -10%);
     }
   }
 
@@ -168,13 +175,13 @@ const bottleStateLabel = computed(() => {
     font-weight: 600;
 
     &.in-stock {
-      background: lighten($accent-color, 40%);
-      color: darken($accent-color, 20%);
+      background: color.adjust($accent-color, $lightness: 40%);
+      color: color.adjust($accent-color, $lightness: -20%);
     }
 
     &.out-of-stock {
-      background: lighten($secondary-color, 35%);
-      color: darken($secondary-color, 10%);
+      background: color.adjust($secondary-color, $lightness: 35%);
+      color: color.adjust($secondary-color, $lightness: -10%);
     }
   }
 
