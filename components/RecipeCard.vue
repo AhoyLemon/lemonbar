@@ -19,8 +19,6 @@
         li(v-for="ingredient in recipe.ingredients" :key="ingredient.name" :class="{ 'available': isIngredientAvailable(ingredient.name) }")
           span.ingredient-name {{ ingredient.name }}
           span.ingredient-qty {{ ingredient.qty }}
-    .recipe-card__actions
-      NuxtLink(:to="`/recipes/${recipe.id}`" class="btn btn-primary") View Recipe
 </template>
 
 <script setup lang="ts">
@@ -191,30 +189,6 @@ const isIngredientAvailable = (ingredientName: string) => {
           color: color.adjust($text-dark, $lightness: 30%);
           font-size: 0.875rem;
         }
-      }
-    }
-  }
-
-  &__actions {
-    margin-top: auto;
-  }
-
-  .btn {
-    display: block;
-    width: 100%;
-    padding: $spacing-sm $spacing-lg;
-    border-radius: $border-radius-md;
-    font-weight: 600;
-    text-align: center;
-    text-decoration: none;
-    transition: all 0.3s ease;
-
-    &-primary {
-      background: $accent-color;
-      color: white;
-
-      &:hover {
-        background: color.adjust($accent-color, $lightness: -10%);
       }
     }
   }
