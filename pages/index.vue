@@ -16,6 +16,11 @@
         h3 Recipes
         p Discover cocktails you can make
 
+      NuxtLink.nav-card(to="/essentials")
+        .nav-card__icon 📋
+        h3 Essentials
+        p Find key ingredients to expand your options
+
       NuxtLink.nav-card(to="/available")
         .nav-card__icon ✨
         h3 Available Now

@@ -73,15 +73,15 @@ onMounted(async () => {
   await loadInventory()
   await loadLocalRecipes()
   loadStarredRecipes()
-  
+
   // Check if this is a CocktailDB recipe that needs to be fetched
   const recipeId = route.params.id as string
   if (recipeId.startsWith('cocktaildb-')) {
     const cocktailDbId = recipeId.replace('cocktaildb-', '')
-    
+
     // Check if we already have this recipe
     const existingRecipe = getAllRecipes.value.find(r => r.id === recipeId)
-    
+
     if (!existingRecipe) {
       // Fetch the specific recipe from CocktailDB
       isLoading.value = true
@@ -203,12 +203,12 @@ const isIngredientAvailable = (ingredientName: string) => {
       font-weight: 600;
       font-size: 0.875rem;
       align-self: flex-start;
-      
+
       &.local {
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         color: white;
       }
-      
+
       &.external {
         background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
         color: white;

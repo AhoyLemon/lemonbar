@@ -52,13 +52,13 @@
       "id": "utah-mule",
       "name": "Simone's Utah Mule",
       "ingredients": [
-        { "name": "Ice"},
+        { "name": "Ice" },
         { "name": "Ginger Ale", "qty": "8 oz" },
         { "name": "Grenadine" },
-        { "name": "Bitters "},
+        { "name": "Bitters " },
         { "name": "Ginger Candy", "qty": "1" }
       ],
-      "instructions":[
+      "instructions": [
         "put some ice in a copper mug",
         "pour in ginger ale",
         "add a splash of grenadine",
@@ -74,10 +74,7 @@
     {
       "id": "just-bourbon-cream",
       "name": "A Nice Nightcap",
-      "ingredients": [
-        { "name": "Ice" },
-        { "name": "Bourbon Cream", "qty": "4 oz" }
-      ],
+      "ingredients": [{ "name": "Ice" }, { "name": "Bourbon Cream", "qty": "4 oz" }],
       "instructions": [
         "put ice in a rocks glass",
         "then some bourbon cream",

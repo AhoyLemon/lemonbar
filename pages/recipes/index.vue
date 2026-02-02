@@ -69,12 +69,14 @@ const handleSearch = async () => {
 // Helper to filter recipes by search term
 const applySearchFilter = (recipes: any[]) => {
   if (!searchTerm.value.trim()) return recipes
-  
+
   const term = searchTerm.value.toLowerCase()
   return recipes.filter(recipe => {
     const nameMatch = recipe.name.toLowerCase().includes(term)
     const categoryMatch = recipe.category?.toLowerCase().includes(term)
-    const ingredientMatch = recipe.ingredients.some((ing: { name: string }) => ing.name.toLowerCase().includes(term))
+    const ingredientMatch = recipe.ingredients.some((ing: { name: string }) =>
+      ing.name.toLowerCase().includes(term)
+    )
     return nameMatch || categoryMatch || ingredientMatch
   })
 }

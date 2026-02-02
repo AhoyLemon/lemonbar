@@ -161,16 +161,16 @@ export const useCocktails = () => {
 
       if (response.drinks && response.drinks[0]) {
         const recipe = convertDrinkToRecipe(response.drinks[0])
-        
+
         // Add to apiRecipes if not already there
         const existingIndex = apiRecipes.value.findIndex(r => r.id === recipe.id)
         if (existingIndex === -1) {
           apiRecipes.value = [...apiRecipes.value, recipe]
         }
-        
+
         return recipe
       }
-      
+
       return null
     } catch (e) {
       console.error('Failed to fetch recipe from CocktailDB:', e)
@@ -182,7 +182,7 @@ export const useCocktails = () => {
   const matchesAsWord = (text: string, searchTerm: string): boolean => {
     // Exact match
     if (text === searchTerm) return true
-    
+
     // Check if searchTerm appears as a whole word in text
     const regex = new RegExp(`\\b${searchTerm.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`, 'i')
     return regex.test(text)
@@ -200,12 +200,15 @@ export const useCocktails = () => {
       if (matchesAsWord(lowerIngredient, lowerName) || matchesAsWord(lowerName, lowerIngredient)) {
         return true
       }
-      
+
       // Check aka (also known as) field for alternate names
       if (item.aka && Array.isArray(item.aka)) {
         for (const akaName of item.aka) {
           const lowerAka = akaName.toLowerCase()
-          if (matchesAsWord(lowerIngredient, lowerAka) || matchesAsWord(lowerAka, lowerIngredient)) {
+          if (
+            matchesAsWord(lowerIngredient, lowerAka) ||
+            matchesAsWord(lowerAka, lowerIngredient)
+          ) {
             return true
           }
         }
