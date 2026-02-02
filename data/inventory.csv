@@ -19,3 +19,20 @@ id,name,category,tags,inStock,bottleSize,bottleState,image,company
 18,Ballotin Bourbon Ball,Liqueur,"whiskey, bourbon, chocolate",true,750ml,opened,/images/bottles/ballotin_bourbonball.webp,Ballotin
 19,Creme de Violette,Liqueur,"liqueur, violet",true,750ml,opened,/images/bottles/cremedeviolette.webp,Rothman & Winter
 20,Dijana Wisnia,Liqueur,"liqueur, cherry",true,200ml,opened,/images/bottles/dijanawisnia.webp,Dijana
+21,Fisk (The Classic),Liqueur,"liqueur, anise, schnapps, mint",true,750ml,opened,/images/bottles/fisk_original.webp,Fisk
+22,Kahlúa,Liqueur,"liqueur, coffee",true,750ml,unopened,/images/bottles/kahlua.webp,Kahlua
+23,Kraken Black Roast,Liqueur,"rum, liqueur, dark rum, coffee",true,750ml,opened,/images/bottles/kraken_blackroast.webp,Kraken
+24,Lazzaroni Maraschino,Liqueur,"liqueur, cherry",true,750ml,opened,/images/bottles/lazzaroni.webp,Lazzaroni
+25,Midori,Liqueur,"liqueur, melon",true,750ml,opened,/images/bottles/midori.png,
+26,St-Germain,Liqueur,"liqueur, elderflower",true,750ml,,/images/bottles/st-germain.webp,
+27,Tattersall Aquavit,Liqueur,"liqueur, aquavit",true,750ml,opened,/images/bottles/aquavit_tattersall.webp,Tattersall
+28,Tattersall Grapefruit Crema,Liqueur,"liqueur, grapefruit",true,750ml,opened,/images/bottles/grapefruit_tattersall.webp,Tattersall
+29,Thatcher's Blood Orange,Liqueur,"orange, blood orange",true,750ml,,/images/bottles/bloodorange_thatcher.webp,Thatcher's
+30,Agave Nectar,Mixers,"syrup, sugar, agave",true,200ml,,/images/bottles/agave_raw.webp,Sugar In The Raw
+31,Bella Sun Luci Bloody Mary,Mixers,"tomato, bloody mary",true,750ml,,/images/bottles/bloody_bellasun.jpg,Bella Sun Luci
+32,El Guapo's Lemon Drop,Mixers,lemon,true,200ml,,/images/bottles/elguapo_lemon.webp,El Guapo
+33,Rose's Grenadine,Mixers,"pomegranate, grenadine",true,200ml,opened,/images/bottles/rose_grenadine.jpg,Rose's
+34,Tattersall Old Fashioned,Mixers,"premix, old fashioned",true,750ml,unopened,/images/bottles/oldfashioned_tattersall.png,Tattersall
+35,Abstente,Special Occasion,"absinthe, anise",true,,opened,/images/bottles/absente.webp,
+36,Absinthe Montmartre,Special Occasion,"absinthe, anise",true,750ml,opened,/images/bottles/absinthe_montmartre.webp,Old Vienna Liqueur Museum
+37,Baller,Special Occasion,"whiskey, japanese whiskey",true,750ml,opened,/images/bottles/baller.webp,St. George

@@ -4,6 +4,12 @@ div
     .container
       h1 🍸 The Headless Bar
       p Your personal cocktail inventory manager
+    nav
+      NuxtLink.nav-link(to="/") Home
+      NuxtLink.nav-link(to="/inventory") Inventory
+      NuxtLink.nav-link(to="/recipes") Recipes
+      NuxtLink.nav-link(to="/available") Available
+      
   main
     slot
   footer.app-footer
@@ -33,6 +39,7 @@ div
     opacity: 0.9;
     font-size: 1.125rem;
   }
+  nav { display: flex; gap: $spacing-lg; margin-top: $spacing-md; max-width: $container-max-width; margin-left: auto; margin-right: auto; }
 }
 
 .app-footer {
