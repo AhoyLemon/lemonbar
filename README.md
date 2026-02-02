@@ -10,6 +10,17 @@ A custom bar inventory and cocktail app built with Nuxt 3.
 - **Non-Alcoholic Support**: Includes mocktails, beer, and wine recipes
 - **Data Sync**: Import from Notion API, CSV, or local JSON files
 
+## Made with
+
+[![Vite](https://img.shields.io/badge/Nuxt-000?style=for-the-badge&labelColor=00DC82&logo=nuxt&logoColor=white&color=222)](https://nuxt.com)
+[![Vue.js](https://img.shields.io/badge/Vue.js-000?style=for-the-badge&labelColor=4FC08D&logo=vue.js&logoColor=white&color=222)](https://vuejs.org/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-000?style=for-the-badge&labelColor=3178C6&logo=typescript&logoColor=white&color=222)](https://www.typescriptlang.org/)
+[![Sass](https://img.shields.io/badge/Sass-000?style=for-the-badge&labelColor=CC6699&logo=sass&logoColor=white&color=222)](https://sass-lang.com/)
+[![Pug](https://img.shields.io/badge/Pug-000?style=for-the-badge&labelColor=A86454&logo=pug&logoColor=white&color=222)](https://pugjs.org/)
+[![Vitest](https://img.shields.io/badge/Vitest-000?style=for-the-badge&labelColor=6E9F18&logo=vitest&logoColor=white&color=222)](https://vitest.dev)
+[![Prettier](https://img.shields.io/badge/Prettier-000?style=for-the-badge&labelColor=F7B93E&logo=prettier&logoColor=111&color=222)](https://prettier.io)
+[![Notion](https://img.shields.io/badge/Notion-000?style=for-the-badge&labelColor=000000&logo=notion&logoColor=white&color=222)](https://www.notion.so)
+
 ## Getting Started
 
 ### Install Dependencies
@@ -25,7 +36,6 @@ npm install
 If you want to use your Notion database as the source of truth:
 
 1. Copy `.env.example` to `.env`:
-
    ```bash
    cp .env.example .env
    ```
@@ -119,7 +129,6 @@ To use your Notion database as the primary source of truth for your inventory, f
 #### Step 3: Get Your Database ID
 
 From your Notion database URL, extract the database ID:
-
 - **URL format**: `https://notion.so/workspace/<database_id>?v=<view_id>`
 - **Example**: For `https://ahoylemon.notion.site/c52ff95a53774261a8301435ee2c9be6?v=a9582664318d4f478b5922fa1b7bd2bd`
 - **Database ID**: `c52ff95a53774261a8301435ee2c9be6` (the part between the last `/` and `?v=`)
@@ -127,7 +136,6 @@ From your Notion database URL, extract the database ID:
 #### Step 4: Configure Environment Variables
 
 1. Copy the example file:
-
    ```bash
    cp .env.example .env
    ```
@@ -141,20 +149,17 @@ From your Notion database URL, extract the database ID:
 #### Step 5: Sync Your Data
 
 Run the sync script to fetch from Notion:
-
 ```bash
 npm run sync-data
 ```
 
 You should see output like:
-
 ```
 📡 Fetching inventory from Notion...
 ✅ Fetched X bottles from Notion
 ```
 
 **Important Notes:**
-
 - The sync script merges Notion data with your local CSV
 - When both sources have the same bottle (matching ID), **Notion data takes priority**
 - The web management UI updates the local CSV only - run `npm run sync-data` to sync with Notion
@@ -172,6 +177,7 @@ You can add, edit, and delete bottles directly from the web interface:
 Changes made through the web interface will update `data/inventory.csv` immediately. Run `npm run sync-data` afterward to regenerate the public JSON files.
 
 ## Testing
+
 
 ```bash
 npm test
