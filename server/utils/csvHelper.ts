@@ -71,6 +71,27 @@ export function writeInventoryCSV(bottles: Bottle[]): void {
   }
 }
 
+/**
+ * Normalizes image path to ensure it has the correct prefix
+ * Converts "bibandtucker.webp" to "/images/bottles/bibandtucker.webp"
+ */
+export function normalizeImagePath(imagePath: string | undefined): string | undefined {
+  if (!imagePath || imagePath.trim() === '') return undefined
+  
+  // If already has the prefix, return as-is
+  if (imagePath.startsWith('/images/bottles/')) {
+    return imagePath
+  }
+  
+  // If it's just a filename, add the prefix
+  if (!imagePath.startsWith('/')) {
+    return `/images/bottles/${imagePath}`
+  }
+  
+  // Otherwise return as-is
+  return imagePath
+}
+
 export function getNextId(bottles: Bottle[]): string {
   if (bottles.length === 0) return '1'
   

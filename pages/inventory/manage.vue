@@ -51,7 +51,7 @@
           .form-group
             label(for="image") Image Filename
             input#image(v-model="form.image" type="text" placeholder="e.g., beefeater_gin.jpg")
-            small.help-text Image files should be placed in public/images/bottles/
+            small.help-text Just enter the filename. Place image files in public/images/bottles/ directory
 
           .form-actions
             button.btn.btn-primary(type="submit" :disabled="loading") 

@@ -1,6 +1,7 @@
 import { readInventoryCSV, writeInventoryCSV } from '~/server/utils/csvHelper'
+import { syncInventoryData } from '~/server/utils/syncHelper'
 
-export default defineEventHandler((event) => {
+export default defineEventHandler(async (event) => {
   try {
     const id = getRouterParam(event, 'id')
 
@@ -23,6 +24,9 @@ export default defineEventHandler((event) => {
 
     bottles.splice(index, 1)
     writeInventoryCSV(bottles)
+
+    // Sync data to regenerate public/data/inventory.json
+    await syncInventoryData()
 
     return {
       success: true,

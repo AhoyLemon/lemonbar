@@ -1,4 +1,5 @@
-import { readInventoryCSV, writeInventoryCSV, getNextId } from '~/server/utils/csvHelper'
+import { readInventoryCSV, writeInventoryCSV, getNextId, normalizeImagePath } from '~/server/utils/csvHelper'
+import { syncInventoryData } from '~/server/utils/syncHelper'
 import type { Bottle } from '~/types'
 
 export default defineEventHandler(async (event) => {
@@ -22,11 +23,14 @@ export default defineEventHandler(async (event) => {
       inStock: body.inStock ?? true,
       bottleSize: body.bottleSize,
       bottleState: body.bottleState,
-      image: body.image,
+      image: normalizeImagePath(body.image),
     }
 
     bottles.push(newBottle)
     writeInventoryCSV(bottles)
+
+    // Sync data to regenerate public/data/inventory.json
+    await syncInventoryData()
 
     return {
       success: true,

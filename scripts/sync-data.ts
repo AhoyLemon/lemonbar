@@ -77,16 +77,24 @@ function parseCSV(): Bottle[] {
       skip_empty_lines: true,
     })
 
-    const bottles: Bottle[] = records.map((record: any) => ({
-      id: record.id,
-      name: record.name,
-      category: record.category,
-      tags: record.tags.split(',').map((tag: string) => tag.trim()),
-      inStock: record.inStock === 'true',
-      bottleSize: record.bottleSize || undefined,
-      bottleState: (record.bottleState as 'unopened' | 'opened' | 'empty') || undefined,
-      image: record.image || undefined,
-    }))
+    const bottles: Bottle[] = records.map((record: any) => {
+      let imagePath = record.image || undefined
+      // Normalize image path to ensure it has the correct prefix
+      if (imagePath && !imagePath.startsWith('/images/bottles/') && !imagePath.startsWith('/')) {
+        imagePath = `/images/bottles/${imagePath}`
+      }
+
+      return {
+        id: record.id,
+        name: record.name,
+        category: record.category,
+        tags: record.tags.split(',').map((tag: string) => tag.trim()),
+        inStock: record.inStock === 'true',
+        bottleSize: record.bottleSize || undefined,
+        bottleState: (record.bottleState as 'unopened' | 'opened' | 'empty') || undefined,
+        image: imagePath,
+      }
+    })
 
     console.log(`✅ Parsed ${bottles.length} bottles from CSV`)
     return bottles

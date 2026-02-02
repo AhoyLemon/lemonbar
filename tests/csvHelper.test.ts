@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach, afterEach } from 'vitest'
 import { readFileSync, writeFileSync, existsSync } from 'fs'
 import { join } from 'path'
-import { readInventoryCSV, writeInventoryCSV, getNextId } from '../server/utils/csvHelper'
+import { readInventoryCSV, writeInventoryCSV, getNextId, normalizeImagePath } from '../server/utils/csvHelper'
 import type { Bottle } from '../types'
 
 const TEST_CSV_PATH = join(process.cwd(), 'data', 'inventory.test.csv')
@@ -22,6 +22,25 @@ describe('CSV Helper Functions', () => {
     if (originalData) {
       writeFileSync(ORIGINAL_CSV_PATH, originalData, 'utf-8')
     }
+  })
+
+  describe('normalizeImagePath', () => {
+    it('should add prefix to simple filename', () => {
+      expect(normalizeImagePath('test.jpg')).toBe('/images/bottles/test.jpg')
+    })
+
+    it('should not modify path that already has prefix', () => {
+      expect(normalizeImagePath('/images/bottles/test.jpg')).toBe('/images/bottles/test.jpg')
+    })
+
+    it('should return undefined for empty input', () => {
+      expect(normalizeImagePath(undefined)).toBe(undefined)
+      expect(normalizeImagePath('')).toBe(undefined)
+    })
+
+    it('should handle paths that start with slash', () => {
+      expect(normalizeImagePath('/other/path/test.jpg')).toBe('/other/path/test.jpg')
+    })
   })
 
   it('should read bottles from CSV correctly', () => {
