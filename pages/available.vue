@@ -22,10 +22,13 @@
 const { loadInventory, loadLocalRecipes, fetchCocktailDBRecipes, getAvailableRecipes } =
   useCocktails()
 
+const { loadStarredRecipes } = useStarredRecipes()
+
 // Load data on mount
 onMounted(async () => {
   await loadInventory()
   await loadLocalRecipes()
+  loadStarredRecipes()
   await fetchCocktailDBRecipes('margarita')
 })
 </script>

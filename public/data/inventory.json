@@ -102,7 +102,102 @@
       "bottleSize": "750ml",
       "bottleState": "unopened",
       "image": "/images/bottles/roots_of_ruin.webp"
+    },
+    {
+      "id": "9",
+      "name": "Fresh Lime",
+      "category": "Mixers",
+      "tags": [
+        "citrus",
+        "lime"
+      ],
+      "inStock": true
+    },
+    {
+      "id": "10",
+      "name": "Fresh Lemon",
+      "category": "Mixers",
+      "tags": [
+        "citrus",
+        "lemon"
+      ],
+      "inStock": true
+    },
+    {
+      "id": "11",
+      "name": "Simple Syrup",
+      "category": "Mixers",
+      "tags": [
+        "syrup"
+      ],
+      "inStock": true
+    },
+    {
+      "id": "12",
+      "name": "Club Soda",
+      "category": "Mixers",
+      "tags": [
+        "soda",
+        "carbonated"
+      ],
+      "inStock": true
+    },
+    {
+      "id": "13",
+      "name": "Ginger Beer",
+      "category": "Mixers",
+      "tags": [
+        "ginger-beer"
+      ],
+      "inStock": true
+    },
+    {
+      "id": "14",
+      "name": "Tonic Water",
+      "category": "Mixers",
+      "tags": [
+        "tonic"
+      ],
+      "inStock": true
+    },
+    {
+      "id": "15",
+      "name": "Orange Juice",
+      "category": "Mixers",
+      "tags": [
+        "juice",
+        "orange"
+      ],
+      "inStock": true
+    },
+    {
+      "id": "16",
+      "name": "Sparkling Water",
+      "category": "Mixers",
+      "tags": [
+        "water",
+        "carbonated"
+      ],
+      "inStock": true
+    },
+    {
+      "id": "17",
+      "name": "Grenadine",
+      "category": "Mixers",
+      "tags": [
+        "grenadine"
+      ],
+      "inStock": true
+    },
+    {
+      "id": "18",
+      "name": "Beer",
+      "category": "Beer",
+      "tags": [
+        "beer"
+      ],
+      "inStock": true
     }
   ],
-  "lastUpdated": "2026-02-02T15:06:17.903Z"
+  "lastUpdated": "2026-02-02T15:09:20.119Z"
 }

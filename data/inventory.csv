@@ -7,3 +7,14 @@ id,name,category,tags,inStock,bottleSize,bottleState,image,company
 6,Camarena Reposado,Staples,"tequila, reposado",true,airplane,unopened,/images/bottles/camarena_airplane.webp,Camarena
 7,Castle & Key Restoration,Staples,"whiskey, rye",true,750ml,opened,/images/bottles/restoration.webp,Castle & Key
 8,Castle & Key Roots of Ruin,Staples,gin,true,750ml,unopened,/images/bottles/roots_of_ruin.webp,Castle & Key
+9,Fresh Lime,Mixers,"citrus, lime",true,,,,
+10,Fresh Lemon,Mixers,"citrus, lemon",true,,,,
+11,Simple Syrup,Mixers,syrup,true,,,,
+12,Club Soda,Mixers,"soda, carbonated",true,,,,
+13,Ginger Beer,Mixers,ginger-beer,true,,,,
+14,Tonic Water,Mixers,tonic,true,,,,
+15,Orange Juice,Mixers,"juice, orange",true,,,,
+16,Sparkling Water,Mixers,"water, carbonated",true,,,,
+17,Grenadine,Mixers,grenadine,true,,,,
+18,Beer,Beer,beer,true,,,,
+
