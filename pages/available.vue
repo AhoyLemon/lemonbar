@@ -14,8 +14,8 @@
       .empty-state(v-else)
         .empty-state__icon 🔍
         h3 No Fully Available Recipes
-        p Try adding more items to your inventory or search for different cocktails
-        NuxtLink.btn.btn-primary(to="/inventory") View Inventory
+        p Try adding more items to your bottles or essentials, or search for different cocktails
+        NuxtLink.btn.btn-primary(to="/bottles") View Bottles
 </template>
 
 <script setup lang="ts">

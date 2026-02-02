@@ -6,7 +6,7 @@ div
       p Your personal cocktail inventory manager
     nav
       NuxtLink.nav-link(to="/") Home
-      NuxtLink.nav-link(to="/inventory") Inventory
+      NuxtLink.nav-link(to="/bottles") Bottles
       NuxtLink.nav-link(to="/recipes") Recipes
       NuxtLink.nav-link(to="/essentials") Essentials
       NuxtLink.nav-link(to="/available") Available

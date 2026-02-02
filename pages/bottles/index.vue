@@ -1,11 +1,11 @@
 <template lang="pug">
-.inventory-page
+.bottles-page
   .container
       .header-with-action.mb-3
         div
-          h2 Your Bar Inventory
+          h2 Your Bottles
           p Manage your bottle collection
-        NuxtLink.manage-btn(to="/inventory/manage") ✏️ Manage Inventory
+        NuxtLink.manage-btn(to="/bottles/manage") ✏️ Manage Bottles
 
       .filters.mb-3
         button.filter-btn(:class="{ active: filter === 'all' }" @click="filter = 'all'") All ({{ inventory.length }})
@@ -92,7 +92,7 @@ const filteredBottles = computed(() => {
 <style lang="scss" scoped>
 @use 'sass:color';
 @use '@/assets/styles/variables' as *;
-.inventory-page {
+.bottles-page {
   min-height: 60vh;
 
   h2 {

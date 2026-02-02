@@ -2,7 +2,7 @@
 .bottle-detail-page
   .container
     .header-section.mb-3
-      NuxtLink.back-btn(to="/inventory") ← Back to Inventory
+      NuxtLink.back-btn(to="/bottles") ← Back to Bottles
       h2 {{ bottle?.name || 'Loading...' }}
       
     .content-grid(v-if="bottle")

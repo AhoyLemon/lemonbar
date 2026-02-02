@@ -1,10 +1,10 @@
 <template lang="pug">
-.manage-inventory-page
+.manage-bottles-page
   .container
     .header-section.mb-3
-      h2 Manage Inventory
+      h2 Manage Bottles
       p Add, edit, or remove bottles from your collection
-      NuxtLink.back-btn(to="/inventory") ← Back to Inventory
+      NuxtLink.back-btn(to="/bottles") ← Back to Bottles
 
     .content-grid
       .form-section
@@ -317,7 +317,7 @@ async function toggleInStock(bottle: Bottle) {
 @use 'sass:color';
 @use '@/assets/styles/variables' as *;
 
-.manage-inventory-page {
+.manage-bottles-page {
   min-height: 60vh;
   padding-bottom: $spacing-xxl;
 }
