@@ -1,0 +1,537 @@
+<template lang="pug">
+.manage-inventory-page
+  .container
+    .header-section.mb-3
+      h2 Manage Inventory
+      p Add, edit, or remove bottles from your collection
+      NuxtLink.back-btn(to="/inventory") ← Back to Inventory
+
+    .content-grid
+      .form-section
+        h3 {{ editingBottle ? 'Edit Bottle' : 'Add New Bottle' }}
+        form.bottle-form(@submit.prevent="handleSubmit")
+          .form-group
+            label(for="name") Name *
+            input#name(v-model="form.name" type="text" required placeholder="e.g., Beefeater Gin")
+
+          .form-group
+            label(for="category") Category *
+            select#category(v-model="form.category" required)
+              option(value="" disabled) Select a category
+              option(value="Staples") Staples
+              option(value="Special Occasion") Special Occasion
+              option(value="Liqueur") Liqueur
+              option(value="Mixers") Mixers
+              option(value="Beer") Beer
+              option(value="Wine") Wine
+              option(value="Other") Other
+
+          .form-group
+            label(for="tags") Tags (comma-separated)
+            input#tags(v-model="tagsInput" type="text" placeholder="e.g., gin, london dry, premium")
+            small.help-text Enter spirit types and characteristics separated by commas
+
+          .form-group
+            label
+              input(type="checkbox" v-model="form.inStock")
+              span In Stock
+
+          .form-group
+            label(for="bottleSize") Bottle Size
+            input#bottleSize(v-model="form.bottleSize" type="text" placeholder="e.g., 750ml")
+
+          .form-group
+            label(for="bottleState") Bottle State
+            select#bottleState(v-model="form.bottleState")
+              option(value="") Not specified
+              option(value="unopened") Unopened
+              option(value="opened") Opened
+              option(value="empty") Empty
+
+          .form-group
+            label(for="image") Image Filename
+            input#image(v-model="form.image" type="text" placeholder="e.g., beefeater_gin.jpg")
+            small.help-text Image files should be placed in public/images/bottles/
+
+          .form-actions
+            button.btn.btn-primary(type="submit" :disabled="loading") 
+              | {{ loading ? 'Saving...' : editingBottle ? 'Update Bottle' : 'Add Bottle' }}
+            button.btn.btn-secondary(v-if="editingBottle" type="button" @click="cancelEdit") Cancel
+
+          .error-message(v-if="error") {{ error }}
+          .success-message(v-if="successMessage") {{ successMessage }}
+
+      .list-section
+        h3 Current Bottles ({{ bottles.length }})
+        .bottle-list
+          .bottle-item(v-for="bottle in bottles" :key="bottle.id")
+            .bottle-info
+              h4 {{ bottle.name }}
+              .bottle-details
+                span.badge {{ bottle.category }}
+                span.badge(v-if="bottle.inStock" class="in-stock") In Stock
+                span.badge(v-else class="out-of-stock") Out of Stock
+                span.size(v-if="bottle.bottleSize") {{ bottle.bottleSize }}
+              .bottle-tags(v-if="bottle.tags.length")
+                span.tag(v-for="tag in bottle.tags" :key="tag") {{ tag }}
+            .bottle-actions
+              button.btn-edit(@click="startEdit(bottle)") Edit
+              button.btn-delete(@click="confirmDelete(bottle)") Delete
+</template>
+
+<script setup lang="ts">
+import type { Bottle } from '~/types'
+
+const bottles = ref<Bottle[]>([])
+const loading = ref(false)
+const error = ref<string | null>(null)
+const successMessage = ref<string | null>(null)
+const editingBottle = ref<Bottle | null>(null)
+
+const form = ref({
+  name: '',
+  category: '',
+  inStock: true,
+  bottleSize: '',
+  bottleState: '',
+  image: '',
+})
+
+const tagsInput = ref('')
+
+onMounted(() => {
+  loadBottles()
+})
+
+async function loadBottles() {
+  try {
+    const response = await $fetch<{ success: boolean; bottles: Bottle[] }>(
+      '/api/inventory'
+    )
+    bottles.value = response.bottles
+  } catch (e) {
+    error.value = 'Failed to load bottles'
+    console.error(e)
+  }
+}
+
+function resetForm() {
+  form.value = {
+    name: '',
+    category: '',
+    inStock: true,
+    bottleSize: '',
+    bottleState: '',
+    image: '',
+  }
+  tagsInput.value = ''
+  editingBottle.value = null
+  error.value = null
+  successMessage.value = null
+}
+
+function startEdit(bottle: Bottle) {
+  editingBottle.value = bottle
+  form.value = {
+    name: bottle.name,
+    category: bottle.category,
+    inStock: bottle.inStock,
+    bottleSize: bottle.bottleSize || '',
+    bottleState: bottle.bottleState || '',
+    image: bottle.image || '',
+  }
+  tagsInput.value = bottle.tags.join(', ')
+  error.value = null
+  successMessage.value = null
+  // Scroll to form
+  window.scrollTo({ top: 0, behavior: 'smooth' })
+}
+
+function cancelEdit() {
+  resetForm()
+}
+
+async function handleSubmit() {
+  loading.value = true
+  error.value = null
+  successMessage.value = null
+
+  try {
+    const bottleData: Partial<Bottle> = {
+      name: form.value.name,
+      category: form.value.category,
+      tags: tagsInput.value
+        .split(',')
+        .map(t => t.trim())
+        .filter(t => t.length > 0),
+      inStock: form.value.inStock,
+      bottleSize: form.value.bottleSize || undefined,
+      bottleState: (form.value.bottleState as 'unopened' | 'opened' | 'empty') || undefined,
+      image: form.value.image || undefined,
+    }
+
+    if (editingBottle.value) {
+      // Update existing bottle
+      await $fetch(`/api/inventory/${editingBottle.value.id}`, {
+        method: 'PUT',
+        body: bottleData,
+      })
+      successMessage.value = 'Bottle updated successfully!'
+    } else {
+      // Create new bottle
+      await $fetch('/api/inventory', {
+        method: 'POST',
+        body: bottleData,
+      })
+      successMessage.value = 'Bottle added successfully!'
+    }
+
+    await loadBottles()
+    resetForm()
+
+    // Clear success message after 3 seconds
+    setTimeout(() => {
+      successMessage.value = null
+    }, 3000)
+  } catch (e: any) {
+    error.value = e.data?.statusMessage || 'Failed to save bottle'
+    console.error(e)
+  } finally {
+    loading.value = false
+  }
+}
+
+async function confirmDelete(bottle: Bottle) {
+  if (!confirm(`Are you sure you want to delete "${bottle.name}"?`)) {
+    return
+  }
+
+  loading.value = true
+  error.value = null
+
+  try {
+    await $fetch(`/api/inventory/${bottle.id}`, {
+      method: 'DELETE',
+    })
+    successMessage.value = 'Bottle deleted successfully!'
+    await loadBottles()
+
+    // Clear success message after 3 seconds
+    setTimeout(() => {
+      successMessage.value = null
+    }, 3000)
+  } catch (e: any) {
+    error.value = e.data?.statusMessage || 'Failed to delete bottle'
+    console.error(e)
+  } finally {
+    loading.value = false
+  }
+}
+</script>
+
+<style lang="scss" scoped>
+@use 'sass:color';
+@use '@/assets/styles/variables' as *;
+
+.manage-inventory-page {
+  min-height: 60vh;
+  padding-bottom: $spacing-xxl;
+}
+
+.header-section {
+  h2 {
+    color: $dark-bg;
+    margin-bottom: $spacing-sm;
+  }
+
+  p {
+    color: color.adjust($text-dark, $lightness: 20%);
+    margin-bottom: $spacing-md;
+  }
+}
+
+.back-btn {
+  display: inline-block;
+  padding: $spacing-sm $spacing-lg;
+  background: white;
+  border: 2px solid $border-color;
+  border-radius: $border-radius-md;
+  text-decoration: none;
+  color: $text-dark;
+  font-weight: 600;
+  transition: all 0.3s ease;
+
+  &:hover {
+    border-color: $accent-color;
+    background: color.adjust($accent-color, $lightness: 45%);
+  }
+}
+
+.content-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: $spacing-xxl;
+
+  @media (max-width: 968px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.form-section {
+  h3 {
+    color: $dark-bg;
+    margin-bottom: $spacing-lg;
+  }
+}
+
+.bottle-form {
+  background: white;
+  padding: $spacing-xl;
+  border-radius: $border-radius-lg;
+  box-shadow: $shadow-md;
+}
+
+.form-group {
+  margin-bottom: $spacing-lg;
+
+  label {
+    display: block;
+    font-weight: 600;
+    color: $text-dark;
+    margin-bottom: $spacing-xs;
+
+    input[type='checkbox'] {
+      margin-right: $spacing-xs;
+    }
+  }
+
+  input[type='text'],
+  select {
+    width: 100%;
+    padding: $spacing-sm $spacing-md;
+    border: 2px solid $border-color;
+    border-radius: $border-radius-md;
+    font-size: 1rem;
+    transition: border-color 0.3s ease;
+
+    &:focus {
+      outline: none;
+      border-color: $accent-color;
+    }
+  }
+
+  input[type='checkbox'] {
+    width: auto;
+  }
+
+  .help-text {
+    display: block;
+    margin-top: $spacing-xs;
+    font-size: 0.875rem;
+    color: color.adjust($text-dark, $lightness: 30%);
+  }
+}
+
+.form-actions {
+  display: flex;
+  gap: $spacing-md;
+  margin-top: $spacing-xl;
+}
+
+.btn {
+  padding: $spacing-sm $spacing-xl;
+  border-radius: $border-radius-md;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: none;
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}
+
+.btn-primary {
+  background: $accent-color;
+  color: white;
+
+  &:hover:not(:disabled) {
+    background: color.adjust($accent-color, $lightness: -10%);
+    transform: translateY(-2px);
+    box-shadow: $shadow-md;
+  }
+}
+
+.btn-secondary {
+  background: white;
+  color: $text-dark;
+  border: 2px solid $border-color;
+
+  &:hover {
+    border-color: $text-dark;
+  }
+}
+
+.error-message {
+  margin-top: $spacing-lg;
+  padding: $spacing-md;
+  background: color.adjust(red, $lightness: 45%);
+  color: color.adjust(red, $lightness: -20%);
+  border-radius: $border-radius-md;
+  border-left: 4px solid red;
+}
+
+.success-message {
+  margin-top: $spacing-lg;
+  padding: $spacing-md;
+  background: color.adjust(green, $lightness: 45%);
+  color: color.adjust(green, $lightness: -30%);
+  border-radius: $border-radius-md;
+  border-left: 4px solid green;
+}
+
+.list-section {
+  h3 {
+    color: $dark-bg;
+    margin-bottom: $spacing-lg;
+  }
+}
+
+.bottle-list {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-md;
+  max-height: 600px;
+  overflow-y: auto;
+  padding-right: $spacing-sm;
+
+  &::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: color.adjust($border-color, $lightness: 10%);
+    border-radius: 4px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: $border-color;
+    border-radius: 4px;
+
+    &:hover {
+      background: color.adjust($border-color, $lightness: -10%);
+    }
+  }
+}
+
+.bottle-item {
+  background: white;
+  padding: $spacing-lg;
+  border-radius: $border-radius-md;
+  box-shadow: $shadow-sm;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: all 0.3s ease;
+
+  &:hover {
+    box-shadow: $shadow-md;
+    transform: translateX(4px);
+  }
+}
+
+.bottle-info {
+  flex: 1;
+
+  h4 {
+    margin: 0 0 $spacing-xs 0;
+    color: $dark-bg;
+  }
+}
+
+.bottle-details {
+  display: flex;
+  gap: $spacing-sm;
+  align-items: center;
+  margin-bottom: $spacing-xs;
+  flex-wrap: wrap;
+}
+
+.badge {
+  padding: $spacing-xs $spacing-sm;
+  border-radius: $border-radius-sm;
+  font-size: 0.75rem;
+  font-weight: 600;
+  background: color.adjust($border-color, $lightness: 15%);
+  color: $text-dark;
+
+  &.in-stock {
+    background: color.adjust(green, $lightness: 40%);
+    color: color.adjust(green, $lightness: -30%);
+  }
+
+  &.out-of-stock {
+    background: color.adjust(red, $lightness: 40%);
+    color: color.adjust(red, $lightness: -20%);
+  }
+}
+
+.size {
+  font-size: 0.875rem;
+  color: color.adjust($text-dark, $lightness: 20%);
+}
+
+.bottle-tags {
+  display: flex;
+  gap: $spacing-xs;
+  flex-wrap: wrap;
+}
+
+.tag {
+  padding: $spacing-xs $spacing-sm;
+  background: color.adjust($accent-color, $lightness: 45%);
+  color: color.adjust($accent-color, $lightness: -20%);
+  border-radius: $border-radius-sm;
+  font-size: 0.75rem;
+}
+
+.bottle-actions {
+  display: flex;
+  gap: $spacing-sm;
+}
+
+.btn-edit,
+.btn-delete {
+  padding: $spacing-xs $spacing-md;
+  border-radius: $border-radius-sm;
+  font-weight: 600;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: 2px solid transparent;
+}
+
+.btn-edit {
+  background: color.adjust($primary-color, $lightness: 40%);
+  color: $primary-color;
+  border-color: $primary-color;
+
+  &:hover {
+    background: $primary-color;
+    color: white;
+  }
+}
+
+.btn-delete {
+  background: color.adjust(red, $lightness: 40%);
+  color: color.adjust(red, $lightness: -20%);
+  border-color: color.adjust(red, $lightness: -20%);
+
+  &:hover {
+    background: red;
+    color: white;
+  }
+}
+</style>
