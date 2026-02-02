@@ -42,6 +42,16 @@
             input#bottleSize(v-model="form.bottleSize" type="text" placeholder="e.g., 750ml")
 
           .form-group
+            label(for="abv") ABV (Alcohol by Volume %)
+            input#abv(v-model.number="form.abv" type="number" min="0" max="100" step="0.1" placeholder="e.g., 40")
+            small.help-text Enter the alcohol percentage (0-100)
+
+          .form-group
+            label(for="origin") Origin
+            input#origin(v-model="form.origin" type="text" placeholder="e.g., Kentucky, Scotland")
+            small.help-text Enter the country or region of origin
+
+          .form-group
             label(for="bottleState") Bottle State
             select#bottleState(v-model="form.bottleState")
               option(value="") Not specified
@@ -73,6 +83,8 @@
                 span.badge(v-if="bottle.inStock" class="in-stock") In Stock
                 span.badge(v-else class="out-of-stock") Out of Stock
                 span.size(v-if="bottle.bottleSize") {{ bottle.bottleSize }}
+                span.abv(v-if="bottle.abv") {{ bottle.abv }}% ABV
+                span.origin(v-if="bottle.origin") {{ bottle.origin }}
               .bottle-tags(v-if="bottle.tags.length")
                 span.tag(v-for="tag in bottle.tags" :key="tag") {{ tag }}
             .bottle-actions
@@ -99,6 +111,8 @@ const form = ref({
   bottleSize: '',
   bottleState: '',
   image: '',
+  abv: undefined as number | undefined,
+  origin: '',
 })
 
 onMounted(() => {
@@ -126,6 +140,8 @@ function resetForm() {
     bottleSize: '',
     bottleState: '',
     image: '',
+    abv: undefined,
+    origin: '',
   }
   editingBottle.value = null
   error.value = null
@@ -142,6 +158,8 @@ function startEdit(bottle: Bottle) {
     bottleSize: bottle.bottleSize || '',
     bottleState: bottle.bottleState || '',
     image: bottle.image || '',
+    abv: bottle.abv,
+    origin: bottle.origin || '',
   }
   error.value = null
   successMessage.value = null
@@ -167,6 +185,8 @@ async function handleSubmit() {
       bottleSize: form.value.bottleSize || undefined,
       bottleState: (form.value.bottleState as 'unopened' | 'opened' | 'empty') || undefined,
       image: form.value.image || undefined,
+      abv: form.value.abv,
+      origin: form.value.origin || undefined,
     }
 
     if (editingBottle.value) {
@@ -517,6 +537,12 @@ async function toggleInStock(bottle: Bottle) {
 }
 
 .size {
+  font-size: 0.875rem;
+  color: color.adjust($text-dark, $lightness: 20%);
+}
+
+.abv,
+.origin {
   font-size: 0.875rem;
   color: color.adjust($text-dark, $lightness: 20%);
 }

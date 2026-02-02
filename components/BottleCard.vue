@@ -9,6 +9,10 @@
     .bottle-card__meta
       span.bottle-card__size(v-if="bottle.bottleSize") 
         | 📏 {{ bottle.bottleSize }}
+      span.bottle-card__abv(v-if="bottle.abv") 
+        | 🍷 {{ bottle.abv }}% ABV
+      span.bottle-card__origin(v-if="bottle.origin") 
+        | 🌍 {{ bottle.origin }}
       span.bottle-card__state(v-if="bottle.bottleState" :class="`state-${bottle.bottleState}`") 
         | {{ bottleStateLabel }}
     .bottle-card__tags
@@ -121,6 +125,8 @@ const bottleStateLabel = computed(() => {
   }
 
   &__size,
+  &__abv,
+  &__origin,
   &__state {
     font-size: 0.875rem;
     padding: $spacing-xs $spacing-sm;
