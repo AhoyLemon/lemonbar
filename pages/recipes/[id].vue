@@ -12,7 +12,7 @@
             span.category-badge(v-if="recipe.category") {{ recipe.category }}
             span.prep-badge(v-if="recipe.prep") {{ recipe.prep }}
           .tags-row(v-if="recipe.tags && recipe.tags.length > 0")
-            span.tag(v-for="tag in recipe.tags" :key="tag") #{{ tag }}
+            span.tag(v-for="tag in recipe.tags" :key="tag") \#{{ tag }}
           .availability-info
             p(v-if="isFullyAvailable") ✅ All ingredients available!
             p(v-else) ⚠️ {{ availableCount }}/{{ totalCount }} ingredients available
