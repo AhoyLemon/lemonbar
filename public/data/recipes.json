@@ -81,6 +81,29 @@
         "lime",
         "classic"
       ]
+    },
+    {
+      "id": "utah-mule",
+      "name": "Simone's Utah Mule",
+      "ingredients": [
+        { "name": "Ice"},
+        { "name": "Ginger Ale", "qty": "8 oz" },
+        { "name": "Grenadine" },
+        { "name": "Bitters "},
+        { "name": "Ginger Candy", "qty": "1" }
+      ],
+      "instructions":[
+        "put some ice in a copper mug",
+        "pour in ginger ale",
+        "add a splash of grenadine",
+        "add a dash of bitters",
+        "stir gently to combine",
+        "garnish with ginger candy"
+      ],
+      "image": "utah-mule.webp",
+      "prep": "Build",
+      "category": "Fizzy",
+      "tags": ["ginger", "non-alcoholic", "easy"]
     }
   ],
   "lastUpdated": "2026-02-02T19:17:26.625Z"

@@ -32,14 +32,16 @@
         { "name": "Limes", "qty": "3" },
         { "name": "Reposado", "qty": "1.5 oz" },
         { "name": "Orange Liqueur", "qty": ".75 oz" },
-        { "name": "Simple Syrup", "qty": ".25 oz" }
+        { "name": "Simple Syrup", "qty": ".25 oz" },
+        { "name": "Salt" }
       ],
       "instructions": [
         "put ice in the shaker",
         "put ingredients in the shaker",
         "shake",
         "shake some more",
-        "pour into glass"
+        "pour into glass",
+        "salt the glass (optional)"
       ],
       "image": "margarita.webp",
       "prep": "Shaker",

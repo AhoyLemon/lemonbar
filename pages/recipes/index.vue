@@ -14,10 +14,10 @@
         button.search-btn(@click="handleSearch") Search
 
       .filters.mb-3
-        button.filter-btn(:class="{ active: filter === 'all' }" @click="filter = 'all'") All ({{ getAllRecipes.length }})
-        button.filter-btn(:class="{ active: filter === 'alcoholic' }" @click="filter = 'alcoholic'") Alcoholic ({{ getAlcoholicRecipes.length }})
-        button.filter-btn(:class="{ active: filter === 'nonAlcoholic' }" @click="filter = 'nonAlcoholic'") Non-Alcoholic ({{ getNonAlcoholicRecipes.length }})
-        button.filter-btn(:class="{ active: filter === 'available' }" @click="filter = 'available'") Available ({{ getAvailableRecipes.length }})
+        button.filter-btn(:class="{ active: filter === 'all' }" @click="filter = 'all'") All ({{ filteredAllRecipes.length }})
+        button.filter-btn(:class="{ active: filter === 'alcoholic' }" @click="filter = 'alcoholic'") Alcoholic ({{ filteredAlcoholicRecipes.length }})
+        button.filter-btn(:class="{ active: filter === 'nonAlcoholic' }" @click="filter = 'nonAlcoholic'") Non-Alcoholic ({{ filteredNonAlcoholicRecipes.length }})
+        button.filter-btn(:class="{ active: filter === 'available' }" @click="filter = 'available'") Available ({{ filteredAvailableRecipes.length }})
 
       .loading(v-if="loading") Loading recipes...
       .error(v-if="error") {{ error }}
@@ -36,6 +36,7 @@ const {
   loadInventory,
   loadLocalRecipes,
   fetchCocktailDBRecipes,
+  fetchRandomCocktails,
   getAllRecipes,
   getAlcoholicRecipes,
   getNonAlcoholicRecipes,
@@ -55,8 +56,8 @@ onMounted(async () => {
   await loadLocalRecipes()
   loadStarredRecipes()
 
-  // If there are no starred recipes or API recipes yet, fetch some default recipes
-  await fetchCocktailDBRecipes('margarita')
+  // Fetch random cocktails to showcase variety
+  await fetchRandomCocktails(8)
 })
 
 const handleSearch = async () => {
@@ -65,36 +66,47 @@ const handleSearch = async () => {
   }
 }
 
+// Helper to filter recipes by search term
+const applySearchFilter = (recipes: any[]) => {
+  if (!searchTerm.value.trim()) return recipes
+  
+  const term = searchTerm.value.toLowerCase()
+  return recipes.filter(recipe => {
+    const nameMatch = recipe.name.toLowerCase().includes(term)
+    const categoryMatch = recipe.category?.toLowerCase().includes(term)
+    const ingredientMatch = recipe.ingredients.some((ing: { name: string }) => ing.name.toLowerCase().includes(term))
+    return nameMatch || categoryMatch || ingredientMatch
+  })
+}
+
+// Computed properties that apply search filter
+const filteredAllRecipes = computed(() => applySearchFilter(getAllRecipes.value))
+const filteredAlcoholicRecipes = computed(() => applySearchFilter(getAlcoholicRecipes.value))
+const filteredNonAlcoholicRecipes = computed(() => applySearchFilter(getNonAlcoholicRecipes.value))
+const filteredAvailableRecipes = computed(() => applySearchFilter(getAvailableRecipes.value))
+
 const filteredRecipes = computed(() => {
   let recipes
   switch (filter.value) {
     case 'alcoholic':
-      recipes = getAlcoholicRecipes.value
+      recipes = filteredAlcoholicRecipes.value
       break
     case 'nonAlcoholic':
-      recipes = getNonAlcoholicRecipes.value
+      recipes = filteredNonAlcoholicRecipes.value
       break
     case 'available':
-      recipes = getAvailableRecipes.value
+      recipes = filteredAvailableRecipes.value
       break
     default:
-      recipes = getAllRecipes.value
+      recipes = filteredAllRecipes.value
   }
 
-  // If there's a search term, filter and sort by relevance
+  // If there's a search term, sort by relevance
   if (searchTerm.value.trim()) {
     const term = searchTerm.value.toLowerCase()
 
-    // Filter recipes that match the search term
-    const matchingRecipes = recipes.filter(recipe => {
-      const nameMatch = recipe.name.toLowerCase().includes(term)
-      const categoryMatch = recipe.category?.toLowerCase().includes(term)
-      const ingredientMatch = recipe.ingredients.some(ing => ing.name.toLowerCase().includes(term))
-      return nameMatch || categoryMatch || ingredientMatch
-    })
-
     // Sort by relevance: exact name matches first, then partial name matches, then others
-    return matchingRecipes.sort((a, b) => {
+    return [...recipes].sort((a, b) => {
       const aNameLower = a.name.toLowerCase()
       const bNameLower = b.name.toLowerCase()
 

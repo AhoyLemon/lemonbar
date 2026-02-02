@@ -223,9 +223,10 @@
       "name": "Ballotin Bourbon Ball",
       "category": "Liqueur",
       "tags": [
+        "liqueur",
         "whiskey",
         "bourbon",
-        "chocolate"
+        "chocolate liqueur"
       ],
       "inStock": true,
       "bottleSize": "750ml",
@@ -238,7 +239,7 @@
       "category": "Liqueur",
       "tags": [
         "liqueur",
-        "violet"
+        "creme de violette"
       ],
       "inStock": true,
       "bottleSize": "750ml",
@@ -251,7 +252,7 @@
       "category": "Liqueur",
       "tags": [
         "liqueur",
-        "cherry"
+        "cherry liqueur"
       ],
       "inStock": true,
       "bottleSize": "200ml",
@@ -264,9 +265,9 @@
       "category": "Liqueur",
       "tags": [
         "liqueur",
-        "anise",
+        "anise liqueur",
         "schnapps",
-        "mint"
+        "mint liqueur"
       ],
       "inStock": true,
       "bottleSize": "750ml",
@@ -279,7 +280,7 @@
       "category": "Liqueur",
       "tags": [
         "liqueur",
-        "coffee"
+        "coffee liqueur"
       ],
       "inStock": true,
       "bottleSize": "750ml",
@@ -294,7 +295,7 @@
         "rum",
         "liqueur",
         "dark rum",
-        "coffee"
+        "coffee liqueur"
       ],
       "inStock": true,
       "bottleSize": "750ml",
@@ -307,7 +308,8 @@
       "category": "Liqueur",
       "tags": [
         "liqueur",
-        "cherry"
+        "cherry liqueur",
+        "maraschino"
       ],
       "inStock": true,
       "bottleSize": "750ml",
@@ -320,7 +322,7 @@
       "category": "Liqueur",
       "tags": [
         "liqueur",
-        "melon"
+        "melon liqueur"
       ],
       "inStock": true,
       "bottleSize": "750ml",
@@ -358,7 +360,7 @@
       "category": "Liqueur",
       "tags": [
         "liqueur",
-        "grapefruit"
+        "grapefruit liqueur"
       ],
       "inStock": true,
       "bottleSize": "750ml",
@@ -370,8 +372,9 @@
       "name": "Thatcher's Blood Orange",
       "category": "Liqueur",
       "tags": [
-        "orange",
-        "blood orange"
+        "liqueur",
+        "orange liqueur",
+        "blood orange liqueur"
       ],
       "inStock": true,
       "bottleSize": "750ml",
@@ -407,7 +410,8 @@
       "name": "El Guapo's Lemon Drop",
       "category": "Mixers",
       "tags": [
-        "lemon"
+        "lemon",
+        "mixer"
       ],
       "inStock": true,
       "bottleSize": "200ml",
@@ -445,7 +449,7 @@
       "category": "Special Occasion",
       "tags": [
         "absinthe",
-        "anise"
+        "anise liqueur"
       ],
       "inStock": true,
       "bottleState": "opened",
@@ -457,7 +461,7 @@
       "category": "Special Occasion",
       "tags": [
         "absinthe",
-        "anise"
+        "anise liqueur"
       ],
       "inStock": true,
       "bottleSize": "750ml",
@@ -485,7 +489,8 @@
         "liqueur",
         "whiskey",
         "bourbon",
-        "cream"
+        "cream liqueur",
+        "bourbon cream"
       ],
       "inStock": true,
       "bottleSize": "750ml",
@@ -525,10 +530,12 @@
       "name": "Peanut Brittle Bourbon Cream",
       "category": "Special Occasion",
       "tags": [
+        "liqueur",
         "whiskey",
         "bourbon",
-        "cream",
-        "peanut brittle"
+        "cream liqueur",
+        "bourbon cream",
+        "peanut brittle liqueur"
       ],
       "inStock": true,
       "bottleSize": "750ml",
@@ -582,7 +589,7 @@
       "tags": [
         "liqueur",
         "tequila",
-        "coffee"
+        "coffee liqueur"
       ],
       "inStock": true,
       "bottleSize": "750ml",
@@ -677,10 +684,10 @@
       "name": "Mountain Creek Ginger Lemon",
       "category": "Liqueur",
       "tags": [
-        "ginger",
-        "lemon",
-        "sparkly",
-        "gin"
+        "gin",
+        "ginger liqueur",
+        "lemon liqueur",
+        "sparkly"
       ],
       "inStock": true,
       "bottleSize": "200ml",

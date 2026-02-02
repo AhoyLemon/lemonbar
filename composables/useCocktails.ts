@@ -75,44 +75,74 @@ export const useCocktails = () => {
     }
   }
 
+  // Helper to convert CocktailDB drink to Recipe format
+  const convertDrinkToRecipe = (drink: CocktailDBDrink): Recipe => {
+    const ingredients = []
+    for (let i = 1; i <= 15; i++) {
+      const ingredient = drink[`strIngredient${i}`]
+      const measure = drink[`strMeasure${i}`]
+      if (ingredient && ingredient.trim()) {
+        ingredients.push({
+          name: ingredient.trim(),
+          qty: measure?.trim() || 'to taste',
+        })
+      }
+    }
+
+    return {
+      id: `cocktaildb-${drink.idDrink}`,
+      name: drink.strDrink,
+      ingredients,
+      instructions: drink.strInstructions,
+      imageUrl: drink.strDrinkThumb,
+      category: drink.strCategory,
+    }
+  }
+
+  // Fetch random cocktails from TheCocktailDB API
+  const fetchRandomCocktails = async (count: number = 8) => {
+    loading.value = true
+    error.value = null
+
+    try {
+      const fetchPromises = []
+      for (let i = 0; i < count; i++) {
+        fetchPromises.push(
+          $fetch<{ drinks: CocktailDBDrink[] | null }>(
+            'https://www.thecocktaildb.com/api/json/v1/1/random.php'
+          )
+        )
+      }
+
+      const responses = await Promise.all(fetchPromises)
+      const recipes: Recipe[] = []
+
+      for (const response of responses) {
+        if (response.drinks && response.drinks[0]) {
+          recipes.push(convertDrinkToRecipe(response.drinks[0]))
+        }
+      }
+
+      apiRecipes.value = recipes
+    } catch (e) {
+      console.error('Failed to fetch from CocktailDB:', e)
+      error.value = 'Failed to fetch cocktail recipes'
+    } finally {
+      loading.value = false
+    }
+  }
+
   // Fetch recipes from TheCocktailDB API
   const fetchCocktailDBRecipes = async (searchTerm: string = '') => {
     loading.value = true
     error.value = null
 
     try {
-      // Fetch popular cocktails if no search term
-      const endpoint = searchTerm
-        ? `https://www.thecocktaildb.com/api/json/v1/1/search.php?s=${searchTerm}`
-        : 'https://www.thecocktaildb.com/api/json/v1/1/search.php?s=margarita' // Default popular drink
-
+      const endpoint = `https://www.thecocktaildb.com/api/json/v1/1/search.php?s=${searchTerm}`
       const response = await $fetch<{ drinks: CocktailDBDrink[] | null }>(endpoint)
 
       if (response.drinks) {
-        const recipes: Recipe[] = response.drinks.map(drink => {
-          // Extract ingredients from the drink object
-          const ingredients = []
-          for (let i = 1; i <= 15; i++) {
-            const ingredient = drink[`strIngredient${i}`]
-            const measure = drink[`strMeasure${i}`]
-            if (ingredient && ingredient.trim()) {
-              ingredients.push({
-                name: ingredient.trim(),
-                qty: measure?.trim() || 'to taste',
-              })
-            }
-          }
-
-          return {
-            id: `cocktaildb-${drink.idDrink}`,
-            name: drink.strDrink,
-            ingredients,
-            instructions: drink.strInstructions,
-            imageUrl: drink.strDrinkThumb,
-            category: drink.strCategory,
-          }
-        })
-
+        const recipes: Recipe[] = response.drinks.map(drink => convertDrinkToRecipe(drink))
         apiRecipes.value = recipes
       }
     } catch (e) {
@@ -123,55 +153,66 @@ export const useCocktails = () => {
     }
   }
 
+  // Helper function to check if a word matches as a whole word or phrase
+  const matchesAsWord = (text: string, searchTerm: string): boolean => {
+    // Exact match
+    if (text === searchTerm) return true
+    
+    // Check if searchTerm appears as a whole word in text
+    const regex = new RegExp(`\\b${searchTerm.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`, 'i')
+    return regex.test(text)
+  }
+
   // Check if an ingredient name matches any in-stock inventory item
   const isIngredientInStock = (ingredientName: string): boolean => {
     if (!Array.isArray(inventory.value)) return false
     const inStockItems = inventory.value.filter(b => b.inStock)
-    const lowerIngredient = ingredientName.toLowerCase()
+    const lowerIngredient = ingredientName.toLowerCase().trim()
 
-    // Direct name match
-    if (
-      inStockItems.some(
-        item =>
-          item.name.toLowerCase().includes(lowerIngredient) ||
-          lowerIngredient.includes(item.name.toLowerCase())
-      )
-    ) {
-      return true
+    // Direct name match - check if bottle name appears as whole words in ingredient
+    for (const item of inStockItems) {
+      const lowerName = item.name.toLowerCase()
+      if (matchesAsWord(lowerIngredient, lowerName) || matchesAsWord(lowerName, lowerIngredient)) {
+        return true
+      }
     }
 
-    // Check tags (tags now contain spirit types like "tequila", "gin", "rum", etc.)
+    // Check tags - only exact matches to avoid false positives like "orange" matching "orange liqueur"
     for (const item of inStockItems) {
       for (const tag of item.tags) {
         const lowerTag = tag.toLowerCase()
 
-        // Direct tag match
-        if (lowerIngredient.includes(lowerTag) || lowerTag.includes(lowerIngredient)) {
+        // Skip generic tags that are too broad
+        const genericTags = ['cream', 'sugar', 'garnish', 'sparkly', 'liqueur', 'mixer']
+        if (genericTags.includes(lowerTag)) {
+          continue
+        }
+
+        // Only exact tag match - no partial word matching
+        if (lowerIngredient === lowerTag) {
           return true
         }
 
         // Check ingredient mapping for this tag
         const mappedIngredients = ingredientMapping[lowerTag]
         if (mappedIngredients) {
-          if (
-            mappedIngredients.some(
-              mapped => lowerIngredient.includes(mapped) || mapped.includes(lowerIngredient)
-            )
-          ) {
-            return true
+          for (const mapped of mappedIngredients) {
+            if (matchesAsWord(lowerIngredient, mapped)) {
+              return true
+            }
           }
         }
       }
     }
 
-    // Check if ingredient name maps to any tag
+    // Check if ingredient name maps to any tag through the ingredient mapping
     for (const [key, aliases] of Object.entries(ingredientMapping)) {
-      if (
-        aliases.some(alias => lowerIngredient.includes(alias) || alias.includes(lowerIngredient))
-      ) {
-        // Check if we have any item with this key in its tags
-        if (inStockItems.some(item => item.tags.some(tag => tag.toLowerCase() === key))) {
-          return true
+      for (const alias of aliases) {
+        if (matchesAsWord(lowerIngredient, alias)) {
+          // Check if we have any item with this key in its tags
+          if (inStockItems.some(item => item.tags.some(tag => tag.toLowerCase() === key))) {
+            return true
+          }
         }
       }
     }
@@ -246,6 +287,7 @@ export const useCocktails = () => {
     loadInventory,
     loadLocalRecipes,
     fetchCocktailDBRecipes,
+    fetchRandomCocktails,
     getAvailableRecipes,
     getAllRecipes,
     getRecipesWithAvailability,
