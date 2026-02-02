@@ -55,7 +55,7 @@ const expandedCategories = ref(new Set<string>())
 const tagHierarchy: TagCategory[] = [
   {
     name: 'Base Spirits',
-    tags: ['vodka', 'gin', 'rum', 'tequila', 'whiskey'],
+    tags: ['vodka', 'gin', 'rum', 'tequila', 'whiskey', 'liqueur'],
   },
   {
     name: 'Whiskey Types',
@@ -79,7 +79,7 @@ const tagHierarchy: TagCategory[] = [
   },
   {
     name: 'Liqueurs & Spirits',
-    tags: ['liqueur', 'vermouth', 'amaro', 'bitters'],
+    tags: ['vermouth', 'amaro', 'bitters', 'chocolate', 'violet', 'cherry'],
   },
   {
     name: 'Modifiers & Mixers',
