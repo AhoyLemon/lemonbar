@@ -429,7 +429,7 @@
     {
       "id": "34",
       "name": "Tattersall Old Fashioned",
-      "category": "Mixers",
+      "category": "Premix",
       "tags": [
         "premix",
         "old fashioned"
@@ -701,5 +701,5 @@
       "image": "/images/bottles/egbert_cherries.webp"
     }
   ],
-  "lastUpdated": "2026-02-02T19:12:51.941Z"
+  "lastUpdated": "2026-02-02T19:17:26.625Z"
 }

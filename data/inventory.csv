@@ -32,7 +32,7 @@ id,name,category,tags,inStock,bottleSize,bottleState,image,company
 31,Bella Sun Luci Bloody Mary,Mixers,"tomato, bloody mary",true,750ml,,/images/bottles/bloody_bellasun.jpg,Bella Sun Luci
 32,El Guapo's Lemon Drop,Mixers,lemon,true,200ml,,/images/bottles/elguapo_lemon.webp,El Guapo
 33,Rose's Grenadine,Mixers,"pomegranate, grenadine",true,200ml,opened,/images/bottles/rose_grenadine.jpg,Rose's
-34,Tattersall Old Fashioned,Mixers,"premix, old fashioned",true,750ml,unopened,/images/bottles/oldfashioned_tattersall.png,Tattersall
+34,Tattersall Old Fashioned,Premix,"premix, old fashioned",true,750ml,unopened,/images/bottles/oldfashioned_tattersall.png,Tattersall
 35,Abstente,Special Occasion,"absinthe, anise",true,,opened,/images/bottles/absente.webp,
 36,Absinthe Montmartre,Special Occasion,"absinthe, anise",true,750ml,opened,/images/bottles/absinthe_montmartre.webp,Old Vienna Liqueur Museum
 37,Baller,Special Occasion,"whiskey, japanese whiskey",true,750ml,opened,/images/bottles/baller.webp,St. George

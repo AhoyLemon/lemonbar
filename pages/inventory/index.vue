@@ -15,12 +15,10 @@
       .category-filters.mb-3
         button.category-btn(:class="{ active: categoryFilter === 'all' }" @click="categoryFilter = 'all'") All Categories
         button.category-btn(:class="{ active: categoryFilter === 'Staples' }" @click="categoryFilter = 'Staples'") Staples
-        button.category-btn(:class="{ active: categoryFilter === 'Special Occasion' }" @click="categoryFilter = 'Special Occasion'") Special Occasion
         button.category-btn(:class="{ active: categoryFilter === 'Liqueur' }" @click="categoryFilter = 'Liqueur'") Liqueur
-        button.category-btn(:class="{ active: categoryFilter === 'Mixers' }" @click="categoryFilter = 'Mixers'") Mixers
-        button.category-btn(:class="{ active: categoryFilter === 'Beer' }" @click="categoryFilter = 'Beer'") Beer
-        button.category-btn(:class="{ active: categoryFilter === 'Wine' }" @click="categoryFilter = 'Wine'") Wine
-
+        button.category-btn(:class="{ active: categoryFilter === 'Premix' }" @click="categoryFilter = 'Premix'") Premix
+        button.category-btn(:class="{ active: categoryFilter === 'Special Occasion' }" @click="categoryFilter = 'Special Occasion'") Special Occasion
+        
       .tag-filters.mb-3(v-if="availableTags.length > 0")
         h3 Filter by Tag
         TagFilterSelect(v-model="tagFilter" :tags="tagOptions" :totalCount="filteredBottles.length")

@@ -21,6 +21,7 @@
               option(value="Staples") Staples
               option(value="Special Occasion") Special Occasion
               option(value="Liqueur") Liqueur
+              option(value="Premix") Premix
               option(value="Mixers") Mixers
               option(value="Beer") Beer
               option(value="Wine") Wine

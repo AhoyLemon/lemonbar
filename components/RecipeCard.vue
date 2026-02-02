@@ -4,6 +4,8 @@ NuxtLink.recipe-card(:to="`/recipes/${recipe.id}`" :class="{ 'fully-available': 
     span {{ starred ? '★' : '☆' }}
   .recipe-card__image(v-if="recipe.imageUrl")
     img(:src="recipe.imageUrl" :alt="recipe.name")
+  .recipe-card__image(v-else-if="recipe.image")
+    img(:src="`/images/drinks/${recipe.image}`" :alt="recipe.name")
   .recipe-card__content
     .recipe-card__header
       h3.recipe-card__name {{ recipe.name }}
