@@ -16,6 +16,7 @@ export interface CSVBottle {
   bottleSize: string
   bottleState: string
   image: string
+  company: string
 }
 
 export function readInventoryCSV(): Bottle[] {
@@ -39,6 +40,7 @@ export function readInventoryCSV(): Bottle[] {
       bottleSize: record.bottleSize || undefined,
       bottleState: (record.bottleState as 'unopened' | 'opened' | 'empty') || undefined,
       image: record.image || undefined,
+      company: record.company || undefined,
     }))
   } catch (error) {
     console.error('Error reading CSV:', error)
@@ -57,11 +59,12 @@ export function writeInventoryCSV(bottles: Bottle[]): void {
       bottleSize: bottle.bottleSize || '',
       bottleState: bottle.bottleState || '',
       image: bottle.image || '',
+      company: bottle.company || '',
     }))
 
     const csv = stringify(records, {
       header: true,
-      columns: ['id', 'name', 'category', 'tags', 'inStock', 'bottleSize', 'bottleState', 'image'],
+      columns: ['id', 'name', 'category', 'tags', 'inStock', 'bottleSize', 'bottleState', 'image', 'company'],
     })
 
     writeFileSync(CSV_PATH, csv, 'utf-8')
