@@ -24,6 +24,7 @@
               option(value="Mixers") Mixers
               option(value="Beer") Beer
               option(value="Wine") Wine
+              option(value="Garnish") Garnish
               option(value="Other") Other
 
           .form-group

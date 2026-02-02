@@ -55,11 +55,11 @@ const expandedCategories = ref(new Set<string>())
 const tagHierarchy: TagCategory[] = [
   {
     name: 'Base Spirits',
-    tags: ['vodka', 'gin', 'rum', 'tequila', 'whiskey', 'liqueur', 'absinthe', 'premix'],
+    tags: ['vodka', 'gin', 'rum', 'tequila', 'whiskey', 'liqueur', 'absinthe', 'premix', 'garnish', 'bitters'],
   },
   {
     name: 'Whiskey Types',
-    tags: ['bourbon', 'scotch', 'rye', 'irish whiskey', 'single malt', 'japanese whiskey'],
+    tags: ['bourbon', 'scotch', 'rye', 'irish whiskey', 'single malt', 'japanese whiskey', 'american whiskey'],
     parent: 'whiskey',
   },
   {
@@ -96,6 +96,10 @@ const tagHierarchy: TagCategory[] = [
       'grapefruit',
       'orange',
       'blood orange',
+      'cream',
+      'peanut brittle',
+      'ginger',
+      'lemon',
     ],
   },
   {
@@ -113,11 +117,16 @@ const tagHierarchy: TagCategory[] = [
       'lemon',
       'pomegranate',
       'grenadine',
+      'molasses',
+      'ginger',
+      'allspice',
+      'lavender',
+      'sparkly'
     ],
   },
   {
     name: 'Other',
-    tags: ['beer', 'wine', 'champagne', 'sake', 'old fashioned'],
+    tags: ['beer', 'wine', 'champagne', 'sake', 'old fashioned', 'cherries'],
   },
 ]
 
