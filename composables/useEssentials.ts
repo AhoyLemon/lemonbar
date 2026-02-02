@@ -12,33 +12,15 @@ export const useEssentials = () => {
   // List of essential ingredients categorized
   const essentialCategories = [
     {
-      name: 'Citrus & Fruit',
-      icon: '🍋',
-      items: [
-        'Fresh Lime',
-        'Fresh Lemon',
-        'Lime Juice',
-        'Lemon Juice',
-        'Orange Juice',
-        'Grapefruit Juice',
-        'Pineapple Juice',
-        'Cranberry Juice',
-        'Orange',
-        'Lime Wedges',
-        'Lemon Wedges',
-      ],
-    },
-    {
-      name: 'Sweeteners',
-      icon: '🍯',
-      items: ['Simple Syrup', 'Sugar', 'Honey', 'Agave Nectar', 'Grenadine', 'Maple Syrup'],
+      name: 'Basics',
+      icon: '🧊',
+      items: ['Ice', 'Water', 'Salt', 'Black Pepper', 'Hot Sauce', 'Worcestershire Sauce'],
     },
     {
       name: 'Carbonated & Mixers',
       icon: '🥤',
       items: [
         'Club Soda',
-        'Soda Water',
         'Tonic Water',
         'Ginger Beer',
         'Ginger Ale',
@@ -47,6 +29,27 @@ export const useEssentials = () => {
         'Sprite/7-Up',
       ],
     },
+    {
+      name: 'Citrus & Fruit',
+      icon: '🍋',
+      items: [
+        'Fresh Lime',
+        'Fresh Lemon',
+        "Fresh Orange",
+        'Lime Juice',
+        'Lemon Juice',
+        'Orange Juice',
+        'Grapefruit Juice',
+        'Pineapple Juice',
+        'Cranberry Juice'
+      ],
+    },
+    {
+      name: 'Sweeteners',
+      icon: '🍯',
+      items: ['Simple Syrup', 'Sugar', 'Honey', 'Agave Nectar', 'Grenadine', 'Maple Syrup'],
+    },
+    
     {
       name: 'Bitters & Aromatics',
       icon: '🌿',
@@ -62,13 +65,9 @@ export const useEssentials = () => {
     {
       name: 'Dairy & Cream',
       icon: '🥛',
-      items: ['Heavy Cream', 'Milk', 'Half and Half', 'Coconut Cream', 'Egg Whites'],
+      items: ['Eggs', 'Heavy Cream', 'Milk', 'Half and Half', 'Coconut Cream'],
     },
-    {
-      name: 'Basics',
-      icon: '🧊',
-      items: ['Ice', 'Water', 'Salt', 'Black Pepper', 'Hot Sauce', 'Worcestershire Sauce'],
-    },
+    
     {
       name: 'Garnishes',
       icon: '🍒',
@@ -77,9 +76,7 @@ export const useEssentials = () => {
         'Olives',
         'Cocktail Onions',
         'Celery',
-        'Cucumber',
-        'Pineapple Wedges',
-      ],
+        'Cucumber'      ],
     },
   ]
 
