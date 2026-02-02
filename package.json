@@ -10,7 +10,7 @@
     "generate": "nuxt generate",
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare",
-    "sync-data": "tsx scripts/sync-data.ts",
+    "sync-data": "tsx --env-file=.env scripts/sync-data.ts",
     "watch-data": "chokidar \"data/inventory.csv\" \"data/recipes.json\" -c \"npm run sync-data\"",
     "test": "vitest run",
     "test:watch": "vitest watch",
