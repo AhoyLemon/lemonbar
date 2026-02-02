@@ -105,6 +105,11 @@
     },
     {
       "id": "9",
+      "name": "Fresh Lime",
+      "category": "Mixers",
+      "tags": [
+        "citrus",
+        "lime"
       "name": "J Wray Silver Rum",
       "category": "Staples",
       "tags": [
@@ -552,10 +557,11 @@
         "Cardamom",
         "Cinnamon"
       ],
-      "inStock": true,
-      "image": "https://cdnimg.webstaurantstore.com/images/products/large/688429/2392450.jpg"
+      "inStock": true
     },
     {
+      "id": "10",
+      "name": "Fresh Lemon",
       "id": "45d32b8e-c544-4860-b8b6-98edef994226",
       "name": "Noble Corazon Coffee Tequila",
       "category": "Special Occasion",
@@ -583,12 +589,14 @@
       "name": "El Guapo’s Lemon Drop",
       "category": "Mixers",
       "tags": [
-        "Lemon"
+        "citrus",
+        "lemon"
       ],
-      "inStock": true,
-      "image": "https://cdn.shopify.com/s/files/1/0257/7127/8418/products/lemondrop.jpg?v=1675783865"
+      "inStock": true
     },
     {
+      "id": "11",
+      "name": "Simple Syrup",
       "id": "4e979226-9722-4a47-bc2b-80cfe8a473ac",
       "name": "Hornitos Reposado",
       "category": "Staples",
@@ -690,9 +698,13 @@
       "name": "Tattersall Old Fashion",
       "category": "Mixers",
       "tags": [
-        "Premix",
-        "Minnesota"
+        "syrup"
       ],
+      "inStock": true
+    },
+    {
+      "id": "12",
+      "name": "Club Soda",
       "inStock": true,
       "image": "https://prod-files-secure.s3.us-west-2.amazonaws.com/c014e928-d6d6-46fc-a73d-f2dd43180aa9/8e9f7ad9-d461-4b34-bf82-7a9b6bf87580/PXL_20241229_184916974.MP.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=ASIAZI2LB4666ANXFS6Y%2F20260202%2Fus-west-2%2Fs3%2Faws4_request&X-Amz-Date=20260202T152222Z&X-Amz-Expires=3600&X-Amz-Security-Token=IQoJb3JpZ2luX2VjEB4aCXVzLXdlc3QtMiJGMEQCIE%2Bq2XtChmm0MtGrFAKgEXCR8Obvvgr6eonL1OAFK5GtAiA6gtAvJY4LSx%2BmW8RJxa3wJhzFGgm1JHmtlPlMtn7xJCqIBAjn%2F%2F%2F%2F%2F%2F%2F%2F%2F%2F8BEAAaDDYzNzQyMzE4MzgwNSIMNNeV20z37tc3xsZAKtwDvlejl35D8qEaqnx%2FBir7Ya%2FFhtF3BnPrk%2BZKsGfOUxXky5j%2BxF7PdASXY4ZFepyYmL1b3dICXVSjwmEMhXwkb5CMOcV2hQrjtroHaeDKavoroLgi8w%2FAUP%2F9NAD3lTpZWHO1coxFe0QEs6m%2BrHf3M4WltPwRJcFuAhVUWzZ7C9JWjbetomswrbl%2FUqQb9g2gAdSGc5m0r%2F063WjJtt1CC1cIaNK0d03cjK5RqZ4AgSFicaw4pAAcSliP57ppVubbYfyymnEaWmOsrd0EVLu9S6QnLwbVLCPA0M362pqLSGHLEfPS%2FDTvU5wYtBtEVvjGJyLsFKDp3BXmOCMlccdZoVIuPS1%2Ff%2FCPqJ6VxeAuj6jl78%2B%2FiIFmzvflax6gBX20ue2cZNsJnwq9Uvr17T1E4g96iAeeoxFQcm6Np2orO6hMKV8Qwska36sz0OreicYm0poMO7DEtIm0XLjoKx%2FejA0%2FrO9LFEP8jh1EgXa7i%2FH5Pee0j1t2Iavdnd%2FWLQFZzoD7FMtp7B0NtBfK0BWlwRfYWGvqENg%2BBbvjcEMz%2FzhC5k2mK%2B5YQTLkspD2VSveiCbW3wXP1nr0PZEjcmoleYZe0CkBRnkx68AF4kEIW2Xabqfw76cfCmcaWNcwsdKCzAY6pgGhk5aYCmPUtnE9wKzJskiFfsysbn%2FnyYAVlS7rHYOoVtHia5JyNltTKoRbanS8rKUz%2F2%2Fl8Uqv5js%2Bqh3N16f8doVBvY%2BNImywr92kwh0D15%2BClxbHo5iJmIaCliKnkUIUPQWWf%2FqU%2BnhOQ7H3U8PIjQRBQNJTUEs3fRyTdWiyorA5f%2BjIbt96LDwk88MqUCV2KNkv0B85O7NqdijMEpUvcQ1m8s0%2B&X-Amz-Signature=d667e30bceafc60a12b93de8a176ae37f6764b0200c2f49a2662eff866087011&X-Amz-SignedHeaders=host&x-amz-checksum-mode=ENABLED&x-id=GetObject"
     },
@@ -736,23 +748,23 @@
       "name": "Rose’s Grenadine",
       "category": "Mixers",
       "tags": [
-        "Grenadine",
-        "Syrup",
-        "Cherries"
+        "soda",
+        "carbonated"
       ],
-      "inStock": true,
-      "image": "https://www.luekensliquors.com/wp-content/uploads/2018/09/11624-ROSES-GRENADINE-w.png"
+      "inStock": true
     },
     {
-      "id": "8f467839-13ce-4e0f-87a4-8f34c087eec7",
-      "name": "Hard Truth Peanut Brittle Bourbon Cream",
-      "category": "Special Occasion",
+      "id": "13",
+      "name": "Ginger Beer",
+      "category": "Mixers",
       "tags": [
-        "Whiskey",
-        "Bourbon",
-        "Cream",
-        "Peanut"
+        "ginger-beer"
       ],
+      "inStock": true
+    },
+    {
+      "id": "14",
+      "name": "Tonic Water",
       "inStock": true,
       "image": "https://prod-files-secure.s3.us-west-2.amazonaws.com/c014e928-d6d6-46fc-a73d-f2dd43180aa9/d7d4f0c7-6eae-4606-a606-cb26fe94b8e5/PXL_20240706_204528466.MP.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=ASIAZI2LB4666ANXFS6Y%2F20260202%2Fus-west-2%2Fs3%2Faws4_request&X-Amz-Date=20260202T152222Z&X-Amz-Expires=3600&X-Amz-Security-Token=IQoJb3JpZ2luX2VjEB4aCXVzLXdlc3QtMiJGMEQCIE%2Bq2XtChmm0MtGrFAKgEXCR8Obvvgr6eonL1OAFK5GtAiA6gtAvJY4LSx%2BmW8RJxa3wJhzFGgm1JHmtlPlMtn7xJCqIBAjn%2F%2F%2F%2F%2F%2F%2F%2F%2F%2F8BEAAaDDYzNzQyMzE4MzgwNSIMNNeV20z37tc3xsZAKtwDvlejl35D8qEaqnx%2FBir7Ya%2FFhtF3BnPrk%2BZKsGfOUxXky5j%2BxF7PdASXY4ZFepyYmL1b3dICXVSjwmEMhXwkb5CMOcV2hQrjtroHaeDKavoroLgi8w%2FAUP%2F9NAD3lTpZWHO1coxFe0QEs6m%2BrHf3M4WltPwRJcFuAhVUWzZ7C9JWjbetomswrbl%2FUqQb9g2gAdSGc5m0r%2F063WjJtt1CC1cIaNK0d03cjK5RqZ4AgSFicaw4pAAcSliP57ppVubbYfyymnEaWmOsrd0EVLu9S6QnLwbVLCPA0M362pqLSGHLEfPS%2FDTvU5wYtBtEVvjGJyLsFKDp3BXmOCMlccdZoVIuPS1%2Ff%2FCPqJ6VxeAuj6jl78%2B%2FiIFmzvflax6gBX20ue2cZNsJnwq9Uvr17T1E4g96iAeeoxFQcm6Np2orO6hMKV8Qwska36sz0OreicYm0poMO7DEtIm0XLjoKx%2FejA0%2FrO9LFEP8jh1EgXa7i%2FH5Pee0j1t2Iavdnd%2FWLQFZzoD7FMtp7B0NtBfK0BWlwRfYWGvqENg%2BBbvjcEMz%2FzhC5k2mK%2B5YQTLkspD2VSveiCbW3wXP1nr0PZEjcmoleYZe0CkBRnkx68AF4kEIW2Xabqfw76cfCmcaWNcwsdKCzAY6pgGhk5aYCmPUtnE9wKzJskiFfsysbn%2FnyYAVlS7rHYOoVtHia5JyNltTKoRbanS8rKUz%2F2%2Fl8Uqv5js%2Bqh3N16f8doVBvY%2BNImywr92kwh0D15%2BClxbHo5iJmIaCliKnkUIUPQWWf%2FqU%2BnhOQ7H3U8PIjQRBQNJTUEs3fRyTdWiyorA5f%2BjIbt96LDwk88MqUCV2KNkv0B85O7NqdijMEpUvcQ1m8s0%2B&X-Amz-Signature=47c3f687a7365f42cb6dab9dfca28fbce2abfd821c8a57897542b05353e61487&X-Amz-SignedHeaders=host&x-amz-checksum-mode=ENABLED&x-id=GetObject"
     },
@@ -842,8 +854,24 @@
       "name": "Tait Farm Lemon Shrub",
       "category": "Mixers",
       "tags": [
-        "Shrub"
+        "tonic"
       ],
+      "inStock": true
+    },
+    {
+      "id": "15",
+      "name": "Orange Juice",
+      "category": "Mixers",
+      "tags": [
+        "juice",
+        "orange"
+      ],
+      "inStock": true
+    },
+    {
+      "id": "16",
+      "name": "Sparkling Water",
+      "category": "Mixers",
       "inStock": true,
       "image": "https://prod-files-secure.s3.us-west-2.amazonaws.com/c014e928-d6d6-46fc-a73d-f2dd43180aa9/420d4544-4326-475f-b0ec-6c30919ed36c/PXL_20240114_010922987.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=ASIAZI2LB4666ANXFS6Y%2F20260202%2Fus-west-2%2Fs3%2Faws4_request&X-Amz-Date=20260202T152223Z&X-Amz-Expires=3600&X-Amz-Security-Token=IQoJb3JpZ2luX2VjEB4aCXVzLXdlc3QtMiJGMEQCIE%2Bq2XtChmm0MtGrFAKgEXCR8Obvvgr6eonL1OAFK5GtAiA6gtAvJY4LSx%2BmW8RJxa3wJhzFGgm1JHmtlPlMtn7xJCqIBAjn%2F%2F%2F%2F%2F%2F%2F%2F%2F%2F8BEAAaDDYzNzQyMzE4MzgwNSIMNNeV20z37tc3xsZAKtwDvlejl35D8qEaqnx%2FBir7Ya%2FFhtF3BnPrk%2BZKsGfOUxXky5j%2BxF7PdASXY4ZFepyYmL1b3dICXVSjwmEMhXwkb5CMOcV2hQrjtroHaeDKavoroLgi8w%2FAUP%2F9NAD3lTpZWHO1coxFe0QEs6m%2BrHf3M4WltPwRJcFuAhVUWzZ7C9JWjbetomswrbl%2FUqQb9g2gAdSGc5m0r%2F063WjJtt1CC1cIaNK0d03cjK5RqZ4AgSFicaw4pAAcSliP57ppVubbYfyymnEaWmOsrd0EVLu9S6QnLwbVLCPA0M362pqLSGHLEfPS%2FDTvU5wYtBtEVvjGJyLsFKDp3BXmOCMlccdZoVIuPS1%2Ff%2FCPqJ6VxeAuj6jl78%2B%2FiIFmzvflax6gBX20ue2cZNsJnwq9Uvr17T1E4g96iAeeoxFQcm6Np2orO6hMKV8Qwska36sz0OreicYm0poMO7DEtIm0XLjoKx%2FejA0%2FrO9LFEP8jh1EgXa7i%2FH5Pee0j1t2Iavdnd%2FWLQFZzoD7FMtp7B0NtBfK0BWlwRfYWGvqENg%2BBbvjcEMz%2FzhC5k2mK%2B5YQTLkspD2VSveiCbW3wXP1nr0PZEjcmoleYZe0CkBRnkx68AF4kEIW2Xabqfw76cfCmcaWNcwsdKCzAY6pgGhk5aYCmPUtnE9wKzJskiFfsysbn%2FnyYAVlS7rHYOoVtHia5JyNltTKoRbanS8rKUz%2F2%2Fl8Uqv5js%2Bqh3N16f8doVBvY%2BNImywr92kwh0D15%2BClxbHo5iJmIaCliKnkUIUPQWWf%2FqU%2BnhOQ7H3U8PIjQRBQNJTUEs3fRyTdWiyorA5f%2BjIbt96LDwk88MqUCV2KNkv0B85O7NqdijMEpUvcQ1m8s0%2B&X-Amz-Signature=cb38a7283fac22d5b4c1c53de3f119ad32b58750aef4f9a6fd3de1fe32c141ea&X-Amz-SignedHeaders=host&x-amz-checksum-mode=ENABLED&x-id=GetObject"
     },
@@ -1105,34 +1133,32 @@
       "name": "J Wray Silver Rum",
       "category": "Staples",
       "tags": [
-        "Light Rum",
-        "Rum"
+        "water",
+        "carbonated"
       ],
-      "inStock": true,
-      "image": "https://icdn.bottlenose.wine/images/full/425235.jpg?min-w=200&min-h=200&fit=crop"
+      "inStock": true
     },
     {
-      "id": "fb1228ae-211e-4892-b1dd-4d54f85059fd",
-      "name": "Buzz Buttons",
-      "category": "Garnish",
+      "id": "17",
+      "name": "Grenadine",
+      "category": "Mixers",
       "tags": [
-        "Garnish",
-        "Edible Flowers"
+        "grenadine"
       ],
+      "inStock": true
       "inStock": true,
       "image": "https://prod-files-secure.s3.us-west-2.amazonaws.com/c014e928-d6d6-46fc-a73d-f2dd43180aa9/34368c49-7408-4afd-a557-1752908520ab/PXL_20240706_170043197.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=ASIAZI2LB4666ANXFS6Y%2F20260202%2Fus-west-2%2Fs3%2Faws4_request&X-Amz-Date=20260202T152224Z&X-Amz-Expires=3600&X-Amz-Security-Token=IQoJb3JpZ2luX2VjEB4aCXVzLXdlc3QtMiJGMEQCIE%2Bq2XtChmm0MtGrFAKgEXCR8Obvvgr6eonL1OAFK5GtAiA6gtAvJY4LSx%2BmW8RJxa3wJhzFGgm1JHmtlPlMtn7xJCqIBAjn%2F%2F%2F%2F%2F%2F%2F%2F%2F%2F8BEAAaDDYzNzQyMzE4MzgwNSIMNNeV20z37tc3xsZAKtwDvlejl35D8qEaqnx%2FBir7Ya%2FFhtF3BnPrk%2BZKsGfOUxXky5j%2BxF7PdASXY4ZFepyYmL1b3dICXVSjwmEMhXwkb5CMOcV2hQrjtroHaeDKavoroLgi8w%2FAUP%2F9NAD3lTpZWHO1coxFe0QEs6m%2BrHf3M4WltPwRJcFuAhVUWzZ7C9JWjbetomswrbl%2FUqQb9g2gAdSGc5m0r%2F063WjJtt1CC1cIaNK0d03cjK5RqZ4AgSFicaw4pAAcSliP57ppVubbYfyymnEaWmOsrd0EVLu9S6QnLwbVLCPA0M362pqLSGHLEfPS%2FDTvU5wYtBtEVvjGJyLsFKDp3BXmOCMlccdZoVIuPS1%2Ff%2FCPqJ6VxeAuj6jl78%2B%2FiIFmzvflax6gBX20ue2cZNsJnwq9Uvr17T1E4g96iAeeoxFQcm6Np2orO6hMKV8Qwska36sz0OreicYm0poMO7DEtIm0XLjoKx%2FejA0%2FrO9LFEP8jh1EgXa7i%2FH5Pee0j1t2Iavdnd%2FWLQFZzoD7FMtp7B0NtBfK0BWlwRfYWGvqENg%2BBbvjcEMz%2FzhC5k2mK%2B5YQTLkspD2VSveiCbW3wXP1nr0PZEjcmoleYZe0CkBRnkx68AF4kEIW2Xabqfw76cfCmcaWNcwsdKCzAY6pgGhk5aYCmPUtnE9wKzJskiFfsysbn%2FnyYAVlS7rHYOoVtHia5JyNltTKoRbanS8rKUz%2F2%2Fl8Uqv5js%2Bqh3N16f8doVBvY%2BNImywr92kwh0D15%2BClxbHo5iJmIaCliKnkUIUPQWWf%2FqU%2BnhOQ7H3U8PIjQRBQNJTUEs3fRyTdWiyorA5f%2BjIbt96LDwk88MqUCV2KNkv0B85O7NqdijMEpUvcQ1m8s0%2B&X-Amz-Signature=36bfd77ec014d8ee81d9a1bc5709147ad204b67fac876803007514e9fdc91559&X-Amz-SignedHeaders=host&x-amz-checksum-mode=ENABLED&x-id=GetObject"
     },
     {
-      "id": "fc631b0b-e9f7-426e-82a2-8bd97aad7942",
-      "name": "Pikesville Rye",
-      "category": "Staples",
+      "id": "18",
+      "name": "Beer",
+      "category": "Beer",
       "tags": [
-        "Whiskey",
-        "Rye"
+        "beer"
       ],
-      "inStock": true,
-      "image": "https://www.totalwine.com/dynamic/490x/media/sys_master/twmmedia/hca/h06/27340707627038.png"
+      "inStock": true
     }
   ],
+  "lastUpdated": "2026-02-02T15:09:20.119Z"
   "lastUpdated": "2026-02-02T15:22:25.250Z"
 }

@@ -39,7 +39,23 @@
 
           .form-group
             label(for="bottleSize") Bottle Size
-            input#bottleSize(v-model="form.bottleSize" type="text" placeholder="e.g., 750ml")
+            select#bottleSize(v-model="form.bottleSize")
+              option(value="") Select a size
+              option(value="50ml") 50ml (Mini)
+              option(value="200ml") 200ml (Half Pint)
+              option(value="375ml") 375ml (Pint)
+              option(value="500ml") 500ml
+              option(value="750ml") 750ml (Fifth)
+              option(value="1L") 1L
+              option(value="1.75L") 1.75L (Handle)
+              option(value="airplane") Airplane Bottle
+              option(value="other") Other
+            small.help-text Select standard bottle size or choose "Other" for custom sizes
+
+          .form-group
+            label(for="company") Company
+            input#company(v-model="form.company" type="text" placeholder="e.g., Buffalo Trace, Castle & Key")
+            small.help-text Enter the distillery or company name (optional)
 
           .form-group
             label(for="abv") ABV (Alcohol by Volume %)
@@ -78,6 +94,7 @@
           .bottle-item(v-for="bottle in bottles" :key="bottle.id")
             .bottle-info
               h4 {{ bottle.name }}
+              p.company(v-if="bottle.company") {{ bottle.company }}
               .bottle-details
                 span.badge {{ bottle.category }}
                 span.badge(v-if="bottle.inStock" class="in-stock") In Stock
@@ -114,6 +131,7 @@ const form = ref({
   image: '',
   abv: undefined as number | undefined,
   origin: '',
+  company: '',
 })
 
 onMounted(async () => {
@@ -152,6 +170,7 @@ function resetForm() {
     image: '',
     abv: undefined,
     origin: '',
+    company: '',
   }
   editingBottle.value = null
   error.value = null
@@ -170,6 +189,7 @@ function startEdit(bottle: Bottle) {
     image: bottle.image || '',
     abv: bottle.abv,
     origin: bottle.origin || '',
+    company: bottle.company || '',
   }
   error.value = null
   successMessage.value = null
@@ -197,6 +217,7 @@ async function handleSubmit() {
       image: form.value.image || undefined,
       abv: form.value.abv,
       origin: form.value.origin || undefined,
+      company: form.value.company || undefined,
     }
 
     if (editingBottle.value) {
@@ -519,6 +540,13 @@ async function toggleInStock(bottle: Bottle) {
   h4 {
     margin: 0 0 $spacing-xs 0;
     color: $dark-bg;
+  }
+
+  .company {
+    margin: 0 0 $spacing-xs 0;
+    color: color.adjust($text-dark, $lightness: 20%);
+    font-size: 0.875rem;
+    font-style: italic;
   }
 }
 

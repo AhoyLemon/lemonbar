@@ -9,6 +9,7 @@ export interface Bottle {
   image?: string
   abv?: number
   origin?: string
+  company?: string
 }
 
 export interface Ingredient {
@@ -24,6 +25,7 @@ export interface Recipe {
   imageUrl?: string
   category?: string
   tags?: string[]
+  starred?: boolean
 }
 
 export interface InventoryData {

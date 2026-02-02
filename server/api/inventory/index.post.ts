@@ -24,6 +24,9 @@ export default defineEventHandler(async (event) => {
       bottleSize: body.bottleSize,
       bottleState: body.bottleState,
       image: normalizeImagePath(body.image),
+      abv: body.abv,
+      origin: body.origin,
+      company: body.company,
     }
 
     bottles.push(newBottle)

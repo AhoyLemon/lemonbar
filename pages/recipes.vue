@@ -44,6 +44,8 @@ const {
   error,
 } = useCocktails()
 
+const { loadStarredRecipes, isStarred } = useStarredRecipes()
+
 const searchTerm = ref('')
 const filter = ref<'all' | 'alcoholic' | 'nonAlcoholic' | 'available'>('all')
 
@@ -51,6 +53,9 @@ const filter = ref<'all' | 'alcoholic' | 'nonAlcoholic' | 'available'>('all')
 onMounted(async () => {
   await loadInventory()
   await loadLocalRecipes()
+  loadStarredRecipes()
+  
+  // If there are no starred recipes or API recipes yet, fetch some default recipes
   await fetchCocktailDBRecipes('margarita')
 })
 
@@ -61,16 +66,62 @@ const handleSearch = async () => {
 }
 
 const filteredRecipes = computed(() => {
+  let recipes
   switch (filter.value) {
     case 'alcoholic':
-      return getAlcoholicRecipes.value
+      recipes = getAlcoholicRecipes.value
+      break
     case 'nonAlcoholic':
-      return getNonAlcoholicRecipes.value
+      recipes = getNonAlcoholicRecipes.value
+      break
     case 'available':
-      return getAvailableRecipes.value
+      recipes = getAvailableRecipes.value
+      break
     default:
-      return getAllRecipes.value
+      recipes = getAllRecipes.value
   }
+
+  // If there's a search term, filter and sort by relevance
+  if (searchTerm.value.trim()) {
+    const term = searchTerm.value.toLowerCase()
+    
+    // Filter recipes that match the search term
+    const matchingRecipes = recipes.filter(recipe => {
+      const nameMatch = recipe.name.toLowerCase().includes(term)
+      const categoryMatch = recipe.category?.toLowerCase().includes(term)
+      const ingredientMatch = recipe.ingredients.some(ing => 
+        ing.name.toLowerCase().includes(term)
+      )
+      return nameMatch || categoryMatch || ingredientMatch
+    })
+
+    // Sort by relevance: exact name matches first, then partial name matches, then others
+    return matchingRecipes.sort((a, b) => {
+      const aNameLower = a.name.toLowerCase()
+      const bNameLower = b.name.toLowerCase()
+      
+      // Exact matches first
+      if (aNameLower === term && bNameLower !== term) return -1
+      if (bNameLower === term && aNameLower !== term) return 1
+      
+      // Name starts with search term
+      if (aNameLower.startsWith(term) && !bNameLower.startsWith(term)) return -1
+      if (bNameLower.startsWith(term) && !aNameLower.startsWith(term)) return 1
+      
+      // Name contains search term (already filtered, so all contain it)
+      return 0
+    })
+  }
+
+  // No search term: sort starred recipes first
+  return recipes.slice().sort((a, b) => {
+    const aStarred = isStarred(a.id)
+    const bStarred = isStarred(b.id)
+    
+    if (aStarred && !bStarred) return -1
+    if (bStarred && !aStarred) return 1
+    return 0
+  })
 })
 </script>
 

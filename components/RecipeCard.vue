@@ -1,5 +1,7 @@
 <template lang="pug">
-.recipe-card(:class="{ 'fully-available': isFullyAvailable }")
+.recipe-card(:class="{ 'fully-available': isFullyAvailable, 'starred': starred }")
+  button.star-button(@click.prevent="handleToggleStar" :class="{ 'starred': starred }" :title="starred ? 'Remove from favorites' : 'Add to favorites'")
+    span {{ starred ? '★' : '☆' }}
   .recipe-card__image(v-if="recipe.imageUrl")
     img(:src="recipe.imageUrl" :alt="recipe.name")
   .recipe-card__content
@@ -17,8 +19,6 @@
         li(v-for="ingredient in recipe.ingredients" :key="ingredient.name" :class="{ 'available': isIngredientAvailable(ingredient.name) }")
           span.ingredient-name {{ ingredient.name }}
           span.ingredient-qty {{ ingredient.qty }}
-    .recipe-card__actions
-      NuxtLink(:to="`/recipes/${recipe.id}`" class="btn btn-primary") View Recipe
 </template>
 
 <script setup lang="ts">
@@ -30,6 +30,13 @@ const props = defineProps<{
 }>()
 
 const { isIngredientInStock } = useCocktails()
+const { isStarred, toggleStar } = useStarredRecipes()
+
+const starred = computed(() => isStarred(props.recipe.id))
+
+const handleToggleStar = () => {
+  toggleStar(props.recipe.id)
+}
 
 const availableCount = computed(() => {
   return props.recipe.ingredients.filter(ing => isIngredientInStock(ing.name)).length
@@ -65,6 +72,7 @@ const isIngredientAvailable = (ingredientName: string) => {
   transition: all 0.3s ease;
   display: flex;
   flex-direction: column;
+  position: relative;
 
   &:hover {
     box-shadow: $shadow-lg;
@@ -73,6 +81,10 @@ const isIngredientAvailable = (ingredientName: string) => {
 
   &.fully-available {
     border: 2px solid $accent-color;
+  }
+
+  &.starred {
+    border: 2px solid gold;
   }
 
   &__image {
@@ -181,28 +193,6 @@ const isIngredientAvailable = (ingredientName: string) => {
     }
   }
 
-  &__actions {
-    margin-top: auto;
-  }
-
-  .btn {
-    display: inline-block;
-    padding: $spacing-sm $spacing-lg;
-    border-radius: $border-radius-md;
-    font-weight: 600;
-    text-align: center;
-    transition: all 0.3s ease;
-
-    &-primary {
-      background: $accent-color;
-      color: white;
-
-      &:hover {
-        background: color.adjust($accent-color, $lightness: -10%);
-      }
-    }
-  }
-
   // Container query for larger cards
   @container recipe-card (min-width: 500px) {
     flex-direction: row;
@@ -210,6 +200,53 @@ const isIngredientAvailable = (ingredientName: string) => {
     .recipe-card__image {
       width: 200px;
       height: auto;
+    }
+  }
+}
+
+.star-button {
+  position: absolute;
+  top: $spacing-sm;
+  right: $spacing-sm;
+  z-index: 10;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 2px solid white;
+  background: rgba(255, 255, 255, 0.9);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  transition: all 0.3s ease;
+  box-shadow: $shadow-sm;
+
+  span {
+    color: #ccc;
+    transition: color 0.3s ease;
+  }
+
+  &:hover {
+    transform: scale(1.1);
+    box-shadow: $shadow-md;
+
+    span {
+      color: gold;
+    }
+  }
+
+  &.starred {
+    background: gold;
+    border-color: gold;
+
+    span {
+      color: white;
+    }
+
+    &:hover {
+      background: color.adjust(gold, $lightness: -10%);
+      border-color: color.adjust(gold, $lightness: -10%);
     }
   }
 }
