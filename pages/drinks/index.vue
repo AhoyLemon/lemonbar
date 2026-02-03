@@ -1,7 +1,7 @@
 <template lang="pug">
-.recipes-page
+.drinks-page
   .container
-      h2 All Recipes
+      h2 All Drinks
       p.mb-3 Explore cocktails from TheCocktailDB and custom recipes
 
       .search-bar.mb-3
@@ -14,17 +14,17 @@
         button.search-btn(@click="handleSearch") Search
 
       .filters.mb-3
-        button.filter-btn(:class="{ active: filter === 'all' }" @click="filter = 'all'") All ({{ filteredAllRecipes.length }})
-        button.filter-btn(:class="{ active: filter === 'alcoholic' }" @click="filter = 'alcoholic'") Alcoholic ({{ filteredAlcoholicRecipes.length }})
-        button.filter-btn(:class="{ active: filter === 'nonAlcoholic' }" @click="filter = 'nonAlcoholic'") Non-Alcoholic ({{ filteredNonAlcoholicRecipes.length }})
-        button.filter-btn(:class="{ active: filter === 'available' }" @click="filter = 'available'") Available ({{ filteredAvailableRecipes.length }})
+        button.filter-btn(:class="{ active: filter === 'all' }" @click="filter = 'all'") All ({{ filteredAllDrinks.length }})
+        button.filter-btn(:class="{ active: filter === 'alcoholic' }" @click="filter = 'alcoholic'") Alcoholic ({{ filteredAlcoholicDrinks.length }})
+        button.filter-btn(:class="{ active: filter === 'nonAlcoholic' }" @click="filter = 'nonAlcoholic'") Non-Alcoholic ({{ filteredNonAlcoholicDrinks.length }})
+        button.filter-btn(:class="{ active: filter === 'available' }" @click="filter = 'available'") Available ({{ filteredAvailableDrinks.length }})
 
       .loading(v-if="loading") Loading recipes...
       .error(v-if="error") {{ error }}
 
-      .recipes-grid
-        RecipeCard(
-          v-for="recipe in filteredRecipes"
+      .drinks-grid
+        DrinkCard(
+          v-for="recipe in filteredDrinks"
           :key="recipe.id"
           :recipe="recipe"
           :show-availability="true"
@@ -34,18 +34,18 @@
 <script setup lang="ts">
 const {
   loadInventory,
-  loadLocalRecipes,
-  fetchCocktailDBRecipes,
+  loadLocalDrinks,
+  fetchCocktailDBDrinks,
   fetchRandomCocktails,
-  getAllRecipes,
-  getAlcoholicRecipes,
-  getNonAlcoholicRecipes,
-  getAvailableRecipes,
+  getAllDrinks,
+  getAlcoholicDrinks,
+  getNonAlcoholicDrinks,
+  getAvailableDrinks,
   loading,
   error,
 } = useCocktails()
 
-const { loadStarredRecipes, isStarred } = useStarredRecipes()
+const { loadStarredRecipes, isStarred } = useStarredDrinks()
 
 const searchTerm = ref('')
 const filter = ref<'all' | 'alcoholic' | 'nonAlcoholic' | 'available'>('all')
@@ -53,7 +53,7 @@ const filter = ref<'all' | 'alcoholic' | 'nonAlcoholic' | 'available'>('all')
 // Load data on mount
 onMounted(async () => {
   await loadInventory()
-  await loadLocalRecipes()
+  await loadLocalDrinks()
   loadStarredRecipes()
 
   // Fetch random cocktails to showcase variety
@@ -62,7 +62,7 @@ onMounted(async () => {
 
 const handleSearch = async () => {
   if (searchTerm.value.trim()) {
-    await fetchCocktailDBRecipes(searchTerm.value)
+    await fetchCocktailDBDrinks(searchTerm.value)
   }
 }
 
@@ -82,25 +82,25 @@ const applySearchFilter = (recipes: any[]) => {
 }
 
 // Computed properties that apply search filter
-const filteredAllRecipes = computed(() => applySearchFilter(getAllRecipes.value))
-const filteredAlcoholicRecipes = computed(() => applySearchFilter(getAlcoholicRecipes.value))
-const filteredNonAlcoholicRecipes = computed(() => applySearchFilter(getNonAlcoholicRecipes.value))
-const filteredAvailableRecipes = computed(() => applySearchFilter(getAvailableRecipes.value))
+const filteredAllDrinks = computed(() => applySearchFilter(getAllDrinks.value))
+const filteredAlcoholicDrinks = computed(() => applySearchFilter(getAlcoholicDrinks.value))
+const filteredNonAlcoholicDrinks = computed(() => applySearchFilter(getNonAlcoholicDrinks.value))
+const filteredAvailableDrinks = computed(() => applySearchFilter(getAvailableDrinks.value))
 
-const filteredRecipes = computed(() => {
+const filteredDrinks = computed(() => {
   let recipes
   switch (filter.value) {
     case 'alcoholic':
-      recipes = filteredAlcoholicRecipes.value
+      recipes = filteredAlcoholicDrinks.value
       break
     case 'nonAlcoholic':
-      recipes = filteredNonAlcoholicRecipes.value
+      recipes = filteredNonAlcoholicDrinks.value
       break
     case 'available':
-      recipes = filteredAvailableRecipes.value
+      recipes = filteredAvailableDrinks.value
       break
     default:
-      recipes = filteredAllRecipes.value
+      recipes = filteredAllDrinks.value
   }
 
   // If there's a search term, sort by relevance
@@ -140,7 +140,7 @@ const filteredRecipes = computed(() => {
 <style lang="scss" scoped>
 @use 'sass:color';
 @use '@/assets/styles/variables' as *;
-.recipes-page {
+.drinks-page {
   min-height: 60vh;
 
   h2 {
@@ -225,7 +225,7 @@ const filteredRecipes = computed(() => {
   color: $secondary-color;
 }
 
-.recipes-grid {
+.drinks-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
   gap: $spacing-lg;

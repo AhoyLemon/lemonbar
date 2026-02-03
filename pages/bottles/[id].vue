@@ -47,11 +47,11 @@
           button.btn.btn-mark-empty(v-if="bottle.inStock" @click="toggleInStock") ⚠️ Mark Empty
           button.btn.btn-mark-in-stock(v-else @click="toggleInStock") ✅ Mark In Stock
       
-      .recipes-section
-        h3 Recipes Using This Bottle
+      .drinks-section
+        h3 Drinks Using This Bottle
         .loading(v-if="drinksLoading") Loading drinks...
-        .recipes-grid(v-else-if="drinksUsingBottle.length > 0")
-          RecipeCard(
+        .drinks-grid(v-else-if="drinksUsingBottle.length > 0")
+          DrinkCard(
             v-for="recipe in drinksUsingBottle"
             :key="recipe.id"
             :recipe="recipe"
@@ -64,14 +64,14 @@
 </template>
 
 <script setup lang="ts">
-import type { Bottle, Recipe } from '~/types'
+import type { Bottle, Drink } from '~/types'
 
 const route = useRoute()
 const bottleId = route.params.id as string
 
 const {
   loadInventory,
-  loadLocalRecipes,
+  loadLocalDrinks,
   fetchDrinksByIngredient,
   getDrinksUsingBottle,
 } = useCocktails()
@@ -115,7 +115,7 @@ async function loadDrinks() {
     drinksLoading.value = true
 
     // Load inventory and local recipes first
-    await Promise.all([loadInventory(), loadLocalRecipes()])
+    await Promise.all([loadInventory(), loadLocalDrinks()])
 
     // Get local drinks that use this bottle
     const localDrinks = getDrinksUsingBottle(bottle.value)
@@ -349,7 +349,7 @@ async function toggleInStock() {
   }
 }
 
-.recipes-section {
+.drinks-section {
   background: white;
   padding: $spacing-xl;
   border-radius: $border-radius-lg;
@@ -370,7 +370,7 @@ async function toggleInStock() {
     font-style: italic;
   }
 
-  .recipes-grid {
+  .drinks-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
     gap: $spacing-lg;

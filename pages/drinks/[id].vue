@@ -1,10 +1,10 @@
 <template lang="pug">
-.recipe-detail-page(v-if="isLoading")
+.drink-detail-page(v-if="isLoading")
   .container
     .loading-state
       p Loading recipe...
 
-.recipe-detail-page(v-else-if="recipe")
+.drink-detail-page(v-else-if="recipe")
   .container
       .back-navigation
         NuxtLink.btn.btn-back(to="/recipes") ← Back to Recipes
@@ -58,20 +58,20 @@
 const route = useRoute()
 const {
   loadInventory,
-  loadLocalRecipes,
-  fetchCocktailDBRecipeById,
+  loadLocalDrinks,
+  fetchCocktailDBDrinkById,
   getAllRecipes,
   isIngredientInStock,
 } = useCocktails()
 
-const { loadStarredRecipes } = useStarredRecipes()
+const { loadStarredRecipes } = useStarredDrinks()
 
 const isLoading = ref(false)
 
 // Load data on mount
 onMounted(async () => {
   await loadInventory()
-  await loadLocalRecipes()
+  await loadLocalDrinks()
   loadStarredRecipes()
 
   // Check if this is a CocktailDB recipe that needs to be fetched
@@ -85,54 +85,54 @@ onMounted(async () => {
     if (!existingRecipe) {
       // Fetch the specific recipe from CocktailDB
       isLoading.value = true
-      await fetchCocktailDBRecipeById(cocktailDbId)
+      await fetchCocktailDBDrinkById(cocktailDbId)
       isLoading.value = false
     }
   }
 })
 
 // Find the recipe by ID
-const recipe = computed(() => {
+const drink = computed(() => {
   return getAllRecipes.value.find(r => r.id === route.params.id)
 })
 
 // Check if this is a local recipe or from CocktailDB
 const isLocalRecipe = computed(() => {
-  if (!recipe.value) return false
-  return !recipe.value.id.startsWith('cocktaildb-')
+  if (!drink.value) return false
+  return !drink.value.id.startsWith('cocktaildb-')
 })
 
 // Get image URL (support both 'image' and 'imageUrl' fields)
 const recipeImageUrl = computed(() => {
-  if (!recipe.value) return ''
-  if (recipe.value.imageUrl) return recipe.value.imageUrl
-  if (recipe.value.image) return `/images/drinks/${recipe.value.image}`
+  if (!drink.value) return ''
+  if (drink.value.imageUrl) return drink.value.imageUrl
+  if (drink.value.image) return `/images/drinks/${drink.value.image}`
   return ''
 })
 
 // Split instructions into steps
 const instructionSteps = computed(() => {
-  if (!recipe.value) return []
+  if (!drink.value) return []
 
   // Handle array of instruction steps (new format)
-  if (Array.isArray(recipe.value.instructions)) {
-    return recipe.value.instructions.map(step => step.trim())
+  if (Array.isArray(drink.value.instructions)) {
+    return drink.value.instructions.map(step => step.trim())
   }
 
   // Handle string instructions (old format from API)
-  return recipe.value.instructions
+  return drink.value.instructions
     .split(/\.\s+/)
     .filter(step => step.trim().length > 0)
     .map(step => step.trim() + (step.endsWith('.') ? '' : '.'))
 })
 
 const availableCount = computed(() => {
-  if (!recipe.value) return 0
-  return recipe.value.ingredients.filter(ing => isIngredientInStock(ing.name)).length
+  if (!drink.value) return 0
+  return drink.value.ingredients.filter(ing => isIngredientInStock(ing.name)).length
 })
 
 const totalCount = computed(() => {
-  return recipe.value?.ingredients.length || 0
+  return drink.value?.ingredients.length || 0
 })
 
 const isFullyAvailable = computed(() => {
@@ -147,7 +147,7 @@ const isIngredientAvailable = (ingredientName: string) => {
 <style lang="scss" scoped>
 @use 'sass:color';
 @use '@/assets/styles/variables' as *;
-.recipe-detail-page {
+.drink-detail-page {
   min-height: 60vh;
 }
 
