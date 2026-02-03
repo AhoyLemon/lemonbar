@@ -34,6 +34,7 @@
 <script setup lang="ts">
 const {
   loadInventory,
+  loadEssentials,
   loadLocalDrinks,
   fetchCocktailDBDrinks,
   fetchRandomCocktails,
@@ -54,6 +55,7 @@ const filter = ref<'all' | 'alcoholic' | 'nonAlcoholic' | 'available'>('all')
 // Load data on mount
 onMounted(async () => {
   await loadInventory()
+  await loadEssentials()
   await loadLocalDrinks()
   loadStarredDrinks()
 

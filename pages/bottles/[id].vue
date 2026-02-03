@@ -54,7 +54,7 @@
           .drink-list-item(
             v-for="drink in sortedDrinksUsingBottle" 
             :key="drink.id"
-            :class="{ 'has-missing-ingredients': !drinkHasAllIngredients(drink) }"
+            :class="{ 'has-missing-ingredients': !drinkHasAllIngredients(drink), 'fully-available': drinkHasAllIngredients(drink) }"
           )
             .drink-thumbnail
               img(v-if="drink.imageUrl" :src="drink.imageUrl" :alt="drink.name")
@@ -62,9 +62,8 @@
               .no-image(v-else) 🍹
             .drink-info
               .drink-name {{ drink.name }}
-              .drink-availability(v-if="!drinkHasAllIngredients(drink)") 
-                span.missing-icon ⚠️
-                span.missing-text {{ getMissingIngredientsCount(drink) }} missing ingredient{{ getMissingIngredientsCount(drink) === 1 ? '' : 's' }}
+              .drink-availability
+                span.availability-label(:class="{ 'fully-available': drinkHasAllIngredients(drink) }") {{ getAvailabilityLabel(drink) }}
             NuxtLink.drink-view-btn(:to="`/drinks/${drink.id}`") View
         p.no-drinks(v-else) No drinks found using this bottle yet.
     
@@ -80,11 +79,13 @@ const bottleId = route.params.id as string
 
 const { 
   loadInventory, 
+  loadEssentials,
   loadLocalDrinks, 
   fetchDrinksByIngredient, 
   getDrinksUsingBottle,
   isIngredientInStock,
   countMatchedIngredients,
+  getAvailabilityPercentage,
   sortDrinksByAvailability,
 } = useCocktails()
 
@@ -106,14 +107,24 @@ const drinkHasAllIngredients = (drink: Drink): boolean => {
   return drink.ingredients.every(ingredient => isIngredientInStock(ingredient.name))
 }
 
-// Helper to count missing ingredients
-const getMissingIngredientsCount = (drink: Drink): number => {
-  return drink.ingredients.length - countMatchedIngredients(drink)
+// Helper to get availability percentage
+const getDrinkAvailabilityPercentage = (drink: Drink): number => {
+  return Math.round(getAvailabilityPercentage(drink))
+}
+
+// Helper to get availability label for bottle detail page
+const getAvailabilityLabel = (drink: Drink): string => {
+  const percentage = getDrinkAvailabilityPercentage(drink)
+  if (percentage === 100) {
+    return 'Available'
+  }
+  return `${percentage}% available`
 }
 
 onMounted(async () => {
   await loadBottle()
   await loadDrinks()
+  await loadEssentials()
   loadStarredDrinks()
 })
 
@@ -416,6 +427,16 @@ async function toggleInStock() {
       border-color: $primary-color;
     }
 
+    &.fully-available {
+      background: color.adjust(green, $lightness: 50%);
+      border-color: color.adjust(green, $lightness: 35%);
+
+      &:hover {
+        background: color.adjust(green, $lightness: 47%);
+        border-color: green;
+      }
+    }
+
     &.has-missing-ingredients {
       background: color.adjust(orange, $lightness: 48%);
       border-color: color.adjust(orange, $lightness: 30%);
@@ -466,14 +487,14 @@ async function toggleInStock() {
     align-items: center;
     gap: $spacing-xs;
     font-size: 0.75rem;
-    color: color.adjust(orange, $lightness: -20%);
 
-    .missing-icon {
-      font-size: 0.875rem;
-    }
-
-    .missing-text {
+    .availability-label {
       font-weight: 500;
+      color: color.adjust(orange, $lightness: -20%);
+
+      &.fully-available {
+        color: color.adjust(green, $lightness: -20%);
+      }
     }
   }
 

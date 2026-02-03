@@ -1,4 +1,4 @@
-import type { Bottle, Drink, InventoryData, DrinkData } from '~/types'
+import type { Bottle, Drink, InventoryData, DrinkData, Essential, EssentialsData } from '~/types'
 
 interface CocktailDBDrink {
   idDrink: string
@@ -11,6 +11,7 @@ interface CocktailDBDrink {
 
 export const useCocktails = () => {
   const inventory = useState<Bottle[]>('inventory', () => [])
+  const essentials = useState<Essential[]>('essentials', () => [])
   const localDrinks = useState<Drink[]>('localDrinks', () => [])
   const apiDrinks = useState<Drink[]>('apiDrinks', () => [])
   const loading = useState<boolean>('loading', () => false)
@@ -61,6 +62,17 @@ export const useCocktails = () => {
     } catch (e) {
       console.error('Failed to load inventory:', e)
       error.value = 'Failed to load inventory data'
+    }
+  }
+
+  // Load essentials from API
+  const loadEssentials = async () => {
+    try {
+      const data = await $fetch<EssentialsData>('/api/essentials')
+      essentials.value = data.essentials
+    } catch (e) {
+      console.error('Failed to load essentials:', e)
+      error.value = 'Failed to load essentials data'
     }
   }
 
@@ -194,22 +206,14 @@ export const useCocktails = () => {
     const inStockItems = inventory.value.filter(b => b.inStock)
     const lowerIngredient = ingredientName.toLowerCase().trim()
 
-    // Check essentials from localStorage
-    let checkedEssentials: string[] = []
-    if (process.client) {
-      const saved = localStorage.getItem('checkedEssentials')
-      if (saved) {
-        try {
-          checkedEssentials = JSON.parse(saved)
-        } catch (e) {
-          console.error('Failed to parse essentials:', e)
-        }
-      }
-    }
+    // Check essentials from state (API-loaded data)
+    const inStockEssentials = Array.isArray(essentials.value) 
+      ? essentials.value.filter(e => e.inStock) 
+      : []
 
     // Check if ingredient matches any checked essential
-    for (const essential of checkedEssentials) {
-      const lowerEssential = essential.toLowerCase().trim()
+    for (const essential of inStockEssentials) {
+      const lowerEssential = essential.name.toLowerCase().trim()
 
       // Direct match
       if (lowerIngredient === lowerEssential) {
@@ -472,27 +476,36 @@ export const useCocktails = () => {
     return drink.ingredients.filter(ingredient => isIngredientInStock(ingredient.name)).length
   }
 
-  // Sort drinks by ingredient availability, then by favorited status
-  // Drinks with more ingredients in stock appear first
-  // Within each availability tier, favorited drinks appear first
+  // Helper function to calculate percentage of ingredients available
+  const getAvailabilityPercentage = (drink: Drink): number => {
+    if (drink.ingredients.length === 0) return 0
+    const matched = countMatchedIngredients(drink)
+    return (matched / drink.ingredients.length) * 100
+  }
+
+  // Sort drinks by ingredient availability percentage, then by favorited status, then alphabetically
+  // Drinks with higher percentage of ingredients available appear first (100% before 83%, etc.)
+  // Within each percentage tier, favorited drinks appear first
+  // Then alphabetically by name if still tied
   const sortDrinksByAvailability = (drinks: Drink[], isStarredFn: (id: string) => boolean): Drink[] => {
     return [...drinks].sort((a, b) => {
-      const aMatched = countMatchedIngredients(a)
-      const bMatched = countMatchedIngredients(b)
+      const aPercentage = getAvailabilityPercentage(a)
+      const bPercentage = getAvailabilityPercentage(b)
       
-      // First, sort by number of matched ingredients (descending)
-      if (aMatched !== bMatched) {
-        return bMatched - aMatched
+      // First, sort by percentage of matched ingredients (descending)
+      if (aPercentage !== bPercentage) {
+        return bPercentage - aPercentage
       }
       
-      // If matched count is the same, prioritize favorited drinks
+      // If percentage is the same, prioritize favorited drinks
       const aStarred = isStarredFn(a.id)
       const bStarred = isStarredFn(b.id)
       
       if (aStarred && !bStarred) return -1
       if (bStarred && !aStarred) return 1
       
-      return 0
+      // Finally, sort alphabetically by name
+      return a.name.localeCompare(b.name)
     })
   }
 
@@ -503,6 +516,7 @@ export const useCocktails = () => {
     loading,
     error,
     loadInventory,
+    loadEssentials,
     loadLocalDrinks,
     fetchCocktailDBDrinks,
     fetchCocktailDBDrinkById,
@@ -516,6 +530,7 @@ export const useCocktails = () => {
     getAlcoholicDrinks,
     isIngredientInStock,
     countMatchedIngredients,
+    getAvailabilityPercentage,
     sortDrinksByAvailability,
   }
 }
