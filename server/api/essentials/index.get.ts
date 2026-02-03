@@ -8,9 +8,10 @@ export default defineEventHandler((): EssentialsData => {
     const essentialsData = readFileSync(essentialsPath, 'utf-8')
     return JSON.parse(essentialsData)
   } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error'
     throw createError({
       statusCode: 500,
-      statusMessage: 'Failed to read essentials data',
+      statusMessage: `Failed to read essentials data: ${errorMessage}`,
     })
   }
 })

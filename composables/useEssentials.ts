@@ -54,11 +54,6 @@ export const useEssentials = () => {
     }
   }
 
-  const isChecked = (itemName: string) => {
-    const essential = essentials.value.find(e => e.name === itemName)
-    return essential?.inStock || false
-  }
-
   const clearAll = async () => {
     // Update all essentials to false
     const updates = essentials.value.map(essential =>
@@ -120,7 +115,6 @@ export const useEssentials = () => {
     error,
     fetchEssentials,
     toggleEssential,
-    isChecked,
     clearAll,
     checkAll,
     getItemsForCategory,

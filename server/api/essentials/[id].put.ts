@@ -37,13 +37,14 @@ export default defineEventHandler(async event => {
       success: true,
       essential,
     }
-  } catch (error: any) {
-    if (error.statusCode) {
+  } catch (error: unknown) {
+    if (error && typeof error === 'object' && 'statusCode' in error) {
       throw error
     }
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error'
     throw createError({
       statusCode: 500,
-      statusMessage: 'Failed to update essential',
+      statusMessage: `Failed to update essential: ${errorMessage}`,
     })
   }
 })
