@@ -1,8 +1,11 @@
 <template lang="pug">
 .drinks-page
   .container
-      h2 All Drinks
-      p.mb-3 Explore cocktails from TheCocktailDB and custom recipes
+      .header-section
+        div
+          h2 All Drinks
+          p.mb-3 Explore cocktails from TheCocktailDB and custom recipes
+        NuxtLink.btn.btn-create(to="/drinks/create") + Create Recipe
 
       .search-bar.mb-3
         input(
@@ -144,6 +147,35 @@
 
     p {
       color: color.adjust($text-dark, $lightness: 20%);
+    }
+  }
+
+  .header-section {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: $spacing-lg;
+
+    @media (max-width: 768px) {
+      flex-direction: column;
+      gap: $spacing-md;
+    }
+  }
+
+  .btn-create {
+    padding: $spacing-md $spacing-xl;
+    background: #28a745;
+    color: white;
+    border: none;
+    border-radius: $border-radius-md;
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: none;
+    white-space: nowrap;
+    transition: all 0.3s ease;
+
+    &:hover {
+      background: #218838;
     }
   }
 
