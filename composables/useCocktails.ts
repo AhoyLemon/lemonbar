@@ -164,9 +164,12 @@ export const useCocktails = () => {
   const matchesStrict = (a: string, b: string): boolean => a.trim().toLowerCase() === b.trim().toLowerCase();
 
   // Strict ingredient matching: only exact name, synonym, or hierarchy matches
+  // Excludes bottles marked as "fingers" from being available for cocktails
   const isIngredientInStock = (ingredientName: string): boolean => {
     if (!Array.isArray(inventory.value)) return false;
-    const inStockItems = inventory.value.filter((b) => b.inStock);
+    
+    // Exclude bottles marked as fingers from being available for cocktails
+    const inStockItems = inventory.value.filter((b) => b.inStock && !b.isFinger);
     const lowerIngredient = ingredientName.toLowerCase().trim();
 
     // Check essentials from state (API-loaded data)
