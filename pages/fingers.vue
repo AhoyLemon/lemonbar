@@ -11,10 +11,17 @@
           | <strong>What are Fingers?</strong> Special occasion bottles that are too nice to mix in cocktails. 
           | They'll be served on their own - either straight up or on the rocks.
       
+      .save-section.mb-3(v-if="hasUnsavedChanges")
+        .unsaved-changes-notice
+          span.icon ⚠️
+          span.text You have unsaved changes
+        button.save-btn(@click="saveChanges" :disabled="saving") 
+          | {{ saving ? 'Saving...' : 'Save Changes' }}
+      
       .filters.mb-3
         button.filter-btn(:class="{ active: filter === 'all' }" @click="filter = 'all'") All ({{ bottles.length }})
-        button.filter-btn(:class="{ active: filter === 'selected' }" @click="filter = 'selected'") Selected ({{ selectedBottles.length }})
-        button.filter-btn(:class="{ active: filter === 'unselected' }" @click="filter = 'unselected'") Not Selected ({{ unselectedBottles.length }})
+        button.filter-btn(:class="{ active: filter === 'selected' }" @click="filter = 'selected'") Selected ({{ pendingSelectedCount }})
+        button.filter-btn(:class="{ active: filter === 'unselected' }" @click="filter = 'unselected'") Not Selected ({{ pendingUnselectedCount }})
       
       .category-filters.mb-3
         button.category-btn(:class="{ active: categoryFilter === 'all' }" @click="categoryFilter = 'all'") All Categories
@@ -26,10 +33,10 @@
         .bottle-card(
           v-for="bottle in filteredBottles" 
           :key="bottle.id"
-          :class="{ 'selected': bottle.isFinger, 'out-of-stock': !bottle.inStock }"
+          :class="{ 'selected': isBottleSelected(bottle.id), 'out-of-stock': !bottle.inStock }"
           @click="toggleFingerStatus(bottle)"
         )
-          .bottle-selected-indicator(v-if="bottle.isFinger") ✓
+          .bottle-selected-indicator(v-if="isBottleSelected(bottle.id)") ✓
           .bottle-image(v-if="bottle.image")
             img(:src="bottle.image" :alt="bottle.name")
           .bottle-image.placeholder(v-else)
@@ -48,22 +55,79 @@
 
   const filter = ref<"all" | "selected" | "unselected">("all");
   const categoryFilter = ref<string>("Special Occasion");
+  const saving = ref(false);
+  const successMessage = ref<string | null>(null);
+  
+  // Track pending changes (bottle IDs that should be marked as fingers)
+  const pendingFingerIds = ref<Set<string>>(new Set());
+  const hasLoadedInitialState = ref(false);
 
   // Load data on mount
   onMounted(async () => {
     await loadInventory();
+    // Initialize pending state from current inventory
+    initializePendingState();
+    hasLoadedInitialState.value = true;
+  });
+
+  // Initialize pending state from current bottle data
+  function initializePendingState() {
+    pendingFingerIds.value = new Set(
+      inventory.value.filter((b) => b.isFinger).map((b) => b.id)
+    );
+  }
+
+  // Check if there are unsaved changes
+  const hasUnsavedChanges = computed(() => {
+    if (!hasLoadedInitialState.value) return false;
+    
+    const currentFingerIds = new Set(
+      inventory.value.filter((b) => b.isFinger).map((b) => b.id)
+    );
+    
+    // Check if the sets are different
+    if (currentFingerIds.size !== pendingFingerIds.value.size) return true;
+    
+    for (const id of currentFingerIds) {
+      if (!pendingFingerIds.value.has(id)) return true;
+    }
+    
+    for (const id of pendingFingerIds.value) {
+      if (!currentFingerIds.has(id)) return true;
+    }
+    
+    return false;
   });
 
   // Get only in-stock bottles for selection
   const bottles = computed(() => inventory.value.filter((b) => b.inStock));
 
-  const selectedBottles = computed(() => bottles.value.filter((b) => b.isFinger));
-  const unselectedBottles = computed(() => bottles.value.filter((b) => !b.isFinger));
+  // Check if a bottle is selected in pending state
+  function isBottleSelected(bottleId: string): boolean {
+    return pendingFingerIds.value.has(bottleId);
+  }
+
+  // Count selected/unselected based on pending state
+  const pendingSelectedCount = computed(() => {
+    return bottles.value.filter((b) => pendingFingerIds.value.has(b.id)).length;
+  });
+
+  const pendingUnselectedCount = computed(() => {
+    return bottles.value.filter((b) => !pendingFingerIds.value.has(b.id)).length;
+  });
+
+  const selectedBottles = computed(() => 
+    bottles.value.filter((b) => pendingFingerIds.value.has(b.id))
+  );
+  
+  const unselectedBottles = computed(() => 
+    bottles.value.filter((b) => !pendingFingerIds.value.has(b.id))
+  );
 
   const filteredBottles = computed(() => {
     let result = bottles.value;
 
-    // Apply selection filter
+    // Apply selection filter based on pending state
     if (filter.value === "selected") {
       result = selectedBottles.value;
     } else if (filter.value === "unselected") {
@@ -78,27 +142,61 @@
     return result;
   });
 
-  // Toggle finger status via API
-  async function toggleFingerStatus(bottle: Bottle) {
-    try {
-      const updatedData = {
-        ...bottle,
-        isFinger: !bottle.isFinger,
-      };
+  // Toggle finger status in pending state (doesn't save immediately)
+  function toggleFingerStatus(bottle: Bottle) {
+    if (pendingFingerIds.value.has(bottle.id)) {
+      pendingFingerIds.value.delete(bottle.id);
+    } else {
+      pendingFingerIds.value.add(bottle.id);
+    }
+    // Force reactivity update
+    pendingFingerIds.value = new Set(pendingFingerIds.value);
+  }
 
-      await $fetch(`/api/inventory/${bottle.id}`, {
-        method: "PUT",
-        body: updatedData,
+  // Save all pending changes to the server
+  async function saveChanges() {
+    saving.value = true;
+    successMessage.value = null;
+
+    try {
+      // Get all bottles that need to be updated
+      const bottlesToUpdate = inventory.value.filter((bottle) => {
+        const isPendingFinger = pendingFingerIds.value.has(bottle.id);
+        const isCurrentlyFinger = bottle.isFinger;
+        return isPendingFinger !== isCurrentlyFinger;
       });
 
-      // Update local state
-      const index = inventory.value.findIndex((b) => b.id === bottle.id);
-      if (index !== -1) {
-        inventory.value[index] = updatedData;
-      }
+      // Update each bottle
+      const updatePromises = bottlesToUpdate.map(async (bottle) => {
+        const updatedData = {
+          ...bottle,
+          isFinger: pendingFingerIds.value.has(bottle.id),
+        };
+
+        await $fetch(`/api/inventory/${bottle.id}`, {
+          method: "PUT",
+          body: updatedData,
+        });
+
+        // Update local state
+        const index = inventory.value.findIndex((b) => b.id === bottle.id);
+        if (index !== -1) {
+          inventory.value[index] = updatedData;
+        }
+      });
+
+      await Promise.all(updatePromises);
+
+      // Show success message briefly
+      successMessage.value = `Successfully saved ${bottlesToUpdate.length} change${bottlesToUpdate.length !== 1 ? 's' : ''}!`;
+      setTimeout(() => {
+        successMessage.value = null;
+      }, 3000);
     } catch (e) {
-      console.error("Failed to update bottle finger status:", e);
-      alert("Failed to update bottle. Please try again.");
+      console.error("Failed to save finger bottle changes:", e);
+      alert("Failed to save changes. Please try again.");
+    } finally {
+      saving.value = false;
     }
   }
 </script>
@@ -130,6 +228,53 @@
       margin: 0;
       color: $text-dark;
       line-height: 1.6;
+    }
+  }
+
+  .save-section {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: color.adjust(orange, $lightness: 45%);
+    border: 2px solid orange;
+    border-radius: $border-radius-lg;
+    padding: $spacing-lg;
+    gap: $spacing-lg;
+
+    .unsaved-changes-notice {
+      display: flex;
+      align-items: center;
+      gap: $spacing-sm;
+      font-weight: 600;
+      color: color.adjust(orange, $lightness: -30%);
+
+      .icon {
+        font-size: 1.5rem;
+      }
+    }
+
+    .save-btn {
+      padding: $spacing-sm $spacing-xl;
+      border-radius: $border-radius-md;
+      background: $accent-color;
+      color: white;
+      border: none;
+      font-weight: 600;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      white-space: nowrap;
+
+      &:hover:not(:disabled) {
+        background: color.adjust($accent-color, $lightness: -10%);
+        transform: translateY(-2px);
+        box-shadow: $shadow-md;
+      }
+
+      &:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+      }
     }
   }
 

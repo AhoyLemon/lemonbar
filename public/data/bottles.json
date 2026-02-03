@@ -37,7 +37,7 @@
         "whiskey"
       ],
       "inStock": true,
-      "isFinger": false,
+      "isFinger": true,
       "bottleSize": "750ml",
       "bottleState": "unopened",
       "image": "/images/bottles/bibandtucker.webp"
@@ -730,5 +730,5 @@
       "image": "/images/bottles/weller12.webp"
     }
   ],
-  "lastUpdated": "2026-02-03T18:46:05.487Z"
+  "lastUpdated": "2026-02-03T19:04:35.648Z"
 }

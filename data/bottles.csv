@@ -1,7 +1,7 @@
 id,name,category,tags,inStock,isFinger,bottleSize,bottleState,image,company
 1,3 Amigos Reposado,Staples,"tequila, reposado",true,false,750ml,opened,/images/bottles/3amigos_reposado.webp,
 2,Beefeater,Staples,"gin, london dry",true,false,750ml,opened,/images/bottles/beefeater.webp,
-3,Bib & Tucker,Special Occasion,"bourbon, whiskey",true,false,750ml,unopened,/images/bottles/bibandtucker.webp,
+3,Bib & Tucker,Special Occasion,"bourbon, whiskey",true,true,750ml,unopened,/images/bottles/bibandtucker.webp,
 4,Blue Run Chosen,Staples,"whiskey, bourbon",true,false,750ml,unopened,/images/bottles/bluerun_chosen.webp,
 5,Bombay Sapphire East,Staples,"gin, london dry",true,false,750ml,opened,/images/bottles/bombay_east.webp,
 6,Camarena Reposado,Staples,"tequila, reposado",true,false,airplane,unopened,/images/bottles/camarena_airplane.webp,
