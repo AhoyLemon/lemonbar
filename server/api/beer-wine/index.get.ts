@@ -1,16 +1,16 @@
-import { readInventoryCSV } from "~/server/utils/csvHelper";
+import { readBeerWineData } from "~/server/utils/beerWineHelper";
 
 export default defineEventHandler(() => {
   try {
-    const bottles = readInventoryCSV();
+    const items = readBeerWineData();
     return {
       success: true,
-      bottles,
+      items,
     };
   } catch (error) {
     throw createError({
       statusCode: 500,
-      statusMessage: "Failed to read inventory",
+      statusMessage: "Failed to read beer-wine data",
     });
   }
 });

@@ -1,25 +1,20 @@
-import {
-  readInventoryCSV,
-  writeInventoryCSV,
-  getNextId,
-  normalizeImagePath,
-} from '~/server/utils/csvHelper'
-import { syncInventoryData } from '~/server/utils/syncHelper'
-import type { Bottle } from '~/types'
+import { readInventoryCSV, writeInventoryCSV, getNextId, normalizeImagePath } from "~/server/utils/csvHelper";
+import { syncInventoryData } from "~/server/utils/syncHelper";
+import type { Bottle } from "~/types";
 
-export default defineEventHandler(async event => {
+export default defineEventHandler(async (event) => {
   try {
-    const body = await readBody<Partial<Bottle>>(event)
+    const body = await readBody<Partial<Bottle>>(event);
 
     // Validate required fields
     if (!body.name || !body.category) {
       throw createError({
         statusCode: 400,
-        statusMessage: 'Name and category are required',
-      })
+        statusMessage: "Name and category are required",
+      });
     }
 
-    const bottles = readInventoryCSV()
+    const bottles = readInventoryCSV();
     const newBottle: Bottle = {
       id: getNextId(bottles),
       name: body.name,
@@ -32,25 +27,25 @@ export default defineEventHandler(async event => {
       abv: body.abv,
       origin: body.origin,
       company: body.company,
-    }
+    };
 
-    bottles.push(newBottle)
-    writeInventoryCSV(bottles)
+    bottles.push(newBottle);
+    writeInventoryCSV(bottles);
 
-    // Sync data to regenerate public/data/inventory.json
-    await syncInventoryData()
+    // Sync data to regenerate public/data/bottles.json
+    await syncInventoryData();
 
     return {
       success: true,
       bottle: newBottle,
-    }
+    };
   } catch (error: any) {
     if (error.statusCode) {
-      throw error
+      throw error;
     }
     throw createError({
       statusCode: 500,
-      statusMessage: 'Failed to create bottle',
-    })
+      statusMessage: "Failed to create bottle",
+    });
   }
-})
+});

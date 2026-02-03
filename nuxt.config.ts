@@ -25,12 +25,12 @@ export default defineNuxtConfig({
 
   // Build configuration for GitHub Pages
   app: {
-    baseURL: process.env.NODE_ENV === 'production' ? '/lemonbar/' : '/',
-    buildAssetsDir: 'assets',
+    baseURL: process.env.NODE_ENV === "production" ? "/lemonbar/" : "/",
+    buildAssetsDir: "assets",
   },
 
   // SSG target for static generation
   ssr: true,
 
-  compatibilityDate: '2026-02-02',
-})
+  compatibilityDate: "2026-02-02",
+});
