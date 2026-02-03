@@ -2,17 +2,18 @@
   "items": [
     {
       "id": "1",
-      "name": "Kentucky Kölsch",
+      "name": "Grain Belt Premium",
       "type": "beer",
-      "inStock": false
+      "subtype": "Lager",
+      "inStock": true
     },
     {
       "id": "2",
-      "name": "Château Margaux",
+      "name": "Trader Joe's Syrah",
       "type": "wine",
-      "subtype": "Red Wine",
+      "subtype": "Shiraz",
       "inStock": true
     }
   ],
-  "lastUpdated": "2026-02-03T17:41:19.083Z"
+  "lastUpdated": "2026-02-03T17:45:44.335Z"
 }
