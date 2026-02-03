@@ -151,7 +151,145 @@
         "easy",
         "nightcap"
       ]
+    },
+    {
+      "id": "nero",
+      "name": "The Nero",
+      "ingredients": [
+        {
+          "name": "Ice"
+        },
+        {
+          "name": "Reposado",
+          "qty": "1.5 oz"
+        },
+        {
+          "name": "wood chips"
+        },
+        {
+          "name": "fire"
+        },
+        {
+          "name": "St-Germain",
+          "qty": ".75 oz"
+        },
+        {
+          "name": "Grapefruit",
+          "qty": "1"
+        },
+        {
+          "name": "Angostura",
+          "qty": "dash"
+        },
+        {
+          "name": "Salt"
+        }
+      ],
+      "instructions": [
+        "cut grapefruit into quarters and juice into the shaker",
+        "add ice to the shaker, then add the reposado and St-Germain",
+        "light woodchips on fire",
+        "once the fire is visible, extinguish it with a rocks glass, trapping the smoke inside",
+        "shake the cocktail",
+        "the moment you flip the glass over, pour the cocktail into the smoked glass",
+        "finish with a dash of angostura and a pinch of salt"
+      ],
+      "prep": "Shaker",
+      "category": "Smoked",
+      "tags": [
+        "shaken",
+        "smoked",
+        "complicated",
+        "outside",
+        "fire"
+      ]
+    },
+    {
+      "id": "rhubarb-elderflower",
+      "name": "Rhubarb Elderflower Fizz",
+      "ingredients": [
+        {
+          "name": "Gin",
+          "qty": "2 oz"
+        },
+        {
+          "name": "Rhubarb Simple Syrup",
+          "qty": "1 oz"
+        },
+        {
+          "name": "St-Germain",
+          "qty": "1 oz"
+        },
+        {
+          "name": "Egg",
+          "qty": "1"
+        },
+        {
+          "name": "Club Soda",
+          "qty": "top"
+        }
+      ],
+      "instructions": [
+        "Dry Shake: In a cocktail shaker, combine gin, rhubarb simple syrup, lemon juice, elderflower liqueur, and egg white (if using). Seal tightly and shake vigorously for about 15-20 seconds without ice.",
+        "Wet Shake: Add ice to the shaker and shake again until well-chilled, about 20-30 seconds.",
+        "Strain: Double strain the mixture into a chilled highball glass (or a coupe) filled with fresh ice.",
+        "Top: Slowly top with chilled club soda until the glass is full and a nice foam head forms.",
+        "Garnish: Garnish with a fresh mint sprig, a thin lemon twist, or a few fresh berries."
+      ],
+      "prep": "Shaker",
+      "category": "Fizzy",
+      "tags": [
+        "gin",
+        "rhubarb",
+        "elderflower",
+        "fizzy"
+      ]
+    },
+    {
+      "id": "aviation",
+      "name": "Lemon's Aviation",
+      "ingredients": [
+        {
+          "name": "Ice"
+        },
+        {
+          "name": "Gin",
+          "qty": "2 oz"
+        },
+        {
+          "name": "Maraschino Liqueur",
+          "qty": ".5 oz"
+        },
+        {
+          "name": "Creme De Violette",
+          "qty": ".5 oz"
+        },
+        {
+          "name": "Lemon",
+          "qty": "1"
+        },
+        {
+          "name": "Cocktail Cherry",
+          "qty": "2 oz"
+        }
+      ],
+      "instructions": [
+        "ice in the shaker",
+        "add the booze",
+        "slice the lemon, and juice half into the shaker",
+        "shake shake shake",
+        "strain into a glass",
+        "garnish with cocktail cherry"
+      ],
+      "prep": "Shaker",
+      "category": "Boozy",
+      "tags": [
+        "gin",
+        "maraschino",
+        "violet",
+        "classic"
+      ]
     }
   ],
-  "lastUpdated": "2026-02-03T02:44:22.407Z"
+  "lastUpdated": "2026-02-03T02:48:28.574Z"
 }
