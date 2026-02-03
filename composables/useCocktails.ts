@@ -467,6 +467,35 @@ export const useCocktails = () => {
     })
   }
 
+  // Helper function to count how many ingredients are in stock
+  const countMatchedIngredients = (drink: Drink): number => {
+    return drink.ingredients.filter(ingredient => isIngredientInStock(ingredient.name)).length
+  }
+
+  // Sort drinks by ingredient availability, then by favorited status
+  // Drinks with more ingredients in stock appear first
+  // Within each availability tier, favorited drinks appear first
+  const sortDrinksByAvailability = (drinks: Drink[], isStarredFn: (id: string) => boolean): Drink[] => {
+    return [...drinks].sort((a, b) => {
+      const aMatched = countMatchedIngredients(a)
+      const bMatched = countMatchedIngredients(b)
+      
+      // First, sort by number of matched ingredients (descending)
+      if (aMatched !== bMatched) {
+        return bMatched - aMatched
+      }
+      
+      // If matched count is the same, prioritize favorited drinks
+      const aStarred = isStarredFn(a.id)
+      const bStarred = isStarredFn(b.id)
+      
+      if (aStarred && !bStarred) return -1
+      if (bStarred && !aStarred) return 1
+      
+      return 0
+    })
+  }
+
   return {
     inventory,
     localDrinks,
@@ -486,5 +515,7 @@ export const useCocktails = () => {
     getNonAlcoholicDrinks,
     getAlcoholicDrinks,
     isIngredientInStock,
+    countMatchedIngredients,
+    sortDrinksByAvailability,
   }
 }

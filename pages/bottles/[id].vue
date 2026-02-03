@@ -50,13 +50,21 @@
       .drinks-section
         h3 Drinks Using This Bottle
         .loading(v-if="drinksLoading") Loading drinks...
-        .drinks-list(v-else-if="drinksUsingBottle.length > 0")
-          .drink-list-item(v-for="drink in drinksUsingBottle" :key="drink.id")
+        .drinks-list(v-else-if="sortedDrinksUsingBottle.length > 0")
+          .drink-list-item(
+            v-for="drink in sortedDrinksUsingBottle" 
+            :key="drink.id"
+            :class="{ 'has-missing-ingredients': !drinkHasAllIngredients(drink) }"
+          )
             .drink-thumbnail
               img(v-if="drink.imageUrl" :src="drink.imageUrl" :alt="drink.name")
               img(v-else-if="drink.image" :src="`/images/drinks/${drink.image}`" :alt="drink.name")
               .no-image(v-else) 🍹
-            .drink-name {{ drink.name }}
+            .drink-info
+              .drink-name {{ drink.name }}
+              .drink-availability(v-if="!drinkHasAllIngredients(drink)") 
+                span.missing-icon ⚠️
+                span.missing-text {{ getMissingIngredientsCount(drink) }} missing ingredient{{ getMissingIngredientsCount(drink) === 1 ? '' : 's' }}
             NuxtLink.drink-view-btn(:to="`/drinks/${drink.id}`") View
         p.no-drinks(v-else) No drinks found using this bottle yet.
     
@@ -70,8 +78,17 @@ import type { Bottle, Drink } from '~/types'
 const route = useRoute()
 const bottleId = route.params.id as string
 
-const { loadInventory, loadLocalDrinks, fetchDrinksByIngredient, getDrinksUsingBottle } =
-  useCocktails()
+const { 
+  loadInventory, 
+  loadLocalDrinks, 
+  fetchDrinksByIngredient, 
+  getDrinksUsingBottle,
+  isIngredientInStock,
+  countMatchedIngredients,
+  sortDrinksByAvailability,
+} = useCocktails()
+
+const { loadStarredDrinks, isStarred } = useStarredDrinks()
 
 const bottle = ref<Bottle | null>(null)
 const loading = ref(true)
@@ -79,9 +96,25 @@ const error = ref<string | null>(null)
 const drinksLoading = ref(false)
 const drinksUsingBottle = ref<Drink[]>([])
 
+// Computed property to sort drinks by availability
+const sortedDrinksUsingBottle = computed(() => {
+  return sortDrinksByAvailability(drinksUsingBottle.value, isStarred)
+})
+
+// Helper to check if drink has all ingredients
+const drinkHasAllIngredients = (drink: Drink): boolean => {
+  return drink.ingredients.every(ingredient => isIngredientInStock(ingredient.name))
+}
+
+// Helper to count missing ingredients
+const getMissingIngredientsCount = (drink: Drink): number => {
+  return drink.ingredients.length - countMatchedIngredients(drink)
+}
+
 onMounted(async () => {
   await loadBottle()
   await loadDrinks()
+  loadStarredDrinks()
 })
 
 async function loadBottle() {
@@ -382,6 +415,16 @@ async function toggleInStock() {
       background: $light-bg;
       border-color: $primary-color;
     }
+
+    &.has-missing-ingredients {
+      background: color.adjust(orange, $lightness: 48%);
+      border-color: color.adjust(orange, $lightness: 30%);
+
+      &:hover {
+        background: color.adjust(orange, $lightness: 45%);
+        border-color: orange;
+      }
+    }
   }
 
   .drink-thumbnail {
@@ -406,10 +449,32 @@ async function toggleInStock() {
     }
   }
 
-  .drink-name {
+  .drink-info {
     flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-xs;
+  }
+
+  .drink-name {
     font-weight: 600;
     color: $text-dark;
+  }
+
+  .drink-availability {
+    display: flex;
+    align-items: center;
+    gap: $spacing-xs;
+    font-size: 0.75rem;
+    color: color.adjust(orange, $lightness: -20%);
+
+    .missing-icon {
+      font-size: 0.875rem;
+    }
+
+    .missing-text {
+      font-weight: 500;
+    }
   }
 
   .drink-view-btn {

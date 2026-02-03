@@ -41,6 +41,7 @@ const {
   getAlcoholicDrinks,
   getNonAlcoholicDrinks,
   getAvailableDrinks,
+  sortDrinksByAvailability,
   loading,
   error,
 } = useCocktails()
@@ -125,15 +126,8 @@ const filteredDrinks = computed(() => {
     })
   }
 
-  // No search term: sort starred recipes first
-  return drinks.slice().sort((a, b) => {
-    const aStarred = isStarred(a.id)
-    const bStarred = isStarred(b.id)
-
-    if (aStarred && !bStarred) return -1
-    if (bStarred && !aStarred) return 1
-    return 0
-  })
+  // No search term: sort by ingredient availability, then by favorited status
+  return sortDrinksByAvailability(drinks, isStarred)
 })
 </script>
 
