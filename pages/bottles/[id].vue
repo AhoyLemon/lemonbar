@@ -80,7 +80,7 @@ const bottle = ref<Bottle | null>(null)
 const loading = ref(true)
 const error = ref<string | null>(null)
 const drinksLoading = ref(false)
-const drinksUsingBottle = ref<Recipe[]>([])
+const drinksUsingBottle = ref<Drink[]([])
 
 onMounted(async () => {
   await loadBottle()

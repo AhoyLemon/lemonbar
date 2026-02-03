@@ -2,12 +2,12 @@
 .drink-detail-page(v-if="isLoading")
   .container
     .loading-state
-      p Loading recipe...
+      p Loading drink...
 
-.drink-detail-page(v-else-if="recipe")
+.drink-detail-page(v-else-if="drink")
   .container
       .back-navigation
-        NuxtLink.btn.btn-back(to="/recipes") ← Back to Recipes
+        NuxtLink.btn.btn-back(to="/drinks") ← Back to Drinks
       .recipe-hero
         .recipe-hero__image(v-if="recipeImageUrl")
           img(:src="recipeImageUrl" :alt="recipe.name")
@@ -15,7 +15,7 @@
           h1 {{ recipe.name }}
           .badge-row
             span.source-badge(:class="isLocalRecipe ? 'local' : 'external'")
-              | {{ isLocalRecipe ? '🏠 Local Recipe' : '🌐 CocktailDB' }}
+              | {{ isLocalRecipe ? '🏠 Local Drink' : '🌐 CocktailDB' }}
             span.category-badge(v-if="recipe.category") {{ recipe.category }}
             span.prep-badge(v-if="recipe.prep") {{ recipe.prep }}
           .tags-row(v-if="recipe.tags && recipe.tags.length > 0")
@@ -49,9 +49,9 @@
 
 .not-found(v-else-if="!isLoading")
   .container
-    h2 Recipe Not Found
-    p The recipe you're looking for doesn't exist.
-    NuxtLink.btn.btn-primary(to="/recipes") Back to Recipes
+    h2 Drink Not Found
+    p The drink you're looking for doesn't exist.
+    NuxtLink.btn.btn-primary(to="/drinks") Back to Drinks
 </template>
 
 <script setup lang="ts">
@@ -60,11 +60,11 @@ const {
   loadInventory,
   loadLocalDrinks,
   fetchCocktailDBDrinkById,
-  getAllRecipes,
+  getAllDrinks,
   isIngredientInStock,
 } = useCocktails()
 
-const { loadStarredRecipes } = useStarredDrinks()
+const { loadStarredDrinks } = useStarredDrinks()
 
 const isLoading = ref(false)
 
@@ -72,7 +72,7 @@ const isLoading = ref(false)
 onMounted(async () => {
   await loadInventory()
   await loadLocalDrinks()
-  loadStarredRecipes()
+  loadStarredDrinks()
 
   // Check if this is a CocktailDB recipe that needs to be fetched
   const recipeId = route.params.id as string
@@ -80,7 +80,7 @@ onMounted(async () => {
     const cocktailDbId = recipeId.replace('cocktaildb-', '')
 
     // Check if we already have this recipe
-    const existingRecipe = getAllRecipes.value.find(r => r.id === recipeId)
+    const existingRecipe = getAllDrinks.value.find(r => r.id === recipeId)
 
     if (!existingRecipe) {
       // Fetch the specific recipe from CocktailDB
@@ -93,7 +93,7 @@ onMounted(async () => {
 
 // Find the recipe by ID
 const drink = computed(() => {
-  return getAllRecipes.value.find(r => r.id === route.params.id)
+  return getAllDrinks.value.find(r => r.id === route.params.id)
 })
 
 // Check if this is a local recipe or from CocktailDB

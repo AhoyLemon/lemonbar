@@ -2,7 +2,7 @@ export const useStarredDrinks = () => {
   const starredDrinkIds = useState<Set<string>>('starredDrinkIds', () => new Set())
 
   // Load starred drinks from localStorage on client side
-  const loadStarredRecipes = () => {
+  const loadStarredDrinks = () => {
     if (process.client) {
       const stored = localStorage.getItem('starredDrinks')
       if (stored) {
@@ -17,33 +17,33 @@ export const useStarredDrinks = () => {
   }
 
   // Save starred drinks to localStorage
-  const saveStarredRecipes = () => {
+  const saveStarredDrinks = () => {
     if (process.client) {
       const ids = Array.from(starredDrinkIds.value)
       localStorage.setItem('starredDrinks', JSON.stringify(ids))
     }
   }
 
-  // Check if a recipe is starred
+  // Check if a drink is starred
   const isStarred = (drinkId: string): boolean => {
     return starredDrinkIds.value.has(drinkId)
   }
 
-  // Toggle star status for a recipe
+  // Toggle star status for a drink
   const toggleStar = (drinkId: string) => {
     if (starredDrinkIds.value.has(drinkId)) {
       starredDrinkIds.value.delete(drinkId)
     } else {
       starredDrinkIds.value.add(drinkId)
     }
-    saveStarredRecipes()
+    saveStarredDrinks()
   }
 
-  // Get list of starred recipe IDs
+  // Get list of starred drink IDs
   const getStarredIds = computed(() => Array.from(starredDrinkIds.value))
 
   return {
-    loadStarredRecipes,
+    loadStarredDrinks,
     isStarred,
     toggleStar,
     getStarredIds,

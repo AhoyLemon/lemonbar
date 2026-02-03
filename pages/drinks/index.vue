@@ -19,7 +19,7 @@
         button.filter-btn(:class="{ active: filter === 'nonAlcoholic' }" @click="filter = 'nonAlcoholic'") Non-Alcoholic ({{ filteredNonAlcoholicDrinks.length }})
         button.filter-btn(:class="{ active: filter === 'available' }" @click="filter = 'available'") Available ({{ filteredAvailableDrinks.length }})
 
-      .loading(v-if="loading") Loading recipes...
+      .loading(v-if="loading") Loading drinks...
       .error(v-if="error") {{ error }}
 
       .drinks-grid
@@ -45,7 +45,7 @@ const {
   error,
 } = useCocktails()
 
-const { loadStarredRecipes, isStarred } = useStarredDrinks()
+const { loadStarredDrinks, isStarred } = useStarredDrinks()
 
 const searchTerm = ref('')
 const filter = ref<'all' | 'alcoholic' | 'nonAlcoholic' | 'available'>('all')
@@ -54,7 +54,7 @@ const filter = ref<'all' | 'alcoholic' | 'nonAlcoholic' | 'available'>('all')
 onMounted(async () => {
   await loadInventory()
   await loadLocalDrinks()
-  loadStarredRecipes()
+  loadStarredDrinks()
 
   // Fetch random cocktails to showcase variety
   await fetchRandomCocktails(8)
@@ -66,15 +66,15 @@ const handleSearch = async () => {
   }
 }
 
-// Helper to filter recipes by search term
-const applySearchFilter = (recipes: any[]) => {
-  if (!searchTerm.value.trim()) return recipes
+// Helper to filter drinks by search term
+const applySearchFilter = (drinks: any[]) => {
+  if (!searchTerm.value.trim()) return drinks
 
   const term = searchTerm.value.toLowerCase()
-  return recipes.filter(recipe => {
-    const nameMatch = recipe.name.toLowerCase().includes(term)
-    const categoryMatch = recipe.category?.toLowerCase().includes(term)
-    const ingredientMatch = recipe.ingredients.some((ing: { name: string }) =>
+  return drinks.filter(drink => {
+    const nameMatch = drink.name.toLowerCase().includes(term)
+    const categoryMatch = drink.category?.toLowerCase().includes(term)
+    const ingredientMatch = drink.ingredients.some((ing: { name: string }) =>
       ing.name.toLowerCase().includes(term)
     )
     return nameMatch || categoryMatch || ingredientMatch
@@ -88,19 +88,19 @@ const filteredNonAlcoholicDrinks = computed(() => applySearchFilter(getNonAlcoho
 const filteredAvailableDrinks = computed(() => applySearchFilter(getAvailableDrinks.value))
 
 const filteredDrinks = computed(() => {
-  let recipes
+  let drinks
   switch (filter.value) {
     case 'alcoholic':
-      recipes = filteredAlcoholicDrinks.value
+      drinks = filteredAlcoholicDrinks.value
       break
     case 'nonAlcoholic':
-      recipes = filteredNonAlcoholicDrinks.value
+      drinks = filteredNonAlcoholicDrinks.value
       break
     case 'available':
-      recipes = filteredAvailableDrinks.value
+      drinks = filteredAvailableDrinks.value
       break
     default:
-      recipes = filteredAllDrinks.value
+      drinks = filteredAllDrinks.value
   }
 
   // If there's a search term, sort by relevance
@@ -126,7 +126,7 @@ const filteredDrinks = computed(() => {
   }
 
   // No search term: sort starred recipes first
-  return recipes.slice().sort((a, b) => {
+  return drinks.slice().sort((a, b) => {
     const aStarred = isStarred(a.id)
     const bStarred = isStarred(b.id)
 
