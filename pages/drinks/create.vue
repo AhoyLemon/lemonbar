@@ -120,6 +120,7 @@
                 option(value="Build") Build
                 option(value="Muddle") Muddle
                 option(value="Shaker") Shaker
+                option(value="Cook") Cook
                 option(value="Simple") Simple
             
             .form-group
@@ -130,6 +131,7 @@
                 option(value="Fizzy") Fizzy
                 option(value="Margarita") Margarita
                 option(value="Nightcap") Nightcap
+                option(value="Hot") Hot
                 option(value="Smoked") Smoked
           
           .form-group

@@ -2,10 +2,10 @@
 .bottle-card(:class="{ 'out-of-stock': !bottle.inStock }")
   .bottle-card__image(v-if="bottle.image")
     img(:src="bottle.image" :alt="bottle.name")
+    span.bottle-card__category {{ bottle.category }}
   .bottle-card__content
     .bottle-card__header
       h3.bottle-card__name {{ bottle.name }}
-      span.bottle-card__category {{ bottle.category }}
     .bottle-card__meta
       span.bottle-card__size(v-if="bottle.bottleSize") 
         | 📏 {{ bottle.bottleSize }}
@@ -20,6 +20,8 @@
     .bottle-card__status
       span.status-indicator(:class="{ 'in-stock': bottle.inStock, 'out-of-stock': !bottle.inStock }")
         | {{ bottle.inStock ? 'In Stock' : 'Out of Stock' }}
+      span.status-fingers(v-if="bottle.isFinger") 
+        | 🫰 Fingers!
     .bottle-card__actions
       NuxtLink.action-btn.action-btn--view(:to="`/bottles/${bottle.id}`") 👁️ View
       NuxtLink.action-btn.action-btn--edit(:to="`/bottles/manage?id=${bottle.id}`") ✏️ Edit
@@ -58,10 +60,10 @@
     display: flex;
     flex-direction: column;
 
-    &:hover {
-      box-shadow: $shadow-md;
-      transform: translateY(-2px);
-    }
+    // &:hover {
+    //   box-shadow: $shadow-md;
+    //   transform: translateY(-2px);
+    // }
 
     &.out-of-stock {
       opacity: 0.6;
@@ -76,6 +78,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
+      position: relative;
 
       img {
         width: 100%;
@@ -108,12 +111,15 @@
     }
 
     &__category {
-      background: $accent-color;
+      background: $dark-bg;
       color: white;
       padding: $spacing-xs $spacing-sm;
       border-radius: $border-radius-sm;
       font-size: 0.875rem;
       font-weight: 600;
+      position: absolute;
+      bottom: 10px;
+      right: 10px;
     }
 
     &__meta {
@@ -127,7 +133,7 @@
     &__abv,
     &__origin,
     &__state {
-      font-size: 0.875rem;
+      font-size: 0.75rem;
       padding: $spacing-xs $spacing-sm;
       border-radius: $border-radius-sm;
       background: $light-bg;
@@ -137,13 +143,13 @@
       font-weight: 600;
 
       &.state-unopened {
-        background: color.adjust($accent-color, $lightness: 40%);
-        color: color.adjust($accent-color, $lightness: -20%);
+        // background: color.adjust($accent-color, $lightness: 40%);
+        // color: color.adjust($accent-color, $lightness: -20%);
       }
 
       &.state-opened {
-        background: color.adjust($primary-color, $lightness: 35%);
-        color: color.adjust($primary-color, $lightness: -15%);
+        // background: color.adjust($primary-color, $lightness: 35%);
+        // color: color.adjust($primary-color, $lightness: -15%);
       }
 
       &.state-empty {
@@ -172,23 +178,30 @@
       align-items: center;
       margin-top: auto;
       margin-bottom: $spacing-sm;
+      gap: $spacing-sm;
     }
 
-    .status-indicator {
-      padding: $spacing-xs $spacing-md;
+    .status-indicator,
+    .status-fingers {
+      padding: $spacing-xs $spacing-sm;
       border-radius: $border-radius-sm;
-      font-size: 0.875rem;
-      font-weight: 600;
+      font-size: 0.75rem;
+      font-weight: 00;
 
       &.in-stock {
-        background: color.adjust($accent-color, $lightness: 40%);
-        color: color.adjust($accent-color, $lightness: -20%);
+        //background: color.adjust($accent-color, $lightness: 40%);
+        border: 0.1em solid $text-dark;
+        color: $text-dark;
       }
 
       &.out-of-stock {
         background: color.adjust($secondary-color, $lightness: 35%);
         color: color.adjust($secondary-color, $lightness: -10%);
       }
+    }
+    .status-fingers {
+      background-color: $dark-bg;
+      color: $text-light;
     }
 
     &__actions {
