@@ -34,6 +34,7 @@
 <script setup lang="ts">
 const {
   loadInventory,
+  loadEssentials,
   loadLocalDrinks,
   fetchCocktailDBDrinks,
   fetchRandomCocktails,
@@ -41,6 +42,7 @@ const {
   getAlcoholicDrinks,
   getNonAlcoholicDrinks,
   getAvailableDrinks,
+  sortDrinksByAvailability,
   loading,
   error,
 } = useCocktails()
@@ -53,6 +55,7 @@ const filter = ref<'all' | 'alcoholic' | 'nonAlcoholic' | 'available'>('all')
 // Load data on mount
 onMounted(async () => {
   await loadInventory()
+  await loadEssentials()
   await loadLocalDrinks()
   loadStarredDrinks()
 
@@ -125,15 +128,8 @@ const filteredDrinks = computed(() => {
     })
   }
 
-  // No search term: sort starred recipes first
-  return drinks.slice().sort((a, b) => {
-    const aStarred = isStarred(a.id)
-    const bStarred = isStarred(b.id)
-
-    if (aStarred && !bStarred) return -1
-    if (bStarred && !aStarred) return 1
-    return 0
-  })
+  // No search term: sort by ingredient availability, then by favorited status
+  return sortDrinksByAvailability(drinks, isStarred)
 })
 </script>
 
