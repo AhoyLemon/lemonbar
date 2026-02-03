@@ -58,6 +58,7 @@
 const route = useRoute()
 const {
   loadInventory,
+  loadEssentials,
   loadLocalDrinks,
   fetchCocktailDBDrinkById,
   getAllDrinks,
@@ -71,6 +72,7 @@ const isLoading = ref(false)
 // Load data on mount
 onMounted(async () => {
   await loadInventory()
+  await loadEssentials()
   await loadLocalDrinks()
   loadStarredDrinks()
 
