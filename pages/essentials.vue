@@ -20,6 +20,13 @@
           .stat-card.actions
             button.btn-secondary(@click="checkAll") Check All
             button.btn-secondary(@click="clearAll") Clear All
+            button.btn-primary(
+              @click="saveChanges"
+              :disabled="!hasUnsavedChanges || saving"
+              :class="{ 'has-changes': hasUnsavedChanges }"
+            )
+              span(v-if="saving") Saving...
+              span(v-else) {{ hasUnsavedChanges ? 'Save Changes' : 'Saved' }}
 
         .essentials-grid
           .category-section(v-for="category in essentialCategories" :key="category.name")
@@ -45,9 +52,12 @@ const {
   essentials,
   essentialCategories,
   loading,
+  saving,
   error,
   fetchEssentials,
   toggleEssential,
+  hasUnsavedChanges,
+  saveChanges,
   clearAll,
   checkAll,
   getItemsForCategory,
@@ -159,6 +169,43 @@ const getCategoryItemCount = (category: { name: string }) => {
   &:hover {
     background: color.adjust(white, $lightness: -10%);
     transform: translateY(-2px);
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+  }
+}
+
+.btn-primary {
+  padding: $spacing-sm $spacing-lg;
+  background: white;
+  color: $dark-bg;
+  border: none;
+  border-radius: $border-radius-md;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 0.9rem;
+
+  &.has-changes {
+    background: linear-gradient(135deg, #28a745 0%, #218838 100%);
+    color: white;
+    box-shadow: 0 4px 8px rgba(40, 167, 69, 0.3);
+
+    &:hover {
+      background: linear-gradient(135deg, #218838 0%, #1e7e34 100%);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 12px rgba(40, 167, 69, 0.4);
+    }
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
   }
 }
 

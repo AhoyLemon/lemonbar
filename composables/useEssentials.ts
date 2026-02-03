@@ -3,7 +3,9 @@ import type { Essential, EssentialsData } from '~/types'
 
 export const useEssentials = () => {
   const essentials = useState<Essential[]>('essentials', () => [])
+  const originalEssentials = useState<Essential[]>('originalEssentials', () => [])
   const loading = useState<boolean>('essentialsLoading', () => false)
+  const saving = useState<boolean>('essentialsSaving', () => false)
   const error = useState<string | null>('essentialsError', () => null)
 
   // Category configuration
@@ -23,7 +25,8 @@ export const useEssentials = () => {
     error.value = null
     try {
       const data = await $fetch<EssentialsData>('/api/essentials')
-      essentials.value = data.essentials
+      essentials.value = JSON.parse(JSON.stringify(data.essentials))
+      originalEssentials.value = JSON.parse(JSON.stringify(data.essentials))
     } catch (e: any) {
       error.value = e.message || 'Failed to load essentials'
       console.error('Failed to fetch essentials:', e)
@@ -32,66 +35,55 @@ export const useEssentials = () => {
     }
   }
 
-  // Toggle essential stock status
-  const toggleEssential = async (id: string) => {
+  // Toggle essential stock status (local only)
+  const toggleEssential = (id: string) => {
     const essential = essentials.value.find(e => e.id === id)
     if (!essential) return
-
-    // Optimistic update
-    const previousState = essential.inStock
     essential.inStock = !essential.inStock
+  }
 
+  // Check if there are unsaved changes
+  const hasUnsavedChanges = computed(() => {
+    return JSON.stringify(essentials.value) !== JSON.stringify(originalEssentials.value)
+  })
+
+  // Save changes to server
+  const saveChanges = async () => {
+    saving.value = true
+    error.value = null
     try {
-      await $fetch(`/api/essentials/${id}`, {
-        method: 'PUT',
-        body: { id, inStock: essential.inStock },
+      // Find which essentials have changed
+      const changedEssentials = essentials.value.filter((essential, index) => {
+        const original = originalEssentials.value[index]
+        return essential.inStock !== original.inStock
       })
+
+      // Update each changed essential
+      const updates = changedEssentials.map(essential =>
+        $fetch(`/api/essentials/${essential.id}`, {
+          method: 'PUT',
+          body: { id: essential.id, inStock: essential.inStock },
+        })
+      )
+
+      await Promise.all(updates)
+
+      // Update the original state to match current state
+      originalEssentials.value = JSON.parse(JSON.stringify(essentials.value))
     } catch (e: any) {
-      // Revert on error
-      essential.inStock = previousState
-      error.value = e.message || 'Failed to update essential'
-      console.error('Failed to toggle essential:', e)
+      error.value = e.message || 'Failed to save changes'
+      console.error('Failed to save changes:', e)
+    } finally {
+      saving.value = false
     }
   }
 
-  const clearAll = async () => {
-    // Update all essentials to false
-    const updates = essentials.value.map(essential =>
-      $fetch(`/api/essentials/${essential.id}`, {
-        method: 'PUT',
-        body: { id: essential.id, inStock: false },
-      })
-    )
-
-    try {
-      await Promise.all(updates)
-      essentials.value.forEach(e => (e.inStock = false))
-    } catch (e: any) {
-      error.value = e.message || 'Failed to clear all essentials'
-      console.error('Failed to clear all:', e)
-      // Refetch to get correct state
-      await fetchEssentials()
-    }
+  const clearAll = () => {
+    essentials.value.forEach(e => (e.inStock = false))
   }
 
-  const checkAll = async () => {
-    // Update all essentials to true
-    const updates = essentials.value.map(essential =>
-      $fetch(`/api/essentials/${essential.id}`, {
-        method: 'PUT',
-        body: { id: essential.id, inStock: true },
-      })
-    )
-
-    try {
-      await Promise.all(updates)
-      essentials.value.forEach(e => (e.inStock = true))
-    } catch (e: any) {
-      error.value = e.message || 'Failed to check all essentials'
-      console.error('Failed to check all:', e)
-      // Refetch to get correct state
-      await fetchEssentials()
-    }
+  const checkAll = () => {
+    essentials.value.forEach(e => (e.inStock = true))
   }
 
   // Get items for a category
@@ -112,9 +104,12 @@ export const useEssentials = () => {
     essentials,
     essentialCategories,
     loading,
+    saving,
     error,
     fetchEssentials,
     toggleEssential,
+    hasUnsavedChanges,
+    saveChanges,
     clearAll,
     checkAll,
     getItemsForCategory,
