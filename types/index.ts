@@ -24,6 +24,7 @@ export interface Essential {
 export interface Ingredient {
   name: string;
   qty?: string;
+  optional?: boolean;
 }
 
 export interface Drink {
