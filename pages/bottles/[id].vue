@@ -50,13 +50,14 @@
       .drinks-section
         h3 Drinks Using This Bottle
         .loading(v-if="drinksLoading") Loading drinks...
-        .drinks-grid(v-else-if="drinksUsingBottle.length > 0")
-          DrinkCard(
-            v-for="drink in drinksUsingBottle"
-            :key="drink.id"
-            :drink="drink"
-            :show-availability="true"
-          )
+        .drinks-list(v-else-if="drinksUsingBottle.length > 0")
+          .drink-list-item(v-for="drink in drinksUsingBottle" :key="drink.id")
+            .drink-thumbnail
+              img(v-if="drink.imageUrl" :src="drink.imageUrl" :alt="drink.name")
+              img(v-else-if="drink.image" :src="`/images/drinks/${drink.image}`" :alt="drink.name")
+              .no-image(v-else) 🍹
+            .drink-name {{ drink.name }}
+            NuxtLink.drink-view-btn(:to="`/drinks/${drink.id}`") View
         p.no-drinks(v-else) No drinks found using this bottle yet.
     
     .loading(v-else-if="loading") Loading bottle details...
@@ -80,7 +81,7 @@ const bottle = ref<Bottle | null>(null)
 const loading = ref(true)
 const error = ref<string | null>(null)
 const drinksLoading = ref(false)
-const drinksUsingBottle = ref<Drink[]([])
+const drinksUsingBottle = ref<Drink[]>([])
 
 onMounted(async () => {
   await loadBottle()
@@ -370,10 +371,68 @@ async function toggleInStock() {
     font-style: italic;
   }
 
-  .drinks-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: $spacing-lg;
+  .drinks-list {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-sm;
+  }
+
+  .drink-list-item {
+    display: flex;
+    align-items: center;
+    gap: $spacing-md;
+    padding: $spacing-sm $spacing-md;
+    border: 1px solid $border-color;
+    border-radius: $border-radius-sm;
+    transition: all 0.2s ease;
+
+    &:hover {
+      background: $light-bg;
+      border-color: $primary-color;
+    }
+  }
+
+  .drink-thumbnail {
+    width: 50px;
+    height: 50px;
+    flex-shrink: 0;
+    border-radius: $border-radius-sm;
+    overflow: hidden;
+    background: $light-bg;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .no-image {
+      font-size: 1.5rem;
+    }
+  }
+
+  .drink-name {
+    flex: 1;
+    font-weight: 600;
+    color: $text-dark;
+  }
+
+  .drink-view-btn {
+    padding: $spacing-xs $spacing-md;
+    background: $primary-color;
+    color: white;
+    text-decoration: none;
+    border-radius: $border-radius-sm;
+    font-size: 0.875rem;
+    font-weight: 600;
+    transition: all 0.2s ease;
+
+    &:hover {
+      background: color.adjust($primary-color, $lightness: -10%);
+    }
   }
 }
 
