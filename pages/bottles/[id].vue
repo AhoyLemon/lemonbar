@@ -2,7 +2,7 @@
 .bottle-detail-page
   .container
     .header-section.mb-3
-      NuxtLink.back-btn(to="/inventory") ← Back to Inventory
+      NuxtLink.back-btn(to="/bottles") ← Back to Bottles
       h2 {{ bottle?.name || 'Loading...' }}
       
     .content-grid(v-if="bottle")
@@ -43,7 +43,7 @@
               span.tag(v-for="tag in bottle.tags" :key="tag") {{ tag }}
         
         .action-buttons
-          NuxtLink.btn.btn-edit(:to="`/inventory/manage?id=${bottle.id}`") ✏️ Edit Bottle
+          NuxtLink.btn.btn-edit(:to="`/bottles/manage?id=${bottle.id}`") ✏️ Edit Bottle
           button.btn.btn-mark-empty(v-if="bottle.inStock" @click="toggleInStock") ⚠️ Mark Empty
           button.btn.btn-mark-in-stock(v-else @click="toggleInStock") ✅ Mark In Stock
       

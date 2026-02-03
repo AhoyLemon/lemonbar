@@ -6,15 +6,20 @@
       p.text-center Manage your inventory and discover cocktails you can make right now
 
     nav.navigation.mb-3
-      NuxtLink.nav-card(to="/inventory")
+      NuxtLink.nav-card(to="/bottles")
         .nav-card__icon 🍾
-        h3 Inventory
+        h3 Bottles
         p View and manage your bottle collection
 
       NuxtLink.nav-card(to="/recipes")
         .nav-card__icon 🍹
         h3 Recipes
         p Discover cocktails you can make
+
+      NuxtLink.nav-card(to="/essentials")
+        .nav-card__icon 🥬
+        h3 Essentials
+        p Track basic ingredients and mixers
 
       NuxtLink.nav-card(to="/available")
         .nav-card__icon ✨
@@ -24,11 +29,11 @@
     section.quick-stats.mb-3
       .stat-card
         h3 {{ inventoryCount }}
-        p Bottles in Inventory
+        p Total Bottles
 
       .stat-card
         h3 {{ inStockCount }}
-        p Currently In Stock
+        p Bottles In Stock
 
       .stat-card
         h3 {{ availableRecipesCount }}

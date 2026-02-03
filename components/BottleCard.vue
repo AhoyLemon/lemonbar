@@ -21,8 +21,8 @@
       span.status-indicator(:class="{ 'in-stock': bottle.inStock, 'out-of-stock': !bottle.inStock }")
         | {{ bottle.inStock ? 'In Stock' : 'Out of Stock' }}
     .bottle-card__actions
-      NuxtLink.action-btn.action-btn--view(:to="`/inventory/${bottle.id}`") 👁️ View
-      NuxtLink.action-btn.action-btn--edit(:to="`/inventory/manage?id=${bottle.id}`") ✏️ Edit
+      NuxtLink.action-btn.action-btn--view(:to="`/bottles/${bottle.id}`") 👁️ View
+      NuxtLink.action-btn.action-btn--edit(:to="`/bottles/manage?id=${bottle.id}`") ✏️ Edit
 </template>
 
 <script setup lang="ts">

@@ -161,16 +161,16 @@ export const useCocktails = () => {
 
       if (response.drinks && response.drinks[0]) {
         const recipe = convertDrinkToRecipe(response.drinks[0])
-        
+
         // Add to apiRecipes if not already there
         const existingIndex = apiRecipes.value.findIndex(r => r.id === recipe.id)
         if (existingIndex === -1) {
           apiRecipes.value = [...apiRecipes.value, recipe]
         }
-        
+
         return recipe
       }
-      
+
       return null
     } catch (e) {
       console.error('Failed to fetch recipe from CocktailDB:', e)
@@ -182,7 +182,7 @@ export const useCocktails = () => {
   const matchesAsWord = (text: string, searchTerm: string): boolean => {
     // Exact match
     if (text === searchTerm) return true
-    
+
     // Check if searchTerm appears as a whole word in text
     const regex = new RegExp(`\\b${searchTerm.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`, 'i')
     return regex.test(text)
@@ -194,18 +194,112 @@ export const useCocktails = () => {
     const inStockItems = inventory.value.filter(b => b.inStock)
     const lowerIngredient = ingredientName.toLowerCase().trim()
 
+    // Check essentials from localStorage
+    let checkedEssentials: string[] = []
+    if (process.client) {
+      const saved = localStorage.getItem('checkedEssentials')
+      if (saved) {
+        try {
+          checkedEssentials = JSON.parse(saved)
+        } catch (e) {
+          console.error('Failed to parse essentials:', e)
+        }
+      }
+    }
+
+    // Check if ingredient matches any checked essential
+    for (const essential of checkedEssentials) {
+      const lowerEssential = essential.toLowerCase().trim()
+
+      // Direct match
+      if (lowerIngredient === lowerEssential) {
+        return true
+      }
+
+      // Check for fruit juice matching: "Fresh Lime" matches "Lime Juice", "Lime", etc.
+      // Extract base fruit name (remove "Fresh", "Juice", "Wedge", "Peel", etc.)
+      const fruitPatterns = [
+        {
+          base: 'lime',
+          variations: [
+            'lime',
+            'limes',
+            'lime juice',
+            'lime wedge',
+            'lime peel',
+            'lime wheel',
+            'fresh lime',
+          ],
+        },
+        {
+          base: 'lemon',
+          variations: [
+            'lemon',
+            'lemons',
+            'lemon juice',
+            'lemon wedge',
+            'lemon peel',
+            'lemon wheel',
+            'fresh lemon',
+          ],
+        },
+        {
+          base: 'orange',
+          variations: [
+            'orange',
+            'oranges',
+            'orange juice',
+            'orange wedge',
+            'orange peel',
+            'orange wheel',
+            'fresh orange',
+          ],
+        },
+        { base: 'grapefruit', variations: ['grapefruit', 'grapefruit juice', 'fresh grapefruit'] },
+        {
+          base: 'pineapple',
+          variations: ['pineapple', 'pineapple juice', 'pineapple wedge', 'fresh pineapple'],
+        },
+        { base: 'cranberry', variations: ['cranberry', 'cranberry juice'] },
+        { base: 'strawberry', variations: ['strawberry', 'strawberries', 'fresh strawberries'] },
+        { base: 'blueberry', variations: ['blueberry', 'blueberries', 'fresh blueberries'] },
+      ]
+
+      for (const fruit of fruitPatterns) {
+        // If essential is a fresh fruit or the base fruit
+        const essentialMatchesFruit = fruit.variations.some(v => lowerEssential.includes(v))
+        if (essentialMatchesFruit) {
+          // Check if ingredient is any variation of that fruit
+          if (fruit.variations.some(v => lowerIngredient.includes(v))) {
+            return true
+          }
+        }
+      }
+
+      // Check for word matching (whole word only)
+      if (
+        matchesAsWord(lowerIngredient, lowerEssential) ||
+        matchesAsWord(lowerEssential, lowerIngredient)
+      ) {
+        return true
+      }
+    }
+
     // Direct name match - check if bottle name appears as whole words in ingredient
     for (const item of inStockItems) {
       const lowerName = item.name.toLowerCase()
       if (matchesAsWord(lowerIngredient, lowerName) || matchesAsWord(lowerName, lowerIngredient)) {
         return true
       }
-      
+
       // Check aka (also known as) field for alternate names
       if (item.aka && Array.isArray(item.aka)) {
         for (const akaName of item.aka) {
           const lowerAka = akaName.toLowerCase()
-          if (matchesAsWord(lowerIngredient, lowerAka) || matchesAsWord(lowerAka, lowerIngredient)) {
+          if (
+            matchesAsWord(lowerIngredient, lowerAka) ||
+            matchesAsWord(lowerAka, lowerIngredient)
+          ) {
             return true
           }
         }
