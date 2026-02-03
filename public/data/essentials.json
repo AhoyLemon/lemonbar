@@ -16,7 +16,7 @@
       "id": "salt",
       "name": "Salt",
       "category": "Basics",
-      "inStock": false
+      "inStock": true
     },
     {
       "id": "black-pepper",
@@ -82,7 +82,7 @@
       "id": "fresh-lime",
       "name": "Fresh Lime",
       "category": "Citrus & Fruit",
-      "inStock": false
+      "inStock": true
     },
     {
       "id": "fresh-lemon",
@@ -238,7 +238,7 @@
       "id": "maraschino-cherries",
       "name": "Maraschino Cherries",
       "category": "Garnishes",
-      "inStock": false
+      "inStock": true
     },
     {
       "id": "olives",
@@ -265,5 +265,5 @@
       "inStock": false
     }
   ],
-  "lastUpdated": "2026-02-03T02:24:07.781Z"
+  "lastUpdated": "2026-02-03T03:01:49.726Z"
 }
