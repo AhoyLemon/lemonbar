@@ -49,24 +49,42 @@
       
       .recipes-section
         h3 Recipes Using This Bottle
-        p.coming-soon Coming soon: View recipes that use this bottle
+        .loading(v-if="drinksLoading") Loading drinks...
+        .recipes-grid(v-else-if="drinksUsingBottle.length > 0")
+          RecipeCard(
+            v-for="recipe in drinksUsingBottle"
+            :key="recipe.id"
+            :recipe="recipe"
+            :show-availability="true"
+          )
+        p.no-drinks(v-else) No drinks found using this bottle yet.
     
     .loading(v-else-if="loading") Loading bottle details...
     .error(v-else-if="error") {{ error }}
 </template>
 
 <script setup lang="ts">
-import type { Bottle } from '~/types'
+import type { Bottle, Recipe } from '~/types'
 
 const route = useRoute()
 const bottleId = route.params.id as string
 
+const {
+  loadInventory,
+  loadLocalRecipes,
+  fetchDrinksByIngredient,
+  getDrinksUsingBottle,
+} = useCocktails()
+
 const bottle = ref<Bottle | null>(null)
 const loading = ref(true)
 const error = ref<string | null>(null)
+const drinksLoading = ref(false)
+const drinksUsingBottle = ref<Recipe[]>([])
 
 onMounted(async () => {
   await loadBottle()
+  await loadDrinks()
 })
 
 async function loadBottle() {
@@ -87,6 +105,44 @@ async function loadBottle() {
     console.error(e)
   } finally {
     loading.value = false
+  }
+}
+
+async function loadDrinks() {
+  if (!bottle.value) return
+
+  try {
+    drinksLoading.value = true
+
+    // Load inventory and local recipes first
+    await Promise.all([loadInventory(), loadLocalRecipes()])
+
+    // Get local drinks that use this bottle
+    const localDrinks = getDrinksUsingBottle(bottle.value)
+
+    // Fetch API drinks using the bottle name and tags
+    const searchTerms = [
+      bottle.value.name,
+      ...bottle.value.tags,
+      ...(bottle.value.aka || [])
+    ]
+
+    // Fetch drinks from API for each search term
+    const apiDrinksPromises = searchTerms.slice(0, 3).map(term => fetchDrinksByIngredient(term))
+    const apiDrinksResults = await Promise.all(apiDrinksPromises)
+    const apiDrinks = apiDrinksResults.flat()
+
+    // Combine and deduplicate drinks
+    const allDrinks = [...localDrinks, ...apiDrinks]
+    const uniqueDrinks = allDrinks.filter((drink, index, self) => 
+      index === self.findIndex(d => d.id === drink.id)
+    )
+
+    drinksUsingBottle.value = uniqueDrinks
+  } catch (e) {
+    console.error('Failed to load drinks:', e)
+  } finally {
+    drinksLoading.value = false
   }
 }
 
@@ -307,6 +363,17 @@ async function toggleInStock() {
   .coming-soon {
     color: color.adjust($text-dark, $lightness: 30%);
     font-style: italic;
+  }
+
+  .no-drinks {
+    color: color.adjust($text-dark, $lightness: 30%);
+    font-style: italic;
+  }
+
+  .recipes-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: $spacing-lg;
   }
 }
 

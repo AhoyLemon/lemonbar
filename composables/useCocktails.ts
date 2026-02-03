@@ -407,6 +407,64 @@ export const useCocktails = () => {
     )
   })
 
+  // Fetch drinks from CocktailDB that use a specific ingredient
+  const fetchDrinksByIngredient = async (ingredient: string): Promise<Recipe[]> => {
+    try {
+      const endpoint = `https://www.thecocktaildb.com/api/json/v1/1/filter.php?i=${encodeURIComponent(ingredient)}`
+      const response = await $fetch<{ drinks: Array<{ idDrink: string; strDrink: string; strDrinkThumb: string }> | null }>(endpoint)
+
+      if (response.drinks) {
+        // The filter endpoint only returns basic info, we need to fetch full details for each drink
+        const fullDrinks: Recipe[] = []
+        
+        // Limit to first 10 drinks to avoid too many requests
+        const drinksToFetch = response.drinks.slice(0, 10)
+        
+        for (const drink of drinksToFetch) {
+          const fullDrink = await fetchCocktailDBRecipeById(drink.idDrink)
+          if (fullDrink) {
+            fullDrinks.push(fullDrink)
+          }
+        }
+        
+        return fullDrinks
+      }
+
+      return []
+    } catch (e) {
+      console.error('Failed to fetch drinks by ingredient:', e)
+      return []
+    }
+  }
+
+  // Get all drinks (local + API) that use a specific bottle
+  const getDrinksUsingBottle = (bottle: Bottle): Recipe[] => {
+    const allRecipes = safeGetAllRecipes()
+    const bottleName = bottle.name.toLowerCase()
+    
+    // Create list of search terms from bottle name, tags, and aka
+    const searchTerms = [
+      bottleName,
+      ...bottle.tags.map(tag => tag.toLowerCase()),
+      ...(bottle.aka || []).map(aka => aka.toLowerCase())
+    ]
+
+    return allRecipes.filter(recipe => {
+      return recipe.ingredients.some(ingredient => {
+        const ingredientLower = ingredient.name.toLowerCase()
+        
+        // Check if any search term matches the ingredient
+        return searchTerms.some(term => {
+          // Direct match
+          if (ingredientLower === term) return true
+          
+          // Word boundary match
+          return matchesAsWord(ingredientLower, term)
+        })
+      })
+    })
+  }
+
   return {
     inventory,
     localRecipes,
@@ -418,6 +476,8 @@ export const useCocktails = () => {
     fetchCocktailDBRecipes,
     fetchCocktailDBRecipeById,
     fetchRandomCocktails,
+    fetchDrinksByIngredient,
+    getDrinksUsingBottle,
     getAvailableRecipes,
     getAllRecipes,
     getRecipesWithAvailability,
