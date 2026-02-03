@@ -21,7 +21,17 @@ export default defineEventHandler(async (event) => {
       });
     }
 
-    if (!body.instructions || (Array.isArray(body.instructions) ? body.instructions.length === 0 : !body.instructions.trim())) {
+    if (!body.instructions) {
+      throw createError({
+        statusCode: 400,
+        statusMessage: "At least one instruction is required",
+      });
+    }
+
+    // Validate instructions based on type
+    const hasInstructions = Array.isArray(body.instructions) ? body.instructions.length > 0 : body.instructions.trim().length > 0;
+
+    if (!hasInstructions) {
       throw createError({
         statusCode: 400,
         statusMessage: "At least one instruction is required",

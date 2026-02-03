@@ -237,7 +237,12 @@
 
     try {
       // Filter out empty ingredients and instructions
-      const cleanedIngredients = form.ingredients.filter((i) => i.name.trim()).map((i) => ({ name: i.name.trim(), qty: i.qty?.trim() || undefined }));
+      const cleanedIngredients = form.ingredients
+        .filter((i) => i.name.trim())
+        .map((i) => ({
+          name: i.name.trim(),
+          qty: i.qty?.trim() || undefined,
+        }));
 
       const cleanedInstructions = form.instructions.filter((i) => i.trim()).map((i) => i.trim());
 
@@ -264,8 +269,13 @@
       });
 
       showSuccess.value = true;
-    } catch (error: any) {
-      globalError.value = error?.data?.statusMessage || "Failed to create recipe. Please try again.";
+    } catch (error: unknown) {
+      if (error && typeof error === "object" && "data" in error) {
+        const errorData = error as { data?: { statusMessage?: string } };
+        globalError.value = errorData.data?.statusMessage || "Failed to create recipe. Please try again.";
+      } else {
+        globalError.value = "Failed to create recipe. Please try again.";
+      }
     } finally {
       isSubmitting.value = false;
     }
