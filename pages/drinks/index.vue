@@ -53,7 +53,7 @@
 
 <script setup lang="ts">
   import type { Bottle } from "~/types";
-  
+
   const {
     loadInventory,
     inventory,
@@ -324,7 +324,10 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    background: $light-bg;
+    background: white;
+    padding-top: $spacing-sm;
+    padding-bottom: $spacing-sm;
+    border-bottom: 1px solid $border-color;
 
     img {
       max-width: 100%;

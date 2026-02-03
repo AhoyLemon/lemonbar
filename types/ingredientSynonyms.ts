@@ -18,6 +18,7 @@ export const ingredientSynonyms: Record<string, string[]> = {
   cranberry: ["cranberries", "fresh cranberry", "fresh cranberries"],
   "creme de cacao": ["crème de cacao", "chocolate liqueur"],
   "dark rum": ["black rum"],
+  egg: ["eggs", "fresh egg", "fresh eggs"],
   grapefruit: ["grapefruits", "fresh grapefruit"],
   grenadine: ["pomegranate syrup", "rose's grenadine"],
   kahlua: ["kahlúa", "coffee liqueur"],

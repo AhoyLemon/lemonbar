@@ -37,6 +37,10 @@
             span.value(:class="bottle.inStock ? 'in-stock' : 'out-of-stock'") 
               | {{ bottle.inStock ? '✓ In Stock' : '✗ Out of Stock' }}
           
+          .detail-row(v-if="bottle.isFinger")
+            span.label Serving:
+            span.value 🤞 Fingers 
+          
           .detail-row(v-if="bottle.tags.length")
             span.label Tags:
             .tags-list
@@ -238,7 +242,7 @@
 
   function toggleFingerStatus() {
     if (!bottle.value) return;
-    
+
     const updatedData = {
       ...bottle.value,
       isFinger: !bottle.value.isFinger,
@@ -454,6 +458,7 @@
     padding: $spacing-xl;
     border-radius: $border-radius-lg;
     box-shadow: $shadow-md;
+    align-self: start;
 
     h3 {
       color: $dark-bg;
@@ -497,6 +502,13 @@
         &:hover {
           background: color.adjust(green, $lightness: 47%);
           border-color: green;
+        }
+        .drink-view-btn {
+          background: color.adjust(green, $lightness: 6%);
+          &:hover,
+          &:focus-visible {
+            background: color.adjust(green, $lightness: -16%);
+          }
         }
       }
 

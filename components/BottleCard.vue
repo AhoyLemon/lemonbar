@@ -21,10 +21,10 @@
       span.status-indicator(:class="{ 'in-stock': bottle.inStock, 'out-of-stock': !bottle.inStock }")
         | {{ bottle.inStock ? 'In Stock' : 'Out of Stock' }}
       span.status-fingers(v-if="bottle.isFinger") 
-        | 🫰 Fingers!
-    .bottle-card__actions
-      NuxtLink.action-btn.action-btn--view(:to="`/bottles/${bottle.id}`") 👁️ View
-      NuxtLink.action-btn.action-btn--edit(:to="`/bottles/manage?id=${bottle.id}`") ✏️ Edit
+        | Fingers
+  .bottle-card__actions
+    NuxtLink.action-btn.action-btn--edit(:to="`/bottles/manage?id=${bottle.id}`") ✏️
+    NuxtLink.action-btn.action-btn--view(:to="`/bottles/${bottle.id}`") 👁️
 </template>
 
 <script setup lang="ts">
@@ -56,7 +56,7 @@
     overflow: hidden;
     box-shadow: $shadow-sm;
     transition: all 0.3s ease;
-    border: 2px solid transparent;
+    border: 1px solid transparent;
     display: flex;
     flex-direction: column;
 
@@ -88,7 +88,7 @@
     }
 
     &__content {
-      padding: $spacing-md;
+      padding: $spacing-md $spacing-md 0 $spacing-md;
       flex: 1;
       display: flex;
       flex-direction: column;
@@ -208,13 +208,16 @@
       display: flex;
       gap: $spacing-sm;
       margin-top: $spacing-sm;
+      justify-content: flex-end;
+      background-color: rgba(0, 0, 0, 0.07);
+      padding: $spacing-sm;
     }
 
     .action-btn {
-      flex: 1;
+      // flex: 1;
       padding: $spacing-sm $spacing-md;
       border-radius: $border-radius-sm;
-      font-size: 0.875rem;
+      font-size: 0.75rem;
       font-weight: 600;
       text-align: center;
       text-decoration: none;
