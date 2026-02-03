@@ -1,4 +1,18 @@
 {
-  "items": [],
-  "lastUpdated": "2024-01-01T00:00:00.000Z"
+  "items": [
+    {
+      "id": "1",
+      "name": "Kentucky Kölsch",
+      "type": "beer",
+      "inStock": false
+    },
+    {
+      "id": "2",
+      "name": "Château Margaux",
+      "type": "wine",
+      "subtype": "Red Wine",
+      "inStock": true
+    }
+  ],
+  "lastUpdated": "2026-02-03T17:41:19.083Z"
 }

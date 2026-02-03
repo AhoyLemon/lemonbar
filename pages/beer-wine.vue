@@ -105,331 +105,331 @@
 </template>
 
 <script setup lang="ts">
-import type { BeerWine } from '~/types'
+  import type { BeerWine } from "~/types";
 
-const { loadBeerWine, getBeers, getWines, loading, error } = useBeerWine()
+  const { loadBeerWine, getBeers, getWines, loading, error } = useBeerWine();
 
-const beerForm = ref({
-  name: '',
-  subtype: '',
-})
+  const beerForm = ref({
+    name: "",
+    subtype: "",
+  });
 
-const wineForm = ref({
-  name: '',
-  subtype: '',
-})
+  const wineForm = ref({
+    name: "",
+    subtype: "",
+  });
 
-const beerSuccess = ref('')
-const wineSuccess = ref('')
+  const beerSuccess = ref("");
+  const wineSuccess = ref("");
 
-onMounted(async () => {
-  await loadBeerWine()
-})
+  onMounted(async () => {
+    await loadBeerWine();
+  });
 
-async function addBeer() {
-  if (!beerForm.value.name) return
-  
-  try {
-    await $fetch('/api/beer-wine', {
-      method: 'POST',
-      body: {
-        name: beerForm.value.name,
-        type: 'beer',
-        subtype: beerForm.value.subtype || undefined,
-        inStock: true,
-      },
-    })
-    
-    beerSuccess.value = 'Beer added successfully!'
-    beerForm.value = { name: '', subtype: '' }
-    await loadBeerWine()
-    
-    setTimeout(() => {
-      beerSuccess.value = ''
-    }, 3000)
-  } catch (e: any) {
-    alert(e.data?.statusMessage || 'Failed to add beer')
+  async function addBeer() {
+    if (!beerForm.value.name) return;
+
+    try {
+      await $fetch("/api/beer-wine", {
+        method: "POST",
+        body: {
+          name: beerForm.value.name,
+          type: "beer",
+          subtype: beerForm.value.subtype || undefined,
+          inStock: true,
+        },
+      });
+
+      beerSuccess.value = "Beer added successfully!";
+      beerForm.value = { name: "", subtype: "" };
+      await loadBeerWine();
+
+      setTimeout(() => {
+        beerSuccess.value = "";
+      }, 3000);
+    } catch (e: any) {
+      alert(e.data?.statusMessage || "Failed to add beer");
+    }
   }
-}
 
-async function addWine() {
-  if (!wineForm.value.name || !wineForm.value.subtype) return
-  
-  try {
-    await $fetch('/api/beer-wine', {
-      method: 'POST',
-      body: {
-        name: wineForm.value.name,
-        type: 'wine',
-        subtype: wineForm.value.subtype,
-        inStock: true,
-      },
-    })
-    
-    wineSuccess.value = 'Wine added successfully!'
-    wineForm.value = { name: '', subtype: '' }
-    await loadBeerWine()
-    
-    setTimeout(() => {
-      wineSuccess.value = ''
-    }, 3000)
-  } catch (e: any) {
-    alert(e.data?.statusMessage || 'Failed to add wine')
-  }
-}
+  async function addWine() {
+    if (!wineForm.value.name || !wineForm.value.subtype) return;
 
-async function toggleStock(item: BeerWine) {
-  try {
-    await $fetch(`/api/beer-wine/${item.id}`, {
-      method: 'PUT',
-      body: {
-        ...item,
-        inStock: !item.inStock,
-      },
-    })
-    await loadBeerWine()
-  } catch (e: any) {
-    alert(e.data?.statusMessage || 'Failed to update stock')
-  }
-}
+    try {
+      await $fetch("/api/beer-wine", {
+        method: "POST",
+        body: {
+          name: wineForm.value.name,
+          type: "wine",
+          subtype: wineForm.value.subtype,
+          inStock: true,
+        },
+      });
 
-async function deleteItem(item: BeerWine) {
-  const itemType = item.type === 'beer' ? 'beer' : 'wine'
-  if (!confirm(`Are you sure you want to delete "${item.name}"?`)) {
-    return
+      wineSuccess.value = "Wine added successfully!";
+      wineForm.value = { name: "", subtype: "" };
+      await loadBeerWine();
+
+      setTimeout(() => {
+        wineSuccess.value = "";
+      }, 3000);
+    } catch (e: any) {
+      alert(e.data?.statusMessage || "Failed to add wine");
+    }
   }
-  
-  try {
-    await $fetch(`/api/beer-wine/${item.id}`, {
-      method: 'DELETE',
-    })
-    await loadBeerWine()
-  } catch (e: any) {
-    alert(e.data?.statusMessage || `Failed to delete ${itemType}`)
+
+  async function toggleStock(item: BeerWine) {
+    try {
+      await $fetch(`/api/beer-wine/${item.id}`, {
+        method: "PUT",
+        body: {
+          ...item,
+          inStock: !item.inStock,
+        },
+      });
+      await loadBeerWine();
+    } catch (e: any) {
+      alert(e.data?.statusMessage || "Failed to update stock");
+    }
   }
-}
+
+  async function deleteItem(item: BeerWine) {
+    const itemType = item.type === "beer" ? "beer" : "wine";
+    if (!confirm(`Are you sure you want to delete "${item.name}"?`)) {
+      return;
+    }
+
+    try {
+      await $fetch(`/api/beer-wine/${item.id}`, {
+        method: "DELETE",
+      });
+      await loadBeerWine();
+    } catch (e: any) {
+      alert(e.data?.statusMessage || `Failed to delete ${itemType}`);
+    }
+  }
 </script>
 
 <style lang="scss" scoped>
-@use 'sass:color';
-@use '@/assets/styles/variables' as *;
+  @use "sass:color";
+  @use "@/assets/styles/variables" as *;
 
-.beer-wine-page {
-  min-height: 60vh;
-  padding-bottom: $spacing-xxl;
+  .beer-wine-page {
+    min-height: 60vh;
+    padding-bottom: $spacing-xxl;
 
-  h2 {
-    color: $dark-bg;
-    margin-bottom: $spacing-sm;
-  }
+    h2 {
+      color: $dark-bg;
+      margin-bottom: $spacing-sm;
+    }
 
-  p {
-    color: color.adjust($text-dark, $lightness: 20%);
-  }
+    p {
+      color: color.adjust($text-dark, $lightness: 20%);
+    }
 
-  .loading,
-  .error {
-    text-align: center;
-    padding: $spacing-xl;
-    font-size: 1.2rem;
-  }
+    .loading,
+    .error {
+      text-align: center;
+      padding: $spacing-xl;
+      font-size: 1.2rem;
+    }
 
-  .error {
-    color: #dc3545;
-    background: #f8d7da;
-    border-radius: $border-radius-md;
-    margin-bottom: $spacing-lg;
-  }
-}
-
-.content-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: $spacing-xxl;
-
-  @media (max-width: 968px) {
-    grid-template-columns: 1fr;
-  }
-}
-
-.section-card {
-  background: white;
-  padding: $spacing-xl;
-  border-radius: $border-radius-lg;
-  box-shadow: $shadow-md;
-}
-
-.section-title {
-  color: $dark-bg;
-  margin: 0 0 $spacing-lg 0;
-  font-size: 1.5rem;
-}
-
-.add-form {
-  margin-bottom: $spacing-xl;
-  padding-bottom: $spacing-xl;
-  border-bottom: 2px solid $border-color;
-}
-
-.form-group {
-  margin-bottom: $spacing-md;
-
-  label {
-    display: block;
-    font-weight: 600;
-    color: $text-dark;
-    margin-bottom: $spacing-xs;
-  }
-
-  input,
-  select {
-    width: 100%;
-    padding: $spacing-sm $spacing-md;
-    border: 2px solid $border-color;
-    border-radius: $border-radius-md;
-    font-size: 1rem;
-    transition: border-color 0.3s ease;
-
-    &:focus {
-      outline: none;
-      border-color: $accent-color;
+    .error {
+      color: #dc3545;
+      background: #f8d7da;
+      border-radius: $border-radius-md;
+      margin-bottom: $spacing-lg;
     }
   }
-}
 
-.btn-primary {
-  width: 100%;
-  padding: $spacing-md;
-  background: $accent-color;
-  color: white;
-  border: none;
-  border-radius: $border-radius-md;
-  font-weight: 600;
-  font-size: 1rem;
-  cursor: pointer;
-  transition: all 0.3s ease;
+  .content-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: $spacing-xxl;
 
-  &:hover:not(:disabled) {
-    background: color.adjust($accent-color, $lightness: -10%);
-    transform: translateY(-2px);
+    @media (max-width: 968px) {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .section-card {
+    background: white;
+    padding: $spacing-xl;
+    border-radius: $border-radius-lg;
     box-shadow: $shadow-md;
   }
 
-  &:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-  }
-}
-
-.success-message {
-  margin-top: $spacing-md;
-  padding: $spacing-md;
-  background: color.adjust(green, $lightness: 45%);
-  color: color.adjust(green, $lightness: -30%);
-  border-radius: $border-radius-md;
-  border-left: 4px solid green;
-}
-
-.items-list {
-  h4 {
+  .section-title {
     color: $dark-bg;
-    margin: 0 0 $spacing-md 0;
-    font-size: 1.125rem;
+    margin: 0 0 $spacing-lg 0;
+    font-size: 1.5rem;
   }
-}
 
-.item-card {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: $spacing-md;
-  margin-bottom: $spacing-sm;
-  background: color.adjust($border-color, $lightness: 15%);
-  border-radius: $border-radius-md;
-  transition: all 0.3s ease;
-
-  &:hover {
-    background: color.adjust($border-color, $lightness: 10%);
-    transform: translateX(4px);
+  .add-form {
+    margin-bottom: $spacing-xl;
+    padding-bottom: $spacing-xl;
+    border-bottom: 2px solid $border-color;
   }
-}
 
-.item-info {
-  flex: 1;
-}
+  .form-group {
+    margin-bottom: $spacing-md;
 
-.item-name {
-  font-weight: 600;
-  color: $dark-bg;
-  margin-bottom: $spacing-xs;
-}
+    label {
+      display: block;
+      font-weight: 600;
+      color: $text-dark;
+      margin-bottom: $spacing-xs;
+    }
 
-.item-type {
-  font-size: 0.875rem;
-  color: color.adjust($text-dark, $lightness: 20%);
-  margin-bottom: $spacing-xs;
-}
+    input,
+    select {
+      width: 100%;
+      padding: $spacing-sm $spacing-md;
+      border: 2px solid $border-color;
+      border-radius: $border-radius-md;
+      font-size: 1rem;
+      transition: border-color 0.3s ease;
 
-.item-badge {
-  display: inline-block;
-  padding: $spacing-xs $spacing-sm;
-  border-radius: $border-radius-sm;
-  font-size: 0.75rem;
-  font-weight: 600;
+      &:focus {
+        outline: none;
+        border-color: $accent-color;
+      }
+    }
+  }
 
-  &.in-stock {
-    background: color.adjust(green, $lightness: 40%);
+  .btn-primary {
+    width: 100%;
+    padding: $spacing-md;
+    background: $accent-color;
+    color: white;
+    border: none;
+    border-radius: $border-radius-md;
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+
+    &:hover:not(:disabled) {
+      background: color.adjust($accent-color, $lightness: -10%);
+      transform: translateY(-2px);
+      box-shadow: $shadow-md;
+    }
+
+    &:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+  }
+
+  .success-message {
+    margin-top: $spacing-md;
+    padding: $spacing-md;
+    background: color.adjust(green, $lightness: 45%);
     color: color.adjust(green, $lightness: -30%);
+    border-radius: $border-radius-md;
+    border-left: 4px solid green;
   }
 
-  &.out-of-stock {
+  .items-list {
+    h4 {
+      color: $dark-bg;
+      margin: 0 0 $spacing-md 0;
+      font-size: 1.125rem;
+    }
+  }
+
+  .item-card {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: $spacing-md;
+    margin-bottom: $spacing-sm;
+    background: color.adjust($border-color, $lightness: 15%);
+    border-radius: $border-radius-md;
+    transition: all 0.3s ease;
+
+    &:hover {
+      background: color.adjust($border-color, $lightness: 10%);
+      transform: translateX(4px);
+    }
+  }
+
+  .item-info {
+    flex: 1;
+  }
+
+  .item-name {
+    font-weight: 600;
+    color: $dark-bg;
+    margin-bottom: $spacing-xs;
+  }
+
+  .item-type {
+    font-size: 0.875rem;
+    color: color.adjust($text-dark, $lightness: 20%);
+    margin-bottom: $spacing-xs;
+  }
+
+  .item-badge {
+    display: inline-block;
+    padding: $spacing-xs $spacing-sm;
+    border-radius: $border-radius-sm;
+    font-size: 0.75rem;
+    font-weight: 600;
+
+    &.in-stock {
+      background: color.adjust(green, $lightness: 40%);
+      color: color.adjust(green, $lightness: -30%);
+    }
+
+    &.out-of-stock {
+      background: color.adjust(red, $lightness: 40%);
+      color: color.adjust(red, $lightness: -20%);
+    }
+  }
+
+  .item-actions {
+    display: flex;
+    gap: $spacing-sm;
+  }
+
+  .btn-toggle {
+    width: 40px;
+    height: 40px;
+    border: 2px solid $border-color;
+    border-radius: $border-radius-md;
+    background: white;
+    color: $text-dark;
+    font-size: 1.25rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+
+    &.in-stock {
+      background: color.adjust(green, $lightness: 40%);
+      border-color: color.adjust(green, $lightness: -20%);
+      color: color.adjust(green, $lightness: -30%);
+    }
+
+    &:hover {
+      transform: scale(1.1);
+    }
+  }
+
+  .btn-delete {
+    width: 40px;
+    height: 40px;
+    border: 2px solid color.adjust(red, $lightness: -20%);
+    border-radius: $border-radius-md;
     background: color.adjust(red, $lightness: 40%);
     color: color.adjust(red, $lightness: -20%);
+    font-size: 1.25rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+
+    &:hover {
+      background: red;
+      color: white;
+      transform: scale(1.1);
+    }
   }
-}
-
-.item-actions {
-  display: flex;
-  gap: $spacing-sm;
-}
-
-.btn-toggle {
-  width: 40px;
-  height: 40px;
-  border: 2px solid $border-color;
-  border-radius: $border-radius-md;
-  background: white;
-  color: $text-dark;
-  font-size: 1.25rem;
-  cursor: pointer;
-  transition: all 0.3s ease;
-
-  &.in-stock {
-    background: color.adjust(green, $lightness: 40%);
-    border-color: color.adjust(green, $lightness: -20%);
-    color: color.adjust(green, $lightness: -30%);
-  }
-
-  &:hover {
-    transform: scale(1.1);
-  }
-}
-
-.btn-delete {
-  width: 40px;
-  height: 40px;
-  border: 2px solid color.adjust(red, $lightness: -20%);
-  border-radius: $border-radius-md;
-  background: color.adjust(red, $lightness: 40%);
-  color: color.adjust(red, $lightness: -20%);
-  font-size: 1.25rem;
-  cursor: pointer;
-  transition: all 0.3s ease;
-
-  &:hover {
-    background: red;
-    color: white;
-    transform: scale(1.1);
-  }
-}
 </style>

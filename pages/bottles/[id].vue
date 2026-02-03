@@ -72,456 +72,454 @@
 </template>
 
 <script setup lang="ts">
-import type { Bottle, Drink } from '~/types'
+  import type { Bottle, Drink } from "~/types";
 
-const route = useRoute()
-const bottleId = route.params.id as string
+  const route = useRoute();
+  const bottleId = route.params.id as string;
 
-const { 
-  loadInventory, 
-  loadEssentials,
-  loadLocalDrinks, 
-  fetchDrinksByIngredient, 
-  getDrinksUsingBottle,
-  isIngredientInStock,
-  countMatchedIngredients,
-  getAvailabilityPercentage,
-  sortDrinksByAvailability,
-} = useCocktails()
+  const {
+    loadInventory,
+    loadEssentials,
+    loadLocalDrinks,
+    fetchDrinksByIngredient,
+    getDrinksUsingBottle,
+    isIngredientInStock,
+    countMatchedIngredients,
+    getAvailabilityPercentage,
+    sortDrinksByAvailability,
+  } = useCocktails();
 
-const { loadStarredDrinks, isStarred } = useStarredDrinks()
+  const { loadStarredDrinks, isStarred } = useStarredDrinks();
 
-const bottle = ref<Bottle | null>(null)
-const loading = ref(true)
-const error = ref<string | null>(null)
-const drinksLoading = ref(false)
-const drinksUsingBottle = ref<Drink[]>([])
+  const bottle = ref<Bottle | null>(null);
+  const loading = ref(true);
+  const error = ref<string | null>(null);
+  const drinksLoading = ref(false);
+  const drinksUsingBottle = ref<Drink[]>([]);
 
-// Computed property to sort drinks by availability
-const sortedDrinksUsingBottle = computed(() => {
-  return sortDrinksByAvailability(drinksUsingBottle.value, isStarred)
-})
+  // Computed property to sort drinks by availability
+  const sortedDrinksUsingBottle = computed(() => {
+    return sortDrinksByAvailability(drinksUsingBottle.value, isStarred);
+  });
 
-// Helper to check if drink has all ingredients
-const drinkHasAllIngredients = (drink: Drink): boolean => {
-  return drink.ingredients.every(ingredient => isIngredientInStock(ingredient.name))
-}
+  // Helper to check if drink has all ingredients
+  const drinkHasAllIngredients = (drink: Drink): boolean => {
+    return drink.ingredients.every((ingredient) => isIngredientInStock(ingredient.name));
+  };
 
-// Helper to get availability percentage
-const getDrinkAvailabilityPercentage = (drink: Drink): number => {
-  return Math.round(getAvailabilityPercentage(drink))
-}
+  // Helper to get availability percentage
+  const getDrinkAvailabilityPercentage = (drink: Drink): number => {
+    return Math.round(getAvailabilityPercentage(drink));
+  };
 
-// Helper to get availability label for bottle detail page
-const getAvailabilityLabel = (drink: Drink): string => {
-  const percentage = getDrinkAvailabilityPercentage(drink)
-  if (percentage === 100) {
-    return 'Available'
-  }
-  return `${percentage}% available`
-}
-
-onMounted(async () => {
-  await loadBottle()
-  await loadDrinks()
-  await loadEssentials()
-  loadStarredDrinks()
-})
-
-async function loadBottle() {
-  try {
-    loading.value = true
-    error.value = null
-
-    const response = await $fetch<{ success: boolean; bottles: Bottle[] }>('/api/inventory')
-
-    const foundBottle = response.bottles.find(b => b.id === bottleId)
-    if (foundBottle) {
-      bottle.value = foundBottle
-    } else {
-      error.value = 'Bottle not found'
+  // Helper to get availability label for bottle detail page
+  const getAvailabilityLabel = (drink: Drink): string => {
+    const percentage = getDrinkAvailabilityPercentage(drink);
+    if (percentage === 100) {
+      return "Available";
     }
-  } catch (e) {
-    error.value = 'Failed to load bottle details'
-    console.error(e)
-  } finally {
-    loading.value = false
-  }
-}
+    return `${percentage}% available`;
+  };
 
-async function loadDrinks() {
-  if (!bottle.value) return
+  onMounted(async () => {
+    await loadBottle();
+    await loadDrinks();
+    await loadEssentials();
+    loadStarredDrinks();
+  });
 
-  try {
-    drinksLoading.value = true
+  async function loadBottle() {
+    try {
+      loading.value = true;
+      error.value = null;
 
-    // Load inventory and local drinks first
-    await Promise.all([loadInventory(), loadLocalDrinks()])
+      const response = await $fetch<{ success: boolean; bottles: Bottle[] }>("/api/inventory");
 
-    // Get local drinks that use this bottle
-    const localDrinks = getDrinksUsingBottle(bottle.value)
-
-    // Fetch API drinks using the bottle name and tags
-    const searchTerms = [bottle.value.name, ...bottle.value.tags, ...(bottle.value.aka || [])]
-
-    // Fetch drinks from API for each search term
-    const apiDrinksPromises = searchTerms.slice(0, 3).map(term => fetchDrinksByIngredient(term))
-    const apiDrinksResults = await Promise.all(apiDrinksPromises)
-    const apiDrinks = apiDrinksResults.flat()
-
-    // Combine and deduplicate drinks
-    const allDrinks = [...localDrinks, ...apiDrinks]
-    const uniqueDrinks = allDrinks.filter(
-      (drink, index, self) => index === self.findIndex(d => d.id === drink.id)
-    )
-
-    drinksUsingBottle.value = uniqueDrinks
-  } catch (e) {
-    console.error('Failed to load drinks:', e)
-  } finally {
-    drinksLoading.value = false
-  }
-}
-
-function bottleStateLabel(state: string) {
-  const states = {
-    unopened: '🔒 Unopened',
-    opened: '🍾 Opened',
-    empty: '⚠️ Empty',
-  }
-  return states[state as keyof typeof states] || state
-}
-
-async function toggleInStock() {
-  if (!bottle.value) return
-
-  try {
-    const updatedData = {
-      ...bottle.value,
-      inStock: !bottle.value.inStock,
+      const foundBottle = response.bottles.find((b) => b.id === bottleId);
+      if (foundBottle) {
+        bottle.value = foundBottle;
+      } else {
+        error.value = "Bottle not found";
+      }
+    } catch (e) {
+      error.value = "Failed to load bottle details";
+      console.error(e);
+    } finally {
+      loading.value = false;
     }
-
-    await $fetch(`/api/inventory/${bottle.value.id}`, {
-      method: 'PUT',
-      body: updatedData,
-    })
-
-    bottle.value = updatedData
-  } catch (e: any) {
-    error.value = 'Failed to update bottle status'
-    console.error(e)
   }
-}
+
+  async function loadDrinks() {
+    if (!bottle.value) return;
+
+    try {
+      drinksLoading.value = true;
+
+      // Load inventory and local drinks first
+      await Promise.all([loadInventory(), loadLocalDrinks()]);
+
+      // Get local drinks that use this bottle
+      const localDrinks = getDrinksUsingBottle(bottle.value);
+
+      // Fetch API drinks using the bottle name and tags
+      const searchTerms = [bottle.value.name, ...bottle.value.tags, ...(bottle.value.aka || [])];
+
+      // Fetch drinks from API for each search term
+      const apiDrinksPromises = searchTerms.slice(0, 3).map((term) => fetchDrinksByIngredient(term));
+      const apiDrinksResults = await Promise.all(apiDrinksPromises);
+      const apiDrinks = apiDrinksResults.flat();
+
+      // Combine and deduplicate drinks
+      const allDrinks = [...localDrinks, ...apiDrinks];
+      const uniqueDrinks = allDrinks.filter((drink, index, self) => index === self.findIndex((d) => d.id === drink.id));
+
+      drinksUsingBottle.value = uniqueDrinks;
+    } catch (e) {
+      console.error("Failed to load drinks:", e);
+    } finally {
+      drinksLoading.value = false;
+    }
+  }
+
+  function bottleStateLabel(state: string) {
+    const states = {
+      unopened: "🔒 Unopened",
+      opened: "🍾 Opened",
+      empty: "⚠️ Empty",
+    };
+    return states[state as keyof typeof states] || state;
+  }
+
+  async function toggleInStock() {
+    if (!bottle.value) return;
+
+    try {
+      const updatedData = {
+        ...bottle.value,
+        inStock: !bottle.value.inStock,
+      };
+
+      await $fetch(`/api/inventory/${bottle.value.id}`, {
+        method: "PUT",
+        body: updatedData,
+      });
+
+      bottle.value = updatedData;
+    } catch (e: any) {
+      error.value = "Failed to update bottle status";
+      console.error(e);
+    }
+  }
 </script>
 
 <style lang="scss" scoped>
-@use 'sass:color';
-@use '@/assets/styles/variables' as *;
+  @use "sass:color";
+  @use "@/assets/styles/variables" as *;
 
-.bottle-detail-page {
-  min-height: 60vh;
-  padding-bottom: $spacing-xxl;
-}
-
-.header-section {
-  h2 {
-    color: $dark-bg;
-    margin: $spacing-md 0;
-  }
-}
-
-.back-btn {
-  display: inline-block;
-  padding: $spacing-xs $spacing-md;
-  background: white;
-  color: $text-dark;
-  text-decoration: none;
-  border-radius: $border-radius-sm;
-  border: 2px solid $border-color;
-  font-weight: 600;
-  transition: all 0.3s ease;
-
-  &:hover {
-    border-color: $primary-color;
-    background: color.adjust($primary-color, $lightness: 45%);
-  }
-}
-
-.content-grid {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: $spacing-xl;
-
-  @media (min-width: 768px) {
-    grid-template-columns: 1fr 1fr;
-  }
-}
-
-.bottle-info-section {
-  display: flex;
-  flex-direction: column;
-  gap: $spacing-lg;
-}
-
-.bottle-image {
-  width: 100%;
-  max-width: 400px;
-  margin: 0 auto;
-  background: white;
-  border-radius: $border-radius-lg;
-  padding: $spacing-lg;
-  box-shadow: $shadow-md;
-
-  img {
-    width: 100%;
-    height: auto;
-    object-fit: contain;
-  }
-}
-
-.bottle-details-card {
-  background: white;
-  padding: $spacing-xl;
-  border-radius: $border-radius-lg;
-  box-shadow: $shadow-md;
-
-  h3 {
-    color: $dark-bg;
-    margin-bottom: $spacing-lg;
-  }
-}
-
-.detail-row {
-  display: flex;
-  align-items: flex-start;
-  gap: $spacing-md;
-  padding: $spacing-sm 0;
-  border-bottom: 1px solid $border-color;
-
-  &:last-child {
-    border-bottom: none;
+  .bottle-detail-page {
+    min-height: 60vh;
+    padding-bottom: $spacing-xxl;
   }
 
-  .label {
-    font-weight: 600;
+  .header-section {
+    h2 {
+      color: $dark-bg;
+      margin: $spacing-md 0;
+    }
+  }
+
+  .back-btn {
+    display: inline-block;
+    padding: $spacing-xs $spacing-md;
+    background: white;
     color: $text-dark;
-    min-width: 100px;
-  }
-
-  .value {
-    flex: 1;
-    color: color.adjust($text-dark, $lightness: 10%);
-
-    &.in-stock {
-      color: green;
-      font-weight: 600;
-    }
-
-    &.out-of-stock {
-      color: red;
-      font-weight: 600;
-    }
-  }
-}
-
-.tags-list {
-  display: flex;
-  gap: $spacing-xs;
-  flex-wrap: wrap;
-
-  .tag {
-    padding: $spacing-xs $spacing-sm;
-    background: color.adjust($accent-color, $lightness: 45%);
-    color: color.adjust($accent-color, $lightness: -20%);
+    text-decoration: none;
     border-radius: $border-radius-sm;
-    font-size: 0.75rem;
-  }
-}
-
-.action-buttons {
-  display: flex;
-  gap: $spacing-md;
-  flex-wrap: wrap;
-}
-
-.btn {
-  padding: $spacing-sm $spacing-xl;
-  border-radius: $border-radius-md;
-  font-weight: 600;
-  font-size: 1rem;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  border: none;
-  text-decoration: none;
-  display: inline-block;
-  text-align: center;
-}
-
-.btn-edit {
-  background: $primary-color;
-  color: white;
-
-  &:hover {
-    background: color.adjust($primary-color, $lightness: -10%);
-  }
-}
-
-.btn-mark-empty {
-  background: color.adjust(orange, $lightness: 30%);
-  color: color.adjust(orange, $lightness: -30%);
-
-  &:hover {
-    background: orange;
-    color: white;
-  }
-}
-
-.btn-mark-in-stock {
-  background: color.adjust(green, $lightness: 40%);
-  color: color.adjust(green, $lightness: -30%);
-
-  &:hover {
-    background: green;
-    color: white;
-  }
-}
-
-.drinks-section {
-  background: white;
-  padding: $spacing-xl;
-  border-radius: $border-radius-lg;
-  box-shadow: $shadow-md;
-
-  h3 {
-    color: $dark-bg;
-    margin-bottom: $spacing-lg;
-  }
-
-  .coming-soon {
-    color: color.adjust($text-dark, $lightness: 30%);
-    font-style: italic;
-  }
-
-  .no-drinks {
-    color: color.adjust($text-dark, $lightness: 30%);
-    font-style: italic;
-  }
-
-  .drinks-list {
-    display: flex;
-    flex-direction: column;
-    gap: $spacing-sm;
-  }
-
-  .drink-list-item {
-    display: flex;
-    align-items: center;
-    gap: $spacing-md;
-    padding: $spacing-sm $spacing-md;
-    border: 1px solid $border-color;
-    border-radius: $border-radius-sm;
-    transition: all 0.2s ease;
+    border: 2px solid $border-color;
+    font-weight: 600;
+    transition: all 0.3s ease;
 
     &:hover {
-      background: $light-bg;
       border-color: $primary-color;
-    }
-
-    &.fully-available {
-      background: color.adjust(green, $lightness: 50%);
-      border-color: color.adjust(green, $lightness: 35%);
-
-      &:hover {
-        background: color.adjust(green, $lightness: 47%);
-        border-color: green;
-      }
-    }
-
-    &.has-missing-ingredients {
-      background: color.adjust(orange, $lightness: 48%);
-      border-color: color.adjust(orange, $lightness: 30%);
-
-      &:hover {
-        background: color.adjust(orange, $lightness: 45%);
-        border-color: orange;
-      }
+      background: color.adjust($primary-color, $lightness: 45%);
     }
   }
 
-  .drink-thumbnail {
-    width: 50px;
-    height: 50px;
-    flex-shrink: 0;
-    border-radius: $border-radius-sm;
-    overflow: hidden;
-    background: $light-bg;
+  .content-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: $spacing-xl;
+
+    @media (min-width: 768px) {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
+  .bottle-info-section {
     display: flex;
-    align-items: center;
-    justify-content: center;
+    flex-direction: column;
+    gap: $spacing-lg;
+  }
+
+  .bottle-image {
+    width: 100%;
+    max-width: 400px;
+    margin: 0 auto;
+    background: white;
+    border-radius: $border-radius-lg;
+    padding: $spacing-lg;
+    box-shadow: $shadow-md;
 
     img {
       width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
-
-    .no-image {
-      font-size: 1.5rem;
+      height: auto;
+      object-fit: contain;
     }
   }
 
-  .drink-info {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    gap: $spacing-xs;
+  .bottle-details-card {
+    background: white;
+    padding: $spacing-xl;
+    border-radius: $border-radius-lg;
+    box-shadow: $shadow-md;
+
+    h3 {
+      color: $dark-bg;
+      margin-bottom: $spacing-lg;
+    }
   }
 
-  .drink-name {
-    font-weight: 600;
-    color: $text-dark;
-  }
-
-  .drink-availability {
+  .detail-row {
     display: flex;
-    align-items: center;
-    gap: $spacing-xs;
-    font-size: 0.75rem;
+    align-items: flex-start;
+    gap: $spacing-md;
+    padding: $spacing-sm 0;
+    border-bottom: 1px solid $border-color;
 
-    .availability-label {
-      font-weight: 500;
-      color: color.adjust(orange, $lightness: -20%);
+    &:last-child {
+      border-bottom: none;
+    }
 
-      &.fully-available {
-        color: color.adjust(green, $lightness: -20%);
+    .label {
+      font-weight: 600;
+      color: $text-dark;
+      min-width: 100px;
+    }
+
+    .value {
+      flex: 1;
+      color: color.adjust($text-dark, $lightness: 10%);
+
+      &.in-stock {
+        color: green;
+        font-weight: 600;
+      }
+
+      &.out-of-stock {
+        color: red;
+        font-weight: 600;
       }
     }
   }
 
-  .drink-view-btn {
-    padding: $spacing-xs $spacing-md;
+  .tags-list {
+    display: flex;
+    gap: $spacing-xs;
+    flex-wrap: wrap;
+
+    .tag {
+      padding: $spacing-xs $spacing-sm;
+      background: color.adjust($accent-color, $lightness: 45%);
+      color: color.adjust($accent-color, $lightness: -20%);
+      border-radius: $border-radius-sm;
+      font-size: 0.75rem;
+    }
+  }
+
+  .action-buttons {
+    display: flex;
+    gap: $spacing-md;
+    flex-wrap: wrap;
+  }
+
+  .btn {
+    padding: $spacing-sm $spacing-xl;
+    border-radius: $border-radius-md;
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: none;
+    text-decoration: none;
+    display: inline-block;
+    text-align: center;
+  }
+
+  .btn-edit {
     background: $primary-color;
     color: white;
-    text-decoration: none;
-    border-radius: $border-radius-sm;
-    font-size: 0.875rem;
-    font-weight: 600;
-    transition: all 0.2s ease;
 
     &:hover {
       background: color.adjust($primary-color, $lightness: -10%);
     }
   }
-}
 
-.loading,
-.error {
-  padding: $spacing-xl;
-  text-align: center;
-  font-size: 1.125rem;
-}
+  .btn-mark-empty {
+    background: color.adjust(orange, $lightness: 30%);
+    color: color.adjust(orange, $lightness: -30%);
 
-.error {
-  color: red;
-}
+    &:hover {
+      background: orange;
+      color: white;
+    }
+  }
+
+  .btn-mark-in-stock {
+    background: color.adjust(green, $lightness: 40%);
+    color: color.adjust(green, $lightness: -30%);
+
+    &:hover {
+      background: green;
+      color: white;
+    }
+  }
+
+  .drinks-section {
+    background: white;
+    padding: $spacing-xl;
+    border-radius: $border-radius-lg;
+    box-shadow: $shadow-md;
+
+    h3 {
+      color: $dark-bg;
+      margin-bottom: $spacing-lg;
+    }
+
+    .coming-soon {
+      color: color.adjust($text-dark, $lightness: 30%);
+      font-style: italic;
+    }
+
+    .no-drinks {
+      color: color.adjust($text-dark, $lightness: 30%);
+      font-style: italic;
+    }
+
+    .drinks-list {
+      display: flex;
+      flex-direction: column;
+      gap: $spacing-sm;
+    }
+
+    .drink-list-item {
+      display: flex;
+      align-items: center;
+      gap: $spacing-md;
+      padding: $spacing-sm $spacing-md;
+      border: 1px solid $border-color;
+      border-radius: $border-radius-sm;
+      transition: all 0.2s ease;
+
+      &:hover {
+        background: $light-bg;
+        border-color: $primary-color;
+      }
+
+      &.fully-available {
+        background: color.adjust(green, $lightness: 50%);
+        border-color: color.adjust(green, $lightness: 35%);
+
+        &:hover {
+          background: color.adjust(green, $lightness: 47%);
+          border-color: green;
+        }
+      }
+
+      &.has-missing-ingredients {
+        background: color.adjust(orange, $lightness: 48%);
+        border-color: color.adjust(orange, $lightness: 30%);
+
+        &:hover {
+          background: color.adjust(orange, $lightness: 45%);
+          border-color: orange;
+        }
+      }
+    }
+
+    .drink-thumbnail {
+      width: 50px;
+      height: 50px;
+      flex-shrink: 0;
+      border-radius: $border-radius-sm;
+      overflow: hidden;
+      background: $light-bg;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+
+      .no-image {
+        font-size: 1.5rem;
+      }
+    }
+
+    .drink-info {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: $spacing-xs;
+    }
+
+    .drink-name {
+      font-weight: 600;
+      color: $text-dark;
+    }
+
+    .drink-availability {
+      display: flex;
+      align-items: center;
+      gap: $spacing-xs;
+      font-size: 0.75rem;
+
+      .availability-label {
+        font-weight: 500;
+        color: color.adjust(orange, $lightness: -20%);
+
+        &.fully-available {
+          color: color.adjust(green, $lightness: -20%);
+        }
+      }
+    }
+
+    .drink-view-btn {
+      padding: $spacing-xs $spacing-md;
+      background: $primary-color;
+      color: white;
+      text-decoration: none;
+      border-radius: $border-radius-sm;
+      font-size: 0.875rem;
+      font-weight: 600;
+      transition: all 0.2s ease;
+
+      &:hover {
+        background: color.adjust($primary-color, $lightness: -10%);
+      }
+    }
+  }
+
+  .loading,
+  .error {
+    padding: $spacing-xl;
+    text-align: center;
+    font-size: 1.125rem;
+  }
+
+  .error {
+    color: red;
+  }
 </style>

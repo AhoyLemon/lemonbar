@@ -28,184 +28,184 @@
 </template>
 
 <script setup lang="ts">
-const { loadInventory, inventory } = useCocktails()
+  const { loadInventory, inventory } = useCocktails();
 
-const filter = ref<'all' | 'inStock' | 'outOfStock'>('all')
-const categoryFilter = ref<string>('all')
-const tagFilter = ref<string>('all')
+  const filter = ref<"all" | "inStock" | "outOfStock">("all");
+  const categoryFilter = ref<string>("all");
+  const tagFilter = ref<string>("all");
 
-// Load data on mount
-onMounted(async () => {
-  await loadInventory()
-})
+  // Load data on mount
+  onMounted(async () => {
+    await loadInventory();
+  });
 
-const inStockBottles = computed(() => inventory.value.filter(b => b.inStock))
-const outOfStockBottles = computed(() => inventory.value.filter(b => !b.inStock))
+  const inStockBottles = computed(() => inventory.value.filter((b) => b.inStock));
+  const outOfStockBottles = computed(() => inventory.value.filter((b) => !b.inStock));
 
-// Get all unique tags from inventory
-const availableTags = computed(() => {
-  const tags = new Set<string>()
-  inventory.value.forEach(bottle => {
-    bottle.tags.forEach(tag => tags.add(tag))
-  })
-  return Array.from(tags).sort()
-})
+  // Get all unique tags from inventory
+  const availableTags = computed(() => {
+    const tags = new Set<string>();
+    inventory.value.forEach((bottle) => {
+      bottle.tags.forEach((tag) => tags.add(tag));
+    });
+    return Array.from(tags).sort();
+  });
 
-// Create tag options for the select component
-const tagOptions = computed(() => {
-  return availableTags.value.map(tag => ({
-    label: tag,
-    value: tag,
-    count: getBottleCountForTag(tag),
-  }))
-})
+  // Create tag options for the select component
+  const tagOptions = computed(() => {
+    return availableTags.value.map((tag) => ({
+      label: tag,
+      value: tag,
+      count: getBottleCountForTag(tag),
+    }));
+  });
 
-// Get bottle count for a specific tag
-const getBottleCountForTag = (tag: string) => {
-  return inventory.value.filter(b => b.tags.includes(tag)).length
-}
+  // Get bottle count for a specific tag
+  const getBottleCountForTag = (tag: string) => {
+    return inventory.value.filter((b) => b.tags.includes(tag)).length;
+  };
 
-const filteredBottles = computed(() => {
-  let bottles = inventory.value
+  const filteredBottles = computed(() => {
+    let bottles = inventory.value;
 
-  // Apply stock filter
-  if (filter.value === 'inStock') {
-    bottles = inStockBottles.value
-  } else if (filter.value === 'outOfStock') {
-    bottles = outOfStockBottles.value
-  }
+    // Apply stock filter
+    if (filter.value === "inStock") {
+      bottles = inStockBottles.value;
+    } else if (filter.value === "outOfStock") {
+      bottles = outOfStockBottles.value;
+    }
 
-  // Apply category filter
-  if (categoryFilter.value !== 'all') {
-    bottles = bottles.filter(b => b.category === categoryFilter.value)
-  }
+    // Apply category filter
+    if (categoryFilter.value !== "all") {
+      bottles = bottles.filter((b) => b.category === categoryFilter.value);
+    }
 
-  // Apply tag filter
-  if (tagFilter.value !== 'all') {
-    bottles = bottles.filter(b => b.tags.includes(tagFilter.value))
-  }
+    // Apply tag filter
+    if (tagFilter.value !== "all") {
+      bottles = bottles.filter((b) => b.tags.includes(tagFilter.value));
+    }
 
-  return bottles
-})
+    return bottles;
+  });
 </script>
 
 <style lang="scss" scoped>
-@use 'sass:color';
-@use '@/assets/styles/variables' as *;
-.bottles-page {
-  min-height: 60vh;
+  @use "sass:color";
+  @use "@/assets/styles/variables" as *;
+  .bottles-page {
+    min-height: 60vh;
 
-  h2 {
-    color: $dark-bg;
-    margin-bottom: $spacing-sm;
+    h2 {
+      color: $dark-bg;
+      margin-bottom: $spacing-sm;
+    }
+
+    p {
+      color: color.adjust($text-dark, $lightness: 20%);
+    }
   }
 
-  p {
-    color: color.adjust($text-dark, $lightness: 20%);
-  }
-}
+  .header-with-action {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: $spacing-lg;
 
-.header-with-action {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: $spacing-lg;
-
-  @media (max-width: 768px) {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-}
-
-.manage-btn {
-  padding: $spacing-sm $spacing-xl;
-  background: $accent-color;
-  color: white;
-  text-decoration: none;
-  border-radius: $border-radius-md;
-  font-weight: 600;
-  transition: all 0.3s ease;
-  white-space: nowrap;
-
-  &:hover {
-    background: color.adjust($accent-color, $lightness: -10%);
-    transform: translateY(-2px);
-    box-shadow: $shadow-md;
-  }
-}
-
-.filters,
-.category-filters {
-  display: flex;
-  gap: $spacing-md;
-  flex-wrap: wrap;
-}
-
-.filter-btn,
-.category-btn {
-  padding: $spacing-sm $spacing-lg;
-  border-radius: $border-radius-md;
-  background: white;
-  border: 2px solid $border-color;
-  font-weight: 600;
-  transition: all 0.3s ease;
-  cursor: pointer;
-
-  &:hover {
-    border-color: $accent-color;
-    background: color.adjust($accent-color, $lightness: 45%);
+    @media (max-width: 768px) {
+      flex-direction: column;
+      align-items: flex-start;
+    }
   }
 
-  &.active {
+  .manage-btn {
+    padding: $spacing-sm $spacing-xl;
     background: $accent-color;
     color: white;
-    border-color: $accent-color;
-  }
-}
+    text-decoration: none;
+    border-radius: $border-radius-md;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    white-space: nowrap;
 
-.category-btn {
-  font-size: 0.875rem;
-  padding: $spacing-xs $spacing-md;
-
-  &.active {
-    background: $primary-color;
-    border-color: $primary-color;
-  }
-}
-
-.tag-filters {
-  h3 {
-    font-size: 1rem;
-    margin-bottom: $spacing-sm;
-    color: $text-dark;
-  }
-}
-
-.tag-btn {
-  font-size: 0.875rem;
-  padding: $spacing-sm $spacing-lg;
-  border-radius: $border-radius-md;
-  background: white;
-  border: 2px solid $border-color;
-  font-weight: 600;
-  transition: all 0.3s ease;
-  cursor: pointer;
-
-  &:hover {
-    border-color: $accent-color;
-    background: color.adjust($accent-color, $lightness: 45%);
+    &:hover {
+      background: color.adjust($accent-color, $lightness: -10%);
+      transform: translateY(-2px);
+      box-shadow: $shadow-md;
+    }
   }
 
-  &.active {
-    background: color.adjust($primary-color, $lightness: 10%);
-    border-color: color.adjust($primary-color, $lightness: 10%);
-    color: white;
+  .filters,
+  .category-filters {
+    display: flex;
+    gap: $spacing-md;
+    flex-wrap: wrap;
   }
-}
 
-.bottle-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-  gap: $spacing-lg;
-}
+  .filter-btn,
+  .category-btn {
+    padding: $spacing-sm $spacing-lg;
+    border-radius: $border-radius-md;
+    background: white;
+    border: 2px solid $border-color;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    cursor: pointer;
+
+    &:hover {
+      border-color: $accent-color;
+      background: color.adjust($accent-color, $lightness: 45%);
+    }
+
+    &.active {
+      background: $accent-color;
+      color: white;
+      border-color: $accent-color;
+    }
+  }
+
+  .category-btn {
+    font-size: 0.875rem;
+    padding: $spacing-xs $spacing-md;
+
+    &.active {
+      background: $primary-color;
+      border-color: $primary-color;
+    }
+  }
+
+  .tag-filters {
+    h3 {
+      font-size: 1rem;
+      margin-bottom: $spacing-sm;
+      color: $text-dark;
+    }
+  }
+
+  .tag-btn {
+    font-size: 0.875rem;
+    padding: $spacing-sm $spacing-lg;
+    border-radius: $border-radius-md;
+    background: white;
+    border: 2px solid $border-color;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    cursor: pointer;
+
+    &:hover {
+      border-color: $accent-color;
+      background: color.adjust($accent-color, $lightness: 45%);
+    }
+
+    &.active {
+      background: color.adjust($primary-color, $lightness: 10%);
+      border-color: color.adjust($primary-color, $lightness: 10%);
+      color: white;
+    }
+  }
+
+  .bottle-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: $spacing-lg;
+  }
 </style>

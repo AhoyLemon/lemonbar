@@ -1,15 +1,15 @@
-import { defineConfig } from 'vitest/config'
-import { resolve } from 'path'
+import { defineConfig } from "vitest/config";
+import { resolve } from "path";
 
 export default defineConfig({
   test: {
     globals: true,
-    environment: 'happy-dom',
+    environment: "happy-dom",
   },
   resolve: {
     alias: {
-      '~': resolve(__dirname, './'),
-      '@': resolve(__dirname, './'),
+      "~": resolve(__dirname, "./"),
+      "@": resolve(__dirname, "./"),
     },
   },
-})
+});

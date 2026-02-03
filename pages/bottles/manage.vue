@@ -114,554 +114,554 @@
 </template>
 
 <script setup lang="ts">
-import type { Bottle } from '~/types'
+  import type { Bottle } from "~/types";
 
-const route = useRoute()
-const bottles = ref<Bottle[]>([])
-const loading = ref(false)
-const error = ref<string | null>(null)
-const successMessage = ref<string | null>(null)
-const editingBottle = ref<Bottle | null>(null)
+  const route = useRoute();
+  const bottles = ref<Bottle[]>([]);
+  const loading = ref(false);
+  const error = ref<string | null>(null);
+  const successMessage = ref<string | null>(null);
+  const editingBottle = ref<Bottle | null>(null);
 
-const form = ref({
-  name: '',
-  category: '',
-  tags: [] as string[],
-  inStock: true,
-  bottleSize: '',
-  bottleState: '',
-  image: '',
-  abv: undefined as number | undefined,
-  origin: '',
-  company: '',
-})
-
-onMounted(async () => {
-  await loadBottles()
-
-  // Check if we have a bottle ID in the query params
-  const bottleId = route.query.id as string
-  if (bottleId) {
-    const bottle = bottles.value.find(b => b.id === bottleId)
-    if (bottle) {
-      startEdit(bottle)
-    }
-  }
-})
-
-async function loadBottles() {
-  try {
-    const response = await $fetch<{ success: boolean; bottles: Bottle[] }>('/api/inventory')
-    bottles.value = response.bottles
-  } catch (e) {
-    error.value = 'Failed to load bottles'
-    console.error(e)
-  }
-}
-
-function resetForm() {
-  form.value = {
-    name: '',
-    category: '',
-    tags: [],
+  const form = ref({
+    name: "",
+    category: "",
+    tags: [] as string[],
     inStock: true,
-    bottleSize: '',
-    bottleState: '',
-    image: '',
-    abv: undefined,
-    origin: '',
-    company: '',
+    bottleSize: "",
+    bottleState: "",
+    image: "",
+    abv: undefined as number | undefined,
+    origin: "",
+    company: "",
+  });
+
+  onMounted(async () => {
+    await loadBottles();
+
+    // Check if we have a bottle ID in the query params
+    const bottleId = route.query.id as string;
+    if (bottleId) {
+      const bottle = bottles.value.find((b) => b.id === bottleId);
+      if (bottle) {
+        startEdit(bottle);
+      }
+    }
+  });
+
+  async function loadBottles() {
+    try {
+      const response = await $fetch<{ success: boolean; bottles: Bottle[] }>("/api/inventory");
+      bottles.value = response.bottles;
+    } catch (e) {
+      error.value = "Failed to load bottles";
+      console.error(e);
+    }
   }
-  editingBottle.value = null
-  error.value = null
-  successMessage.value = null
-}
 
-function startEdit(bottle: Bottle) {
-  editingBottle.value = bottle
-  form.value = {
-    name: bottle.name,
-    category: bottle.category,
-    tags: [...bottle.tags],
-    inStock: bottle.inStock,
-    bottleSize: bottle.bottleSize || '',
-    bottleState: bottle.bottleState || '',
-    image: bottle.image || '',
-    abv: bottle.abv,
-    origin: bottle.origin || '',
-    company: bottle.company || '',
+  function resetForm() {
+    form.value = {
+      name: "",
+      category: "",
+      tags: [],
+      inStock: true,
+      bottleSize: "",
+      bottleState: "",
+      image: "",
+      abv: undefined,
+      origin: "",
+      company: "",
+    };
+    editingBottle.value = null;
+    error.value = null;
+    successMessage.value = null;
   }
-  error.value = null
-  successMessage.value = null
-  // Scroll to form
-  window.scrollTo({ top: 0, behavior: 'smooth' })
-}
 
-function cancelEdit() {
-  resetForm()
-}
+  function startEdit(bottle: Bottle) {
+    editingBottle.value = bottle;
+    form.value = {
+      name: bottle.name,
+      category: bottle.category,
+      tags: [...bottle.tags],
+      inStock: bottle.inStock,
+      bottleSize: bottle.bottleSize || "",
+      bottleState: bottle.bottleState || "",
+      image: bottle.image || "",
+      abv: bottle.abv,
+      origin: bottle.origin || "",
+      company: bottle.company || "",
+    };
+    error.value = null;
+    successMessage.value = null;
+    // Scroll to form
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
 
-async function handleSubmit() {
-  loading.value = true
-  error.value = null
-  successMessage.value = null
+  function cancelEdit() {
+    resetForm();
+  }
 
-  try {
-    const bottleData: Partial<Bottle> = {
-      name: form.value.name,
-      category: form.value.category,
-      tags: form.value.tags,
-      inStock: form.value.inStock,
-      bottleSize: form.value.bottleSize || undefined,
-      bottleState: (form.value.bottleState as 'unopened' | 'opened' | 'empty') || undefined,
-      image: form.value.image || undefined,
-      abv: form.value.abv,
-      origin: form.value.origin || undefined,
-      company: form.value.company || undefined,
+  async function handleSubmit() {
+    loading.value = true;
+    error.value = null;
+    successMessage.value = null;
+
+    try {
+      const bottleData: Partial<Bottle> = {
+        name: form.value.name,
+        category: form.value.category,
+        tags: form.value.tags,
+        inStock: form.value.inStock,
+        bottleSize: form.value.bottleSize || undefined,
+        bottleState: (form.value.bottleState as "unopened" | "opened" | "empty") || undefined,
+        image: form.value.image || undefined,
+        abv: form.value.abv,
+        origin: form.value.origin || undefined,
+        company: form.value.company || undefined,
+      };
+
+      if (editingBottle.value) {
+        // Update existing bottle
+        await $fetch(`/api/inventory/${editingBottle.value.id}`, {
+          method: "PUT",
+          body: bottleData,
+        });
+        successMessage.value = `Bottle updated successfully! Form cleared - you are now adding a new bottle.`;
+      } else {
+        // Create new bottle
+        await $fetch("/api/inventory", {
+          method: "POST",
+          body: bottleData,
+        });
+        successMessage.value = "Bottle added successfully!";
+      }
+
+      await loadBottles();
+      resetForm();
+
+      // Scroll to top to see the message
+      window.scrollTo({ top: 0, behavior: "smooth" });
+
+      // Clear success message after 5 seconds
+      setTimeout(() => {
+        successMessage.value = null;
+      }, 5000);
+    } catch (e: any) {
+      error.value = e.data?.statusMessage || "Failed to save bottle";
+      console.error(e);
+    } finally {
+      loading.value = false;
+    }
+  }
+
+  async function confirmDelete(bottle: Bottle) {
+    if (!confirm(`Are you sure you want to delete "${bottle.name}"?`)) {
+      return;
     }
 
-    if (editingBottle.value) {
-      // Update existing bottle
-      await $fetch(`/api/inventory/${editingBottle.value.id}`, {
-        method: 'PUT',
-        body: bottleData,
-      })
-      successMessage.value = `Bottle updated successfully! Form cleared - you are now adding a new bottle.`
-    } else {
-      // Create new bottle
-      await $fetch('/api/inventory', {
-        method: 'POST',
-        body: bottleData,
-      })
-      successMessage.value = 'Bottle added successfully!'
+    loading.value = true;
+    error.value = null;
+
+    try {
+      await $fetch(`/api/inventory/${bottle.id}`, {
+        method: "DELETE",
+      });
+      successMessage.value = "Bottle deleted successfully!";
+      await loadBottles();
+
+      // Clear success message after 3 seconds
+      setTimeout(() => {
+        successMessage.value = null;
+      }, 3000);
+    } catch (e: any) {
+      error.value = e.data?.statusMessage || "Failed to delete bottle";
+      console.error(e);
+    } finally {
+      loading.value = false;
     }
-
-    await loadBottles()
-    resetForm()
-
-    // Scroll to top to see the message
-    window.scrollTo({ top: 0, behavior: 'smooth' })
-
-    // Clear success message after 5 seconds
-    setTimeout(() => {
-      successMessage.value = null
-    }, 5000)
-  } catch (e: any) {
-    error.value = e.data?.statusMessage || 'Failed to save bottle'
-    console.error(e)
-  } finally {
-    loading.value = false
-  }
-}
-
-async function confirmDelete(bottle: Bottle) {
-  if (!confirm(`Are you sure you want to delete "${bottle.name}"?`)) {
-    return
   }
 
-  loading.value = true
-  error.value = null
+  async function toggleInStock(bottle: Bottle) {
+    loading.value = true;
+    error.value = null;
 
-  try {
-    await $fetch(`/api/inventory/${bottle.id}`, {
-      method: 'DELETE',
-    })
-    successMessage.value = 'Bottle deleted successfully!'
-    await loadBottles()
+    try {
+      const updatedData = {
+        ...bottle,
+        inStock: !bottle.inStock,
+      };
 
-    // Clear success message after 3 seconds
-    setTimeout(() => {
-      successMessage.value = null
-    }, 3000)
-  } catch (e: any) {
-    error.value = e.data?.statusMessage || 'Failed to delete bottle'
-    console.error(e)
-  } finally {
-    loading.value = false
-  }
-}
+      await $fetch(`/api/inventory/${bottle.id}`, {
+        method: "PUT",
+        body: updatedData,
+      });
 
-async function toggleInStock(bottle: Bottle) {
-  loading.value = true
-  error.value = null
+      const action = updatedData.inStock ? "marked as in stock" : "marked as empty";
+      successMessage.value = `${bottle.name} ${action} successfully!`;
+      await loadBottles();
 
-  try {
-    const updatedData = {
-      ...bottle,
-      inStock: !bottle.inStock,
+      // Clear success message after 3 seconds
+      setTimeout(() => {
+        successMessage.value = null;
+      }, 3000);
+    } catch (e: any) {
+      error.value = e.data?.statusMessage || "Failed to update bottle status";
+      console.error(e);
+    } finally {
+      loading.value = false;
     }
-
-    await $fetch(`/api/inventory/${bottle.id}`, {
-      method: 'PUT',
-      body: updatedData,
-    })
-
-    const action = updatedData.inStock ? 'marked as in stock' : 'marked as empty'
-    successMessage.value = `${bottle.name} ${action} successfully!`
-    await loadBottles()
-
-    // Clear success message after 3 seconds
-    setTimeout(() => {
-      successMessage.value = null
-    }, 3000)
-  } catch (e: any) {
-    error.value = e.data?.statusMessage || 'Failed to update bottle status'
-    console.error(e)
-  } finally {
-    loading.value = false
   }
-}
 </script>
 
 <style lang="scss" scoped>
-@use 'sass:color';
-@use '@/assets/styles/variables' as *;
+  @use "sass:color";
+  @use "@/assets/styles/variables" as *;
 
-.manage-bottles-page {
-  min-height: 60vh;
-  padding-bottom: $spacing-xxl;
-}
-
-.header-section {
-  h2 {
-    color: $dark-bg;
-    margin-bottom: $spacing-sm;
+  .manage-bottles-page {
+    min-height: 60vh;
+    padding-bottom: $spacing-xxl;
   }
 
-  p {
-    color: color.adjust($text-dark, $lightness: 20%);
-    margin-bottom: $spacing-md;
-  }
-}
+  .header-section {
+    h2 {
+      color: $dark-bg;
+      margin-bottom: $spacing-sm;
+    }
 
-.back-btn {
-  display: inline-block;
-  padding: $spacing-sm $spacing-lg;
-  background: white;
-  border: 2px solid $border-color;
-  border-radius: $border-radius-md;
-  text-decoration: none;
-  color: $text-dark;
-  font-weight: 600;
-  transition: all 0.3s ease;
-
-  &:hover {
-    border-color: $accent-color;
-    background: color.adjust($accent-color, $lightness: 45%);
-  }
-}
-
-.content-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: $spacing-xxl;
-
-  @media (max-width: 968px) {
-    grid-template-columns: 1fr;
-  }
-}
-
-.form-section {
-  h3 {
-    color: $dark-bg;
-    margin-bottom: $spacing-lg;
-  }
-}
-
-.bottle-form {
-  background: white;
-  padding: $spacing-xl;
-  border-radius: $border-radius-lg;
-  box-shadow: $shadow-md;
-}
-
-.form-group {
-  margin-bottom: $spacing-lg;
-
-  label {
-    display: block;
-    font-weight: 600;
-    color: $text-dark;
-    margin-bottom: $spacing-xs;
-
-    input[type='checkbox'] {
-      margin-right: $spacing-xs;
+    p {
+      color: color.adjust($text-dark, $lightness: 20%);
+      margin-bottom: $spacing-md;
     }
   }
 
-  input[type='text'],
-  select {
-    width: 100%;
-    padding: $spacing-sm $spacing-md;
+  .back-btn {
+    display: inline-block;
+    padding: $spacing-sm $spacing-lg;
+    background: white;
     border: 2px solid $border-color;
     border-radius: $border-radius-md;
-    font-size: 1rem;
-    transition: border-color 0.3s ease;
-
-    &:focus {
-      outline: none;
-      border-color: $accent-color;
-    }
-  }
-
-  input[type='checkbox'] {
-    width: auto;
-  }
-
-  .help-text {
-    display: block;
-    margin-top: $spacing-xs;
-    font-size: 0.875rem;
-    color: color.adjust($text-dark, $lightness: 30%);
-  }
-}
-
-.tag-selector-wrapper {
-  border: 2px solid $border-color;
-  border-radius: $border-radius-md;
-  padding: $spacing-sm;
-  min-height: 200px;
-  background: white;
-}
-
-.form-actions {
-  display: flex;
-  gap: $spacing-md;
-  margin-top: $spacing-xl;
-}
-
-.btn {
-  padding: $spacing-sm $spacing-xl;
-  border-radius: $border-radius-md;
-  font-weight: 600;
-  font-size: 1rem;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  border: none;
-
-  &:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-  }
-}
-
-.btn-primary {
-  background: $accent-color;
-  color: white;
-
-  &:hover:not(:disabled) {
-    background: color.adjust($accent-color, $lightness: -10%);
-    transform: translateY(-2px);
-    box-shadow: $shadow-md;
-  }
-}
-
-.btn-secondary {
-  background: white;
-  color: $text-dark;
-  border: 2px solid $border-color;
-
-  &:hover {
-    border-color: $text-dark;
-  }
-}
-
-.error-message {
-  margin-top: $spacing-lg;
-  padding: $spacing-md;
-  background: color.adjust(red, $lightness: 45%);
-  color: color.adjust(red, $lightness: -20%);
-  border-radius: $border-radius-md;
-  border-left: 4px solid red;
-}
-
-.success-message {
-  margin-top: $spacing-lg;
-  padding: $spacing-md;
-  background: color.adjust(green, $lightness: 45%);
-  color: color.adjust(green, $lightness: -30%);
-  border-radius: $border-radius-md;
-  border-left: 4px solid green;
-}
-
-.list-section {
-  h3 {
-    color: $dark-bg;
-    margin-bottom: $spacing-lg;
-  }
-}
-
-.bottle-list {
-  display: flex;
-  flex-direction: column;
-  gap: $spacing-md;
-  max-height: 600px;
-  overflow-y: auto;
-  padding-right: $spacing-sm;
-
-  &::-webkit-scrollbar {
-    width: 8px;
-  }
-
-  &::-webkit-scrollbar-track {
-    background: color.adjust($border-color, $lightness: 10%);
-    border-radius: 4px;
-  }
-
-  &::-webkit-scrollbar-thumb {
-    background: $border-color;
-    border-radius: 4px;
+    text-decoration: none;
+    color: $text-dark;
+    font-weight: 600;
+    transition: all 0.3s ease;
 
     &:hover {
-      background: color.adjust($border-color, $lightness: -10%);
+      border-color: $accent-color;
+      background: color.adjust($accent-color, $lightness: 45%);
     }
   }
-}
 
-.bottle-item {
-  background: white;
-  padding: $spacing-lg;
-  border-radius: $border-radius-md;
-  box-shadow: $shadow-sm;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  transition: all 0.3s ease;
+  .content-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: $spacing-xxl;
 
-  &:hover {
+    @media (max-width: 968px) {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .form-section {
+    h3 {
+      color: $dark-bg;
+      margin-bottom: $spacing-lg;
+    }
+  }
+
+  .bottle-form {
+    background: white;
+    padding: $spacing-xl;
+    border-radius: $border-radius-lg;
     box-shadow: $shadow-md;
-    transform: translateX(4px);
-  }
-}
-
-.bottle-info {
-  flex: 1;
-
-  h4 {
-    margin: 0 0 $spacing-xs 0;
-    color: $dark-bg;
   }
 
-  .company {
-    margin: 0 0 $spacing-xs 0;
-    color: color.adjust($text-dark, $lightness: 20%);
+  .form-group {
+    margin-bottom: $spacing-lg;
+
+    label {
+      display: block;
+      font-weight: 600;
+      color: $text-dark;
+      margin-bottom: $spacing-xs;
+
+      input[type="checkbox"] {
+        margin-right: $spacing-xs;
+      }
+    }
+
+    input[type="text"],
+    select {
+      width: 100%;
+      padding: $spacing-sm $spacing-md;
+      border: 2px solid $border-color;
+      border-radius: $border-radius-md;
+      font-size: 1rem;
+      transition: border-color 0.3s ease;
+
+      &:focus {
+        outline: none;
+        border-color: $accent-color;
+      }
+    }
+
+    input[type="checkbox"] {
+      width: auto;
+    }
+
+    .help-text {
+      display: block;
+      margin-top: $spacing-xs;
+      font-size: 0.875rem;
+      color: color.adjust($text-dark, $lightness: 30%);
+    }
+  }
+
+  .tag-selector-wrapper {
+    border: 2px solid $border-color;
+    border-radius: $border-radius-md;
+    padding: $spacing-sm;
+    min-height: 200px;
+    background: white;
+  }
+
+  .form-actions {
+    display: flex;
+    gap: $spacing-md;
+    margin-top: $spacing-xl;
+  }
+
+  .btn {
+    padding: $spacing-sm $spacing-xl;
+    border-radius: $border-radius-md;
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: none;
+
+    &:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+  }
+
+  .btn-primary {
+    background: $accent-color;
+    color: white;
+
+    &:hover:not(:disabled) {
+      background: color.adjust($accent-color, $lightness: -10%);
+      transform: translateY(-2px);
+      box-shadow: $shadow-md;
+    }
+  }
+
+  .btn-secondary {
+    background: white;
+    color: $text-dark;
+    border: 2px solid $border-color;
+
+    &:hover {
+      border-color: $text-dark;
+    }
+  }
+
+  .error-message {
+    margin-top: $spacing-lg;
+    padding: $spacing-md;
+    background: color.adjust(red, $lightness: 45%);
+    color: color.adjust(red, $lightness: -20%);
+    border-radius: $border-radius-md;
+    border-left: 4px solid red;
+  }
+
+  .success-message {
+    margin-top: $spacing-lg;
+    padding: $spacing-md;
+    background: color.adjust(green, $lightness: 45%);
+    color: color.adjust(green, $lightness: -30%);
+    border-radius: $border-radius-md;
+    border-left: 4px solid green;
+  }
+
+  .list-section {
+    h3 {
+      color: $dark-bg;
+      margin-bottom: $spacing-lg;
+    }
+  }
+
+  .bottle-list {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-md;
+    max-height: 600px;
+    overflow-y: auto;
+    padding-right: $spacing-sm;
+
+    &::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    &::-webkit-scrollbar-track {
+      background: color.adjust($border-color, $lightness: 10%);
+      border-radius: 4px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background: $border-color;
+      border-radius: 4px;
+
+      &:hover {
+        background: color.adjust($border-color, $lightness: -10%);
+      }
+    }
+  }
+
+  .bottle-item {
+    background: white;
+    padding: $spacing-lg;
+    border-radius: $border-radius-md;
+    box-shadow: $shadow-sm;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: all 0.3s ease;
+
+    &:hover {
+      box-shadow: $shadow-md;
+      transform: translateX(4px);
+    }
+  }
+
+  .bottle-info {
+    flex: 1;
+
+    h4 {
+      margin: 0 0 $spacing-xs 0;
+      color: $dark-bg;
+    }
+
+    .company {
+      margin: 0 0 $spacing-xs 0;
+      color: color.adjust($text-dark, $lightness: 20%);
+      font-size: 0.875rem;
+      font-style: italic;
+    }
+  }
+
+  .bottle-details {
+    display: flex;
+    gap: $spacing-sm;
+    align-items: center;
+    margin-bottom: $spacing-xs;
+    flex-wrap: wrap;
+  }
+
+  .badge {
+    padding: $spacing-xs $spacing-sm;
+    border-radius: $border-radius-sm;
+    font-size: 0.75rem;
+    font-weight: 600;
+    background: color.adjust($border-color, $lightness: 15%);
+    color: $text-dark;
+
+    &.in-stock {
+      background: color.adjust(green, $lightness: 40%);
+      color: color.adjust(green, $lightness: -30%);
+    }
+
+    &.out-of-stock {
+      background: color.adjust(red, $lightness: 40%);
+      color: color.adjust(red, $lightness: -20%);
+    }
+  }
+
+  .size {
     font-size: 0.875rem;
-    font-style: italic;
+    color: color.adjust($text-dark, $lightness: 20%);
   }
-}
 
-.bottle-details {
-  display: flex;
-  gap: $spacing-sm;
-  align-items: center;
-  margin-bottom: $spacing-xs;
-  flex-wrap: wrap;
-}
+  .abv,
+  .origin {
+    font-size: 0.875rem;
+    color: color.adjust($text-dark, $lightness: 20%);
+  }
 
-.badge {
-  padding: $spacing-xs $spacing-sm;
-  border-radius: $border-radius-sm;
-  font-size: 0.75rem;
-  font-weight: 600;
-  background: color.adjust($border-color, $lightness: 15%);
-  color: $text-dark;
+  .bottle-tags {
+    display: flex;
+    gap: $spacing-xs;
+    flex-wrap: wrap;
+  }
 
-  &.in-stock {
+  .tag {
+    padding: $spacing-xs $spacing-sm;
+    background: color.adjust($accent-color, $lightness: 45%);
+    color: color.adjust($accent-color, $lightness: -20%);
+    border-radius: $border-radius-sm;
+    font-size: 0.75rem;
+  }
+
+  .bottle-actions {
+    display: flex;
+    gap: $spacing-sm;
+    flex-wrap: wrap;
+  }
+
+  .btn-edit,
+  .btn-mark-empty,
+  .btn-mark-in-stock,
+  .btn-delete {
+    padding: $spacing-xs $spacing-md;
+    border-radius: $border-radius-sm;
+    font-weight: 600;
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: 2px solid transparent;
+  }
+
+  .btn-edit {
+    background: color.adjust($primary-color, $lightness: 40%);
+    color: $primary-color;
+    border-color: $primary-color;
+
+    &:hover {
+      background: $primary-color;
+      color: white;
+    }
+  }
+
+  .btn-mark-empty {
+    background: color.adjust(orange, $lightness: 30%);
+    color: color.adjust(orange, $lightness: -30%);
+    border-color: color.adjust(orange, $lightness: -20%);
+
+    &:hover {
+      background: orange;
+      color: white;
+    }
+  }
+
+  .btn-mark-in-stock {
     background: color.adjust(green, $lightness: 40%);
     color: color.adjust(green, $lightness: -30%);
+    border-color: color.adjust(green, $lightness: -20%);
+
+    &:hover {
+      background: green;
+      color: white;
+    }
   }
 
-  &.out-of-stock {
+  .btn-delete {
     background: color.adjust(red, $lightness: 40%);
     color: color.adjust(red, $lightness: -20%);
+    border-color: color.adjust(red, $lightness: -20%);
+
+    &:hover {
+      background: red;
+      color: white;
+    }
   }
-}
-
-.size {
-  font-size: 0.875rem;
-  color: color.adjust($text-dark, $lightness: 20%);
-}
-
-.abv,
-.origin {
-  font-size: 0.875rem;
-  color: color.adjust($text-dark, $lightness: 20%);
-}
-
-.bottle-tags {
-  display: flex;
-  gap: $spacing-xs;
-  flex-wrap: wrap;
-}
-
-.tag {
-  padding: $spacing-xs $spacing-sm;
-  background: color.adjust($accent-color, $lightness: 45%);
-  color: color.adjust($accent-color, $lightness: -20%);
-  border-radius: $border-radius-sm;
-  font-size: 0.75rem;
-}
-
-.bottle-actions {
-  display: flex;
-  gap: $spacing-sm;
-  flex-wrap: wrap;
-}
-
-.btn-edit,
-.btn-mark-empty,
-.btn-mark-in-stock,
-.btn-delete {
-  padding: $spacing-xs $spacing-md;
-  border-radius: $border-radius-sm;
-  font-weight: 600;
-  font-size: 0.875rem;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  border: 2px solid transparent;
-}
-
-.btn-edit {
-  background: color.adjust($primary-color, $lightness: 40%);
-  color: $primary-color;
-  border-color: $primary-color;
-
-  &:hover {
-    background: $primary-color;
-    color: white;
-  }
-}
-
-.btn-mark-empty {
-  background: color.adjust(orange, $lightness: 30%);
-  color: color.adjust(orange, $lightness: -30%);
-  border-color: color.adjust(orange, $lightness: -20%);
-
-  &:hover {
-    background: orange;
-    color: white;
-  }
-}
-
-.btn-mark-in-stock {
-  background: color.adjust(green, $lightness: 40%);
-  color: color.adjust(green, $lightness: -30%);
-  border-color: color.adjust(green, $lightness: -20%);
-
-  &:hover {
-    background: green;
-    color: white;
-  }
-}
-
-.btn-delete {
-  background: color.adjust(red, $lightness: 40%);
-  color: color.adjust(red, $lightness: -20%);
-  border-color: color.adjust(red, $lightness: -20%);
-
-  &:hover {
-    background: red;
-    color: white;
-  }
-}
 </style>

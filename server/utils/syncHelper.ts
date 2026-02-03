@@ -1,7 +1,7 @@
-import { exec } from 'child_process'
-import { promisify } from 'util'
+import { exec } from "child_process";
+import { promisify } from "util";
 
-const execAsync = promisify(exec)
+const execAsync = promisify(exec);
 
 /**
  * Runs the sync-data script to regenerate public/data/bottles.json
@@ -9,11 +9,11 @@ const execAsync = promisify(exec)
  */
 export async function syncInventoryData(): Promise<void> {
   try {
-    await execAsync('npm run sync-data', {
+    await execAsync("npm run sync-data", {
       cwd: process.cwd(),
-    })
+    });
   } catch (error) {
-    console.error('Failed to sync inventory data:', error)
-    throw error
+    console.error("Failed to sync inventory data:", error);
+    throw error;
   }
 }

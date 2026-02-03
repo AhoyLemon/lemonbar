@@ -1,27 +1,27 @@
-import { readBeerWineData, writeBeerWineData, getNextBeerWineId } from '~/server/utils/beerWineHelper'
-import type { BeerWine } from '~/types'
+import { readBeerWineData, writeBeerWineData, getNextBeerWineId } from "~/server/utils/beerWineHelper";
+import type { BeerWine } from "~/types";
 
-export default defineEventHandler(async event => {
+export default defineEventHandler(async (event) => {
   try {
-    const body = await readBody<Partial<BeerWine>>(event)
+    const body = await readBody<Partial<BeerWine>>(event);
 
     // Validate required fields
     if (!body.name || !body.type) {
       throw createError({
         statusCode: 400,
-        statusMessage: 'Name and type are required',
-      })
+        statusMessage: "Name and type are required",
+      });
     }
 
     // For wine, subtype is required; for beer, it's optional
-    if (body.type === 'wine' && !body.subtype) {
+    if (body.type === "wine" && !body.subtype) {
       throw createError({
         statusCode: 400,
-        statusMessage: 'Wine type (subtype) is required for wines',
-      })
+        statusMessage: "Wine type (subtype) is required for wines",
+      });
     }
 
-    const items = readBeerWineData()
+    const items = readBeerWineData();
     const newItem: BeerWine = {
       id: getNextBeerWineId(items),
       name: body.name,
@@ -29,22 +29,22 @@ export default defineEventHandler(async event => {
       subtype: body.subtype,
       inStock: body.inStock ?? true,
       image: body.image,
-    }
+    };
 
-    items.push(newItem)
-    writeBeerWineData(items)
+    items.push(newItem);
+    writeBeerWineData(items);
 
     return {
       success: true,
       item: newItem,
-    }
+    };
   } catch (error: any) {
     if (error.statusCode) {
-      throw error
+      throw error;
     }
     throw createError({
       statusCode: 500,
-      statusMessage: 'Failed to create beer/wine item',
-    })
+      statusMessage: "Failed to create beer/wine item",
+    });
   }
-})
+});
