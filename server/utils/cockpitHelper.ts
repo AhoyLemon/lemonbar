@@ -85,24 +85,24 @@ function loadLocalBeerWine(): BeerWine[] {
 // Transform Cockpit bottle data to app format
 interface CockpitBottle {
   _id: string;
-  Name: string;
-  Category: string;
-  "Base Spirits"?: string[];
-  "Whiskey Types"?: string[] | null;
-  "Tequila Types"?: string[] | null;
-  "Gin Types"?: string[] | null;
-  "Rum Types"?: string[] | null;
-  "Bottle Size"?: string;
-  Company?: string;
-  ABV?: number;
-  Origin?: string;
-  "Bottle State"?: string;
-  Image?: {
+  name: string;
+  category: string;
+  baseSpirits?: string[];
+  whiskeyTypes?: string[] | null;
+  tequilaTypes?: string[] | null;
+  ginTypes?: string[] | null;
+  rumTypes?: string[] | null;
+  bottleSize?: string;
+  company?: string;
+  abv?: number;
+  origin?: string;
+  bottleState?: string;
+  image?: {
     path?: string;
     [key: string]: any;
   };
-  "Mark as special fingers"?: boolean | null;
-  _state?: number;
+  isFingers?: boolean | null;
+  inStock?: boolean;
 }
 
 export async function fetchBottlesFromCockpit(): Promise<Bottle[]> {
@@ -112,37 +112,37 @@ export async function fetchBottlesFromCockpit(): Promise<Bottle[]> {
     return data.map((item) => {
       // Combine all spirit types into tags array
       const tags: string[] = [];
-      if (item["Base Spirits"]) tags.push(...item["Base Spirits"]);
-      if (item["Whiskey Types"]) tags.push(...item["Whiskey Types"]);
-      if (item["Tequila Types"]) tags.push(...item["Tequila Types"]);
-      if (item["Gin Types"]) tags.push(...item["Gin Types"]);
-      if (item["Rum Types"]) tags.push(...item["Rum Types"]);
+      if (item.baseSpirits) tags.push(...item.baseSpirits);
+      if (item.whiskeyTypes) tags.push(...item.whiskeyTypes);
+      if (item.tequilaTypes) tags.push(...item.tequilaTypes);
+      if (item.ginTypes) tags.push(...item.ginTypes);
+      if (item.rumTypes) tags.push(...item.rumTypes);
 
       // Map bottle state from Cockpit format to app format
       let bottleState: "unopened" | "opened" | "empty" = "opened";
-      if (item["Bottle State"]) {
-        const state = item["Bottle State"].toLowerCase();
+      if (item.bottleState) {
+        const state = item.bottleState.toLowerCase();
         if (state.includes("unopened")) bottleState = "unopened";
         else if (state.includes("opened")) bottleState = "opened";
         else if (state.includes("empty")) bottleState = "empty";
       }
 
       // Build image path
-      const imageUrl = item.Image?.path ? `https://hirelemon.com/bar/storage/uploads${item.Image.path}` : undefined;
+      const imageUrl = item.image?.path ? `https://hirelemon.com/bar/storage/uploads${item.image.path}` : undefined;
 
       return {
         id: item._id,
-        name: item.Name || "",
-        category: item.Category || "Uncategorized",
+        name: item.name || "",
+        category: item.category || "Uncategorized",
         tags,
-        inStock: item._state === 1,
-        isFinger: item["Mark as special fingers"] === true,
-        bottleSize: item["Bottle Size"],
+        inStock: item.inStock ?? true,
+        isFingers: item.isFingers === true,
+        bottleSize: item.bottleSize,
         bottleState,
         image: imageUrl,
-        abv: item.ABV,
-        origin: item.Origin,
-        company: item.Company,
+        abv: item.abv,
+        origin: item.origin,
+        company: item.company,
       };
     });
   } catch (error) {
@@ -156,7 +156,7 @@ interface CockpitDrink {
   _id: string;
   cocktailName?: string; // Cockpit uses cocktailName
   name?: string; // Fallback
-  ingredients?: Array<{ 
+  ingredients?: Array<{
     "Ingredient Name"?: string; // Cockpit format
     name?: string; // Fallback
     Quantity?: string;
@@ -164,7 +164,7 @@ interface CockpitDrink {
     Optional?: boolean;
     optional?: boolean; // Fallback
   }>;
-  steps?: Array<{ Step?: string }>; // Cockpit format
+  steps?: Array<{ step?: string }>; // Cockpit format
   instructions?: string | string[]; // Fallback
   image?: {
     path?: string;
@@ -183,30 +183,28 @@ export async function fetchDrinksFromCockpit(): Promise<Drink[]> {
 
     return data.map((item) => {
       // Handle ingredients - Cockpit uses "Ingredient Name", "Quantity", "Optional"
-      const ingredients = Array.isArray(item.ingredients) 
-        ? item.ingredients
-            .map(ing => {
+      const ingredients = Array.isArray(item.ingredients)
+        ? (item.ingredients
+            .map((ing) => {
               const name = ing["Ingredient Name"] || ing.name;
               const qty = ing.Quantity || ing.qty;
               const optional = ing.Optional ?? ing.optional ?? false;
               return name && name.trim() ? { name, qty, optional } : null;
             })
-            .filter(Boolean) as Array<{ name: string; qty?: string; optional?: boolean }>
+            .filter(Boolean) as Array<{ name: string; qty?: string; optional?: boolean }>)
         : [];
 
       // Handle instructions - Cockpit uses "steps" array with "Step" property
       let instructions: string | string[] = "";
       if (Array.isArray(item.steps)) {
-        const stepTexts = item.steps.map(s => s.Step).filter(Boolean) as string[];
+        const stepTexts = item.steps.map((s) => s.step).filter(Boolean) as string[];
         instructions = stepTexts.length > 0 ? stepTexts : "";
       } else if (item.instructions) {
         instructions = item.instructions;
       }
 
       // Handle image - Cockpit uses object with path
-      const imageUrl = item.image?.path 
-        ? `https://hirelemon.com/bar/storage/uploads${item.image.path}` 
-        : item.imageUrl;
+      const imageUrl = item.image?.path ? `https://hirelemon.com/bar/storage/uploads${item.image.path}` : item.imageUrl;
 
       return {
         id: item._id,
@@ -332,7 +330,10 @@ export async function fetchEssentialsFromCockpit(): Promise<Essential[]> {
       // value can be true (in stock), false (out of stock), or null (out of stock)
       if (nameMap[key]) {
         essentials.push({
-          id: key.replace(/([A-Z])/g, "-$1").toLowerCase().replace(/^-/, ""),
+          id: key
+            .replace(/([A-Z])/g, "-$1")
+            .toLowerCase()
+            .replace(/^-/, ""),
           name: nameMap[key],
           category: categoryMap[key] || "Other",
           inStock: value === true, // Only true means in stock, false/null means out of stock
