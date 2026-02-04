@@ -12,7 +12,7 @@ export default defineEventHandler(async (): Promise<DrinkData> => {
     const errorMessage = error instanceof Error ? error.message : "Unknown error";
     throw createError({
       statusCode: 500,
-      statusMessage: `Failed to fetch drinks from Cockpit: ${errorMessage}`,
+      statusMessage: `Failed to fetch drinks: ${errorMessage}`,
     });
   }
 });
