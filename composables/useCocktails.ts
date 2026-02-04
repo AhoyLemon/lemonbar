@@ -28,10 +28,10 @@ export const useCocktails = () => {
 
   // Centralized ingredient synonym mapping (imported at top)
 
-  // Load inventory from public data
+  // Load inventory from Cockpit API
   const loadInventory = async () => {
     try {
-      const data = await $fetch<InventoryData>("/data/bottles.json");
+      const data = await $fetch<InventoryData>("/api/cockpit/bottles");
       inventory.value = data.bottles;
     } catch (e) {
       console.error("Failed to load inventory:", e);
@@ -50,10 +50,10 @@ export const useCocktails = () => {
     }
   };
 
-  // Load local drinks from public data
+  // Load local drinks from Cockpit API
   const loadLocalDrinks = async () => {
     try {
-      const data = await $fetch<DrinkData>("/data/drinks.json");
+      const data = await $fetch<DrinkData>("/api/cockpit/drinks");
       localDrinks.value = data.drinks;
     } catch (e) {
       console.error("Failed to load local drinks:", e);

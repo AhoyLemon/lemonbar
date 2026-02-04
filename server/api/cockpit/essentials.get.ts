@@ -1,5 +1,5 @@
-import type { EssentialsData } from "~/types";
 import { fetchEssentialsFromCockpit } from "~/server/utils/cockpitHelper";
+import type { EssentialsData } from "~/types";
 
 export default defineEventHandler(async (): Promise<EssentialsData> => {
   try {
@@ -12,7 +12,7 @@ export default defineEventHandler(async (): Promise<EssentialsData> => {
     const errorMessage = error instanceof Error ? error.message : "Unknown error";
     throw createError({
       statusCode: 500,
-      statusMessage: `Failed to read essentials data: ${errorMessage}`,
+      statusMessage: `Failed to fetch essentials from Cockpit: ${errorMessage}`,
     });
   }
 });
