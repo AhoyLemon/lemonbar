@@ -85,39 +85,66 @@ function loadLocalBeerWine(): BeerWine[] {
 // Transform Cockpit bottle data to app format
 interface CockpitBottle {
   _id: string;
-  name: string;
-  category: string;
-  tags?: string[];
-  inStock?: boolean;
-  isFinger?: boolean;
-  bottleSize?: string;
-  bottleState?: string;
-  image?: string;
-  abv?: number;
-  origin?: string;
-  company?: string;
-  aka?: string[];
+  Name: string;
+  Category: string;
+  "Base Spirits"?: string[];
+  "Whiskey Types"?: string[] | null;
+  "Tequila Types"?: string[] | null;
+  "Gin Types"?: string[] | null;
+  "Rum Types"?: string[] | null;
+  "Bottle Size"?: string;
+  Company?: string;
+  ABV?: number;
+  Origin?: string;
+  "Bottle State"?: string;
+  Image?: {
+    path?: string;
+    [key: string]: any;
+  };
+  "Mark as special fingers"?: boolean | null;
+  _state?: number;
 }
 
 export async function fetchBottlesFromCockpit(): Promise<Bottle[]> {
   try {
     const data = await fetchFromCockpit<CockpitBottle[]>("/content/items/bottles");
 
-    return data.map((item) => ({
-      id: item._id,
-      name: item.name || "",
-      category: item.category || "Uncategorized",
-      tags: Array.isArray(item.tags) ? item.tags : [],
-      inStock: item.inStock ?? true,
-      isFinger: item.isFinger ?? false,
-      bottleSize: item.bottleSize,
-      bottleState: (item.bottleState as "unopened" | "opened" | "empty") || "opened",
-      image: item.image,
-      abv: item.abv,
-      origin: item.origin,
-      company: item.company,
-      aka: Array.isArray(item.aka) ? item.aka : undefined,
-    }));
+    return data.map((item) => {
+      // Combine all spirit types into tags array
+      const tags: string[] = [];
+      if (item["Base Spirits"]) tags.push(...item["Base Spirits"]);
+      if (item["Whiskey Types"]) tags.push(...item["Whiskey Types"]);
+      if (item["Tequila Types"]) tags.push(...item["Tequila Types"]);
+      if (item["Gin Types"]) tags.push(...item["Gin Types"]);
+      if (item["Rum Types"]) tags.push(...item["Rum Types"]);
+
+      // Map bottle state from Cockpit format to app format
+      let bottleState: "unopened" | "opened" | "empty" = "opened";
+      if (item["Bottle State"]) {
+        const state = item["Bottle State"].toLowerCase();
+        if (state.includes("unopened")) bottleState = "unopened";
+        else if (state.includes("opened")) bottleState = "opened";
+        else if (state.includes("empty")) bottleState = "empty";
+      }
+
+      // Build image path
+      const imageUrl = item.Image?.path ? `https://hirelemon.com/bar/storage/uploads${item.Image.path}` : undefined;
+
+      return {
+        id: item._id,
+        name: item.Name || "",
+        category: item.Category || "Uncategorized",
+        tags,
+        inStock: item._state === 1,
+        isFinger: item["Mark as special fingers"] === true,
+        bottleSize: item["Bottle Size"],
+        bottleState,
+        image: imageUrl,
+        abv: item.ABV,
+        origin: item.Origin,
+        company: item.Company,
+      };
+    });
   } catch (error) {
     console.error("Error fetching bottles from Cockpit, falling back to local data:", error);
     return loadLocalBottles();
