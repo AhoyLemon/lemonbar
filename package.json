@@ -21,6 +21,7 @@
     "@notionhq/client": "^2.2.15",
     "csv-parse": "^5.5.3",
     "csv-stringify": "^6.6.0",
+    "node-fetch": "^3.3.2",
     "nuxt": "^3.11.2",
     "vue": "^3.4.21"
   },
