@@ -4,8 +4,7 @@
       .header-section
         div
           h2 All Drinks
-          p.mb-3 Explore cocktails from TheCocktailDB and custom recipes
-        NuxtLink.btn.btn-create(to="/drinks/create") + Create Recipe
+          p.mb-3 Explore cocktails from TheCocktailDB and custom recipes (managed in Cockpit)
 
       .search-bar.mb-3
         input(

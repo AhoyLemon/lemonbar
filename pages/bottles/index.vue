@@ -4,8 +4,7 @@
       .header-with-action.mb-3
         div
           h2 Your Bottles
-          p Manage your bottle collection
-        NuxtLink.manage-btn(to="/bottles/manage") ✏️ Manage Bottles
+          p Browse your bottle collection (managed in Cockpit)
 
       .filters.mb-3
         button.filter-btn(:class="{ active: filter === 'all' }" @click="filter = 'all'") All ({{ inventory.length }})

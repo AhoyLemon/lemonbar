@@ -1,17 +1,58 @@
 # Lemonbar Development Guidelines
 
-## Data Storage Architecture
+## Data Architecture - CLIENT-SIDE ONLY
 
-### Inventory (Bar-Owned Data)
+**IMPORTANT**: All data fetching happens CLIENT-SIDE from Cockpit CMS API. There is NO server-side data storage or API routes.
 
-All inventory items belong to the bar and should be saved in JSON format on the server side. This includes:
+### Data Source: Cockpit CMS
 
-- **Bottles**: Individual spirits, liqueurs, wines, beers stored in `public/data/bottles.json`
-- **Essentials**: Ice, mixers, juices, syrups, and other non-bottled ingredients stored in `public/data/essentials.json`
-- **Garnishes**: Bitters, cherries, olives, and other garnish items
-- **Custom Drinks**: User-created cocktail drinks stored in `public/data/drinks.json`
+All bar inventory data is fetched directly from Cockpit CMS API at **https://hirelemon.com/bar/api** on the client side when pages load.
 
-These items should **NOT** use localStorage as they are part of the bar's inventory and need to persist across all users and browser sessions.
+#### Data Types Fetched from Cockpit:
+
+- **Bottles**: Individual spirits, liqueurs stored at `/content/items/bottles`
+- **Drinks**: User-created cocktail recipes stored at `/content/items/drinks`
+- **Essentials**: Ice, mixers, juices, syrups stored at `/content/item/essentials`
+- **Beer & Wine**: Beer and wine inventory stored at `/content/item/beerWine`
+
+#### API Configuration
+
+API constants are defined in `/utils/cockpitConfig.ts`:
+```typescript
+export const COCKPIT_API_URL = "https://hirelemon.com/bar/api";
+export const COCKPIT_API_KEY = "API-d8dddbef2be84368b83f4fefb0ff15a0f4bf7a8e";
+```
+
+**Note about API Key Security**: This API key has **read-only** permissions and is safe to expose publicly. It cannot create, edit, or delete data. More sensitive API keys with write permissions should NEVER be exposed.
+
+#### Data Fetching Pattern
+
+All data fetching uses the `useCockpitAPI()` composable:
+
+```typescript
+const { fetchBottles, fetchDrinks, fetchEssentials, fetchBeerWine } = useCockpitAPI();
+
+// Fetch data client-side
+const bottles = await fetchBottles();
+const drinks = await fetchDrinks();
+const essentials = await fetchEssentials();
+const beerWine = await fetchBeerWine();
+```
+
+#### Error Handling
+
+- If API calls fail, errors should be displayed prominently on the page
+- Users should always know if data failed to load from Cockpit
+- Never silently fail - always surface API errors to the user
+
+### Deprecated Files
+
+The following files/folders have been moved to `/deprecated/` and should NOT be used:
+- `/deprecated/data/` - Old CSV and JSON files
+- `/deprecated/public-data/` - Old static JSON files  
+- `/deprecated/server-api/` - Old server API routes
+- `/deprecated/scripts/` - Old data sync scripts
+- `/deprecated/server-utils/` - Old server-side utilities
 
 ### Preferences (User-Owned Data)
 
@@ -22,52 +63,22 @@ User preferences are personal to each individual and should leverage localStorag
 - **UI Preferences**: Theme settings, display options
 - **Personal Notes**: Private notes about drinks or bottles
 
-These items should **NOT** be stored in JSON files as they are user-specific.
+These items should **NOT** be stored in Cockpit CMS as they are user-specific.
 
-## Future Migration Plans
+### Future Improvements (TODO)
 
-### Current State
-
-Currently, all bar inventory is stored in the `public/data` directory as JSON files:
-
-- `public/data/bottles.json` - Bottle inventory
-- `public/data/essentials.json` - Essential ingredients
-- `public/data/drinks.json` - Cocktail drinks
-
-### Future State
-
-We plan to migrate the data storage to a more robust backend solution to allow for:
-
-- Real-time inventory updates without rebuilding the site
-- Better data management and editing capabilities
-- Multi-user access and synchronization
-
-**Potential Solutions:**
-
-- **Notion**: Already partially integrated for inventory syncing
-- **Firebase**: Low-cost, real-time database with good free tier
-- **Other cheap/free solutions**: Supabase, PocketBase, or similar
-
-### Migration Considerations
-
-When implementing new features:
-
-1. Keep data access abstracted (use composables/services)
-2. Avoid tight coupling to the current JSON file structure
-3. Design APIs that can easily be swapped for external services
-4. Document data schemas clearly for easier migration
-5. Use TypeScript types consistently to ensure data integrity
+- **Caching**: Consider caching Cockpit API responses in `sessionStorage` to speed up repeated queries within the same session
+- **Optimistic Updates**: For better UX, consider implementing optimistic UI updates while API calls are in flight
 
 ## Development Workflow
 
-When adding new inventory items:
+### Working with Bar Inventory
 
-1. Add data to the appropriate source (CSV, Notion, or JSON in `data/`)
-2. Run `npm run sync-data` to regenerate `public/data/*.json` files
-3. Server API endpoints will serve the data from `public/data/`
-4. Client-side composables fetch from server APIs
+1. Update data directly in Cockpit CMS (https://hirelemon.com/bar)
+2. Changes are immediately reflected on the live site (no build needed!)
+3. Client-side composables fetch from Cockpit API when pages load
 
-When working with user preferences:
+### Working with User Preferences
 
 1. Use localStorage directly from the client
 2. Implement proper serialization/deserialization

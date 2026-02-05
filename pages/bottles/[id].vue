@@ -47,7 +47,6 @@
               span.tag(v-for="tag in bottle.tags" :key="tag") {{ tag }}
         
         .action-buttons
-          NuxtLink.btn.btn-edit(:to="`/bottles/manage?id=${bottle.id}`") ✏️ Edit Bottle
           button.btn.btn-mark-empty(v-if="bottle.inStock" @click="toggleInStock") ⚠️ Mark Empty
           button.btn.btn-mark-in-stock(v-else @click="toggleInStock") ✅ Mark In Stock
           button.btn.btn-toggle-finger(@click="toggleFingerStatus" :class="{ 'is-finger': isFingers(bottle) }") 
