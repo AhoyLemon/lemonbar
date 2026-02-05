@@ -45,12 +45,6 @@
             span.label Tags:
             .tags-list
               span.tag(v-for="tag in bottle.tags" :key="tag") {{ tag }}
-        
-        .action-buttons
-          button.btn.btn-mark-empty(v-if="bottle.inStock" @click="toggleInStock") ⚠️ Mark Empty
-          button.btn.btn-mark-in-stock(v-else @click="toggleInStock") ✅ Mark In Stock
-          button.btn.btn-toggle-finger(@click="toggleFingerStatus" :class="{ 'is-finger': isFingers(bottle) }") 
-            | {{ isFingers(bottle) ? '🥃 Remove from Fingers' : '🥃 Make Finger' }}
       
       .drinks-section
         h3 {{ bottle.isFingers ? 'Serving Options' : 'Drinks Using This Bottle' }}
