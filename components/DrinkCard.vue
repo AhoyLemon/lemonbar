@@ -5,12 +5,15 @@ NuxtLink.drink-card(:to="`/drinks/${drink.id}`" :class="{ 'fully-available': isF
   .drink-card__image(v-if="drink.imageUrl")
     img(:src="drink.imageUrl" :alt="drink.name")
     span.drink-card__category(v-if="drink.category") {{ drink.category }}
+    abbr.external-source(v-if="drink.external" title="This drink is sourced from an external API") 📡
   .drink-card__image(v-else-if="drink.image")
     img(:src="`/images/drinks/${drink.image}`" :alt="drink.name")
     span.drink-card__category(v-if="drink.category") {{ drink.category }}
+    abbr.external-source(v-if="drink.external" title="This drink is sourced from an external API") 📡
   .drink-card__image.drink-card__image--placeholder(v-else)
     span 🍸
     span.drink-card__category(v-if="drink.category") {{ drink.category }}
+    abbr.external-source(v-if="drink.external" title="This drink is sourced from an external API") 📡
   .drink-card__content
     .drink-card__header
       h3.drink-card__name {{ drink.name }}
@@ -116,6 +119,18 @@ NuxtLink.drink-card(:to="`/drinks/${drink.id}`" :class="{ 'fully-available': isF
         height: 100%;
         object-fit: cover;
       }
+    }
+
+    .external-source {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      font-size: 1.5rem;
+      text-decoration: none;
+      background: rgba(255, 255, 255, 0.5);
+      border-radius: 4px;
+      text-shadow: 0 0 2px black;
+      cursor: help;
     }
 
     &__content {

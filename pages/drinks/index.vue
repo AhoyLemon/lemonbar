@@ -40,7 +40,10 @@
           :key="drink.id"
           :drink="drink"
           :show-availability="true"
+          :external="drink.external"
         )
+      .hydrate-btn-container
+        button.hydrate-btn(@click="hydrateMoreCocktailDB") Get More Random Cocktails!
 
       // Beer & Wine Section
       .beer-wine-section(v-if="getInStockBeerWine.length > 0 && filter === 'beerWine' || filter === 'all' || filter === 'available' || filter === 'alcoholic' ")
@@ -89,12 +92,16 @@
     sortDrinksByAvailability,
     loading,
     error,
+    apiDrinks,
+    localDrinks,
   } = useCocktails();
 
   const { loadStarredDrinks, isStarred } = useStarredDrinks();
 
   const searchTerm = ref("");
   const filter = ref<"all" | "alcoholic" | "nonAlcoholic" | "available" | "beerWine">("all");
+
+  const hydratedCount = ref(0);
 
   // Load data on mount
   onMounted(async () => {
@@ -104,11 +111,18 @@
     loadStarredDrinks();
     await loadBeerWine();
 
-    // Fetch random cocktails to showcase variety
-    await fetchRandomCocktails(8);
+    if (localDrinks.value.length < 20) {
+      const needed = 20 - localDrinks.value.length;
+      await fetchRandomCocktails(needed);
+      hydratedCount.value = needed;
+    }
   });
 
-  // Get available finger bottles
+  const hydrateMoreCocktailDB = async () => {
+    await fetchRandomCocktails(20);
+    hydratedCount.value += 20;
+  };
+
   const availableFingerBottles = computed(() => {
     return inventory.value.filter((b) => b.inStock && b.isFingers);
   });
@@ -133,7 +147,12 @@
   };
 
   // Computed properties that apply search filter
-  const filteredAllDrinks = computed(() => applySearchFilter(getAllDrinks.value));
+  const combinedDrinks = computed(() => {
+    const local = localDrinks.value.map((d) => ({ ...d, external: false }));
+    const api = apiDrinks.value.map((d) => ({ ...d, external: true }));
+    return [...local, ...api];
+  });
+  const filteredAllDrinks = computed(() => applySearchFilter(combinedDrinks.value));
   const filteredAlcoholicDrinks = computed(() => applySearchFilter(getAlcoholicDrinks.value));
   const filteredNonAlcoholicDrinks = computed(() => applySearchFilter(getNonAlcoholicDrinks.value));
   const filteredAvailableDrinks = computed(() => applySearchFilter(getAvailableDrinks.value));
@@ -199,6 +218,22 @@
 
     p {
       color: color.adjust($text-dark, $lightness: 20%);
+    }
+  }
+
+  .hydrate-btn-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    .hydrate-btn {
+      background-color: $secondary-color;
+      padding: $spacing-md $spacing-xl;
+      color: $text-light;
+      font-weight: 625;
+      &:hover,
+      &:focus-visible {
+        background-color: color.adjust($secondary-color, $lightness: -15%);
+      }
     }
   }
 

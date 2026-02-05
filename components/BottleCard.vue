@@ -17,14 +17,6 @@ NuxtLink.bottle-card(:class="{ 'out-of-stock': !bottle.inStock }" :to="`/bottles
         | {{ bottleStateLabel }}
     .bottle-card__tags
       span.tag(v-for="tag in getBottleTags(bottle)" :key="tag") {{ tag }}
-    //.bottle-card__status
-      span.status-indicator(:class="{ 'in-stock': bottle.inStock, 'out-of-stock': !bottle.inStock }")
-        | {{ bottle.inStock ? 'In Stock' : 'Out of Stock' }}
-      span.status-fingers(v-if="bottle.isFingers") 
-        | Fingers
-  //-.bottle-card__actions
-    //-NuxtLink.action-btn.action-btn--edit(:to="`/bottles/manage?id=${bottle.id}`") ✏️
-    NuxtLink.action-btn.action-btn--view(:to="`/bottles/${bottle.id}`") 👁️
 </template>
 
 <script setup lang="ts">
