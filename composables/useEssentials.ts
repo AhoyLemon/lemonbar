@@ -24,9 +24,10 @@ export const useEssentials = () => {
     loading.value = true;
     error.value = null;
     try {
-      const data = await $fetch<EssentialsData>("/api/essentials");
-      essentials.value = JSON.parse(JSON.stringify(data.essentials));
-      originalEssentials.value = JSON.parse(JSON.stringify(data.essentials));
+      const cockpitAPI = useCockpitAPI();
+      const data = await cockpitAPI.fetchEssentials();
+      essentials.value = JSON.parse(JSON.stringify(data));
+      originalEssentials.value = JSON.parse(JSON.stringify(data));
     } catch (e: any) {
       error.value = e.message || "Failed to load essentials";
       console.error("Failed to fetch essentials:", e);

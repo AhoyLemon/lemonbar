@@ -4,7 +4,23 @@
 
 After merging this PR, follow these steps to enable GitHub Pages deployment:
 
-### 1. Enable GitHub Pages
+### 1. Configure GitHub Secrets
+
+The deployment requires Cockpit CMS API credentials to fetch live data:
+
+1. Go to your repository: `https://github.com/AhoyLemon/lemonbar`
+2. Click on **Settings** (top navigation)
+3. In the left sidebar, click **Secrets and variables** → **Actions**
+4. Click **New repository secret**
+5. Add the following secrets:
+   - **Name**: `COCKPIT_API_URL`
+     - **Value**: `https://hirelemon.com/bar/api` (or your Cockpit CMS API URL)
+   - **Name**: `COCKPIT_API_KEY`
+     - **Value**: Your Cockpit CMS API token
+
+> **Note**: These secrets are necessary for the deployed site to fetch live data from your Cockpit CMS. The API key will be embedded in the static site to enable client-side API calls.
+
+### 2. Enable GitHub Pages
 
 1. Go to your repository: `https://github.com/AhoyLemon/lemonbar`
 2. Click on **Settings** (top navigation)
@@ -13,7 +29,7 @@ After merging this PR, follow these steps to enable GitHub Pages deployment:
    - **Source**: Select **"GitHub Actions"** from the dropdown
 5. Click **Save** (if needed)
 
-### 2. Trigger the First Deployment
+### 3. Trigger the First Deployment
 
 The workflow will automatically run when you:
 - Push to the `main` branch
@@ -27,7 +43,7 @@ To manually trigger the deployment:
 4. Select `main` branch
 5. Click **Run workflow**
 
-### 3. View Your Deployed Site
+### 4. View Your Deployed Site
 
 Once the workflow completes (usually 2-5 minutes):
 

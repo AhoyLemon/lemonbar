@@ -35,6 +35,8 @@ jobs:
         run: npm run generate
         env:
           NODE_ENV: production
+          COCKPIT_API_URL: ${{ secrets.COCKPIT_API_URL }}
+          COCKPIT_API_KEY: ${{ secrets.COCKPIT_API_KEY }}
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3

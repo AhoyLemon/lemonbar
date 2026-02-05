@@ -91,20 +91,29 @@ app: {
   baseURL: process.env.NODE_ENV === "production" ? "/lemonbar/" : "/",
   buildAssetsDir: "assets",
 }
+
+runtimeConfig: {
+  cockpitApiKey: process.env.COCKPIT_API_KEY || "",
+  public: {
+    cockpitApiUrl: process.env.COCKPIT_API_URL || "https://hirelemon.com/bar/api",
+    cockpitApiKey: process.env.COCKPIT_API_KEY || "",
+  },
+}
 ```
 
 - **baseURL**: Set to `/lemonbar/` in production to match the GitHub Pages repository path
 - **buildAssetsDir**: Set to `assets` to ensure proper asset loading
+- **runtimeConfig**: Exposes Cockpit CMS API credentials to the client for live data fetching
 
-#### Static Site Generation
+#### Static Site Generation with Live Data
 
 The deployment uses `npm run generate` which:
 
 1. Builds the Nuxt application with the `static` preset
 2. Pre-renders all routes (29 routes including pages and data payloads)
 3. Generates static HTML files in `.output/public/`
-4. Includes all data files from `public/data/` in the build
-5. Creates a fully static site that can be served from any static hosting
+4. Embeds Cockpit API credentials in the runtime config for client-side API calls
+5. Creates a fully static site that fetches live data at runtime
 
 #### GitHub Actions Workflow
 
@@ -115,7 +124,10 @@ The `.github/workflows/deploy.yml` workflow:
    - Checks out code
    - Sets up Node.js 20 with npm caching
    - Runs `npm ci` for clean install
-   - Runs `npm run generate` with NODE_ENV=production
+   - Runs `npm run generate` with environment variables:
+     - `NODE_ENV=production`
+     - `COCKPIT_API_URL` from GitHub secrets
+     - `COCKPIT_API_KEY` from GitHub secrets
    - Uploads `.output/public/` as GitHub Pages artifact
 3. **Deploy Step**:
    - Deploys the artifact to GitHub Pages
@@ -123,19 +135,26 @@ The `.github/workflows/deploy.yml` workflow:
 
 ### Important Notes
 
-1. **Data Files**: All inventory data in `public/data/` is automatically included in the static build. The site will serve this data as static JSON files.
+1. **Live Data Fetching**: The deployed site fetches data directly from Cockpit CMS API at runtime using client-side API calls. This means data updates in Cockpit CMS are immediately reflected on the live site without requiring a rebuild.
 
-2. **API Calls**: External API calls to `hirelemon.com/bar/api` and `thecocktaildb.com/api` will work in production as they are client-side requests.
+2. **API Credentials**: The Cockpit API credentials are stored as GitHub repository secrets and embedded in the static site during build. These credentials enable client-side API calls to fetch live inventory, drinks, essentials, and beer/wine data.
 
-3. **Base URL**: The production baseURL `/lemonbar/` is hardcoded in the config. If you rename the repository, update this value in `nuxt.config.ts`.
+3. **Client-Side Composables**: The app uses `useCockpitAPI()` composable to fetch data directly from Cockpit CMS. All data fetching happens in the browser, not on a server.
 
-4. **Repository Settings**: You must enable GitHub Pages in repository settings and set the source to "GitHub Actions" for the deployment to work.
+4. **External APIs**: TheCocktailDB API calls continue to work as they are client-side requests.
 
-5. **Build Time**: The static generation process pre-renders all routes, making the deployed site extremely fast with no server-side rendering needed at runtime.
+5. **Base URL**: The production baseURL `/lemonbar/` is hardcoded in the config. If you rename the repository, update this value in `nuxt.config.ts`.
+
+6. **Repository Settings**: You must:
+   - Enable GitHub Pages in repository settings and set the source to "GitHub Actions"
+   - Configure GitHub secrets for `COCKPIT_API_URL` and `COCKPIT_API_KEY`
+
+7. **Build Time**: The static generation process pre-renders all routes, making the deployed site extremely fast with no server-side rendering needed at runtime.
 
 ### Troubleshooting
 
 - **404 errors on deployed site**: Check that baseURL in `nuxt.config.ts` matches your repository name
 - **Assets not loading**: Verify buildAssetsDir is set to "assets" 
 - **Workflow fails**: Check the Actions tab for detailed error logs
-- **Data not updating**: Run `npm run sync-data` before committing to update the JSON files in `public/data/`
+- **No data showing**: Verify GitHub secrets are configured correctly with valid Cockpit API credentials
+- **CORS errors**: Ensure Cockpit CMS is configured to allow requests from your GitHub Pages domain

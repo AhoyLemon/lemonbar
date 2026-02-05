@@ -32,5 +32,17 @@ export default defineNuxtConfig({
   // SSG target for static generation
   ssr: true,
 
+  // Runtime configuration for API access
+  runtimeConfig: {
+    // Private keys (server-side only, not exposed to client)
+    cockpitApiKey: process.env.COCKPIT_API_KEY || "",
+
+    // Public keys (exposed to client)
+    public: {
+      cockpitApiUrl: process.env.COCKPIT_API_URL || "https://hirelemon.com/bar/api",
+      cockpitApiKey: process.env.COCKPIT_API_KEY || "", // Made public for client-side API calls
+    },
+  },
+
   compatibilityDate: "2026-02-02",
 });

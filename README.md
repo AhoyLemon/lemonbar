@@ -83,25 +83,39 @@ npm run generate
 
 ### GitHub Pages
 
-This project is configured to automatically deploy to GitHub Pages when you push to the `main` branch.
+This project is configured to automatically deploy to GitHub Pages when you push to the `main` branch. The deployed site fetches live data from your Cockpit CMS API.
 
 #### Initial Setup
 
-1. **Enable GitHub Pages in Repository Settings**:
+1. **Configure GitHub Secrets**:
+   - Go to your repository on GitHub
+   - Navigate to **Settings** → **Secrets and variables** → **Actions**
+   - Add two secrets:
+     - `COCKPIT_API_URL`: Your Cockpit CMS API URL (e.g., `https://hirelemon.com/bar/api`)
+     - `COCKPIT_API_KEY`: Your Cockpit CMS API token
+
+2. **Enable GitHub Pages in Repository Settings**:
    - Go to your repository on GitHub
    - Navigate to **Settings** → **Pages**
    - Under "Build and deployment", set:
      - **Source**: "GitHub Actions"
 
-2. **Push to Main Branch**:
+3. **Push to Main Branch**:
    ```bash
    git push origin main
    ```
 
-3. **Monitor Deployment**:
+4. **Monitor Deployment**:
    - Go to the **Actions** tab in your repository
    - You should see the "Deploy to GitHub Pages" workflow running
    - Once complete, your site will be available at: `https://[username].github.io/lemonbar/`
+
+#### How It Works
+
+The deployed site fetches data directly from your Cockpit CMS API at runtime. This means:
+- Visitors see fresh, up-to-date inventory and drink data
+- No need to rebuild/redeploy when data changes in Cockpit CMS
+- Updates to your CMS are immediately reflected on the live site
 
 #### Manual Deployment
 
