@@ -73,3 +73,69 @@ When working with user preferences:
 2. Implement proper serialization/deserialization
 3. Handle missing or corrupt data gracefully
 4. Consider adding export/import functionality for user backup
+
+## Deployment to GitHub Pages
+
+### Overview
+
+This Nuxt 3 application is configured for automatic deployment to GitHub Pages using GitHub Actions. The deployment happens automatically on every push to the `main` branch.
+
+### Configuration Details
+
+#### Nuxt Configuration
+
+The `nuxt.config.ts` file includes specific settings for GitHub Pages deployment:
+
+```typescript
+app: {
+  baseURL: process.env.NODE_ENV === "production" ? "/lemonbar/" : "/",
+  buildAssetsDir: "assets",
+}
+```
+
+- **baseURL**: Set to `/lemonbar/` in production to match the GitHub Pages repository path
+- **buildAssetsDir**: Set to `assets` to ensure proper asset loading
+
+#### Static Site Generation
+
+The deployment uses `npm run generate` which:
+
+1. Builds the Nuxt application with the `static` preset
+2. Pre-renders all routes (29 routes including pages and data payloads)
+3. Generates static HTML files in `.output/public/`
+4. Includes all data files from `public/data/` in the build
+5. Creates a fully static site that can be served from any static hosting
+
+#### GitHub Actions Workflow
+
+The `.github/workflows/deploy.yml` workflow:
+
+1. **Triggers**: On push to `main` or manual workflow dispatch
+2. **Build Step**: 
+   - Checks out code
+   - Sets up Node.js 20 with npm caching
+   - Runs `npm ci` for clean install
+   - Runs `npm run generate` with NODE_ENV=production
+   - Uploads `.output/public/` as GitHub Pages artifact
+3. **Deploy Step**:
+   - Deploys the artifact to GitHub Pages
+   - Provides deployment URL in workflow output
+
+### Important Notes
+
+1. **Data Files**: All inventory data in `public/data/` is automatically included in the static build. The site will serve this data as static JSON files.
+
+2. **API Calls**: External API calls to `hirelemon.com/bar/api` and `thecocktaildb.com/api` will work in production as they are client-side requests.
+
+3. **Base URL**: The production baseURL `/lemonbar/` is hardcoded in the config. If you rename the repository, update this value in `nuxt.config.ts`.
+
+4. **Repository Settings**: You must enable GitHub Pages in repository settings and set the source to "GitHub Actions" for the deployment to work.
+
+5. **Build Time**: The static generation process pre-renders all routes, making the deployed site extremely fast with no server-side rendering needed at runtime.
+
+### Troubleshooting
+
+- **404 errors on deployed site**: Check that baseURL in `nuxt.config.ts` matches your repository name
+- **Assets not loading**: Verify buildAssetsDir is set to "assets" 
+- **Workflow fails**: Check the Actions tab for detailed error logs
+- **Data not updating**: Run `npm run sync-data` before committing to update the JSON files in `public/data/`

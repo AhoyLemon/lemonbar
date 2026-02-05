@@ -79,6 +79,49 @@ npm run preview
 npm run generate
 ```
 
+## Deployment
+
+### GitHub Pages
+
+This project is configured to automatically deploy to GitHub Pages when you push to the `main` branch.
+
+#### Initial Setup
+
+1. **Enable GitHub Pages in Repository Settings**:
+   - Go to your repository on GitHub
+   - Navigate to **Settings** → **Pages**
+   - Under "Build and deployment", set:
+     - **Source**: "GitHub Actions"
+
+2. **Push to Main Branch**:
+   ```bash
+   git push origin main
+   ```
+
+3. **Monitor Deployment**:
+   - Go to the **Actions** tab in your repository
+   - You should see the "Deploy to GitHub Pages" workflow running
+   - Once complete, your site will be available at: `https://[username].github.io/lemonbar/`
+
+#### Manual Deployment
+
+You can also trigger a deployment manually:
+
+1. Go to the **Actions** tab
+2. Select "Deploy to GitHub Pages" workflow
+3. Click **Run workflow** → **Run workflow**
+
+#### Local Preview of Production Build
+
+To preview what will be deployed:
+
+```bash
+npm run generate
+npx serve .output/public
+```
+
+The site will be available at `http://localhost:3000`
+
 ## Data Structure
 
 ### Inventory CSV
