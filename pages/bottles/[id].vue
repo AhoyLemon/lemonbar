@@ -47,11 +47,10 @@
               span.tag(v-for="tag in bottle.tags" :key="tag") {{ tag }}
         
         .action-buttons
-          NuxtLink.btn.btn-edit(:to="`/bottles/manage?id=${bottle.id}`") ✏️ Edit Bottle
           button.btn.btn-mark-empty(v-if="bottle.inStock" @click="toggleInStock") ⚠️ Mark Empty
           button.btn.btn-mark-in-stock(v-else @click="toggleInStock") ✅ Mark In Stock
-          button.btn.btn-toggle-finger(@click="toggleFingerStatus" :class="{ 'is-finger': isFinger(bottle) }") 
-            | {{ isFinger(bottle) ? '🥃 Remove from Fingers' : '🥃 Make Finger' }}
+          button.btn.btn-toggle-finger(@click="toggleFingerStatus" :class="{ 'is-finger': isFingers(bottle) }") 
+            | {{ isFingers(bottle) ? '🥃 Remove from Fingers' : '🥃 Make Finger' }}
       
       .drinks-section
         h3 {{ bottle.isFingers ? 'Serving Options' : 'Drinks Using This Bottle' }}
@@ -123,7 +122,7 @@
   } = useCocktails();
 
   const { loadStarredDrinks, isStarred } = useStarredDrinks();
-  const { isFinger } = useFingers();
+  const { isFingers } = useFingers();
 
   const bottle = ref<BottleWithFingers | null>(null);
   const loading = ref(true);
@@ -167,26 +166,9 @@
       loading.value = true;
       error.value = null;
 
-      let bottles: Bottle[] = [];
-      // Detect if running on GitHub Pages
-      const isGithubPages = typeof window !== "undefined" && window.location.hostname.endsWith("github.io");
-      if (isGithubPages) {
-        // Fetch directly from Cockpit API
-        const cockpitUrl = "https://hirelemon.com/bar/api/content/items/bottles";
-        const COCKPIT_API_KEY = "API-319b8ffd3422b8c4e491e9e46356f39bd831dc56";
-        const response = await fetch(cockpitUrl, {
-          headers: {
-            "Content-Type": "application/json",
-            "Cockpit-Token": COCKPIT_API_KEY,
-          },
-        });
-        if (!response.ok) throw new Error("Failed to fetch bottles from Cockpit");
-        bottles = await response.json();
-      } else {
-        // Use local/server API
-        const response = await $fetch<{ success: boolean; bottles: Bottle[] }>("/api/inventory");
-        bottles = response.bottles;
-      }
+      // Fetch directly from Cockpit API using the composable
+      const cockpitAPI = useCockpitAPI();
+      const bottles = await cockpitAPI.fetchBottles();
 
       const foundBottle = bottles.find((b) => b.id === bottleId);
       if (foundBottle) {
@@ -275,7 +257,7 @@
 
     const updatedData = {
       ...bottle.value,
-      isFinger: !bottle.value.isFinger,
+      isFingers: !bottle.value.isFingers,
     };
 
     $fetch(`/api/inventory/${bottle.value.id}`, {
