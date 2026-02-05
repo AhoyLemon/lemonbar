@@ -11,8 +11,9 @@ export const useBeerWine = () => {
     error.value = null;
 
     try {
-      const data = await $fetch<{ items: BeerWine[]; lastUpdated: string }>("/api/beer-wine");
-      beerWineItems.value = data.items;
+      const cockpitAPI = useCockpitAPI();
+      const items = await cockpitAPI.fetchBeerWine();
+      beerWineItems.value = items;
     } catch (e) {
       console.error("Failed to load beer-wine:", e);
       error.value = "Failed to load beer and wine data";

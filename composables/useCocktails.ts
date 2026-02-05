@@ -31,8 +31,9 @@ export const useCocktails = () => {
   // Load inventory from API
   const loadInventory = async () => {
     try {
-      const data = await $fetch<InventoryData>("/api/inventory");
-      inventory.value = data.bottles;
+      const cockpitAPI = useCockpitAPI();
+      const bottles = await cockpitAPI.fetchBottles();
+      inventory.value = bottles;
     } catch (e) {
       console.error("Failed to load inventory:", e);
       error.value = "Failed to load inventory data";
@@ -42,8 +43,9 @@ export const useCocktails = () => {
   // Load essentials from API
   const loadEssentials = async () => {
     try {
-      const data = await $fetch<EssentialsData>("/api/essentials");
-      essentials.value = data.essentials;
+      const cockpitAPI = useCockpitAPI();
+      const essentialsData = await cockpitAPI.fetchEssentials();
+      essentials.value = essentialsData;
     } catch (e) {
       console.error("Failed to load essentials:", e);
       error.value = "Failed to load essentials data";
@@ -53,8 +55,9 @@ export const useCocktails = () => {
   // Load local drinks from API
   const loadLocalDrinks = async () => {
     try {
-      const data = await $fetch<DrinkData>("/api/drinks");
-      localDrinks.value = data.drinks;
+      const cockpitAPI = useCockpitAPI();
+      const drinks = await cockpitAPI.fetchDrinks();
+      localDrinks.value = drinks;
     } catch (e) {
       console.error("Failed to load local drinks:", e);
       error.value = "Failed to load local drinks";
