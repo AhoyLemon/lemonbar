@@ -54,11 +54,13 @@
 
   // Create tag options for the select component
   const tagOptions = computed(() => {
-    return availableTags.value.map((tag) => ({
-      label: tag,
-      value: tag,
-      count: getBottleCountForTag(tag),
-    }));
+    return availableTags.value
+      .map((tag) => ({
+        label: tag,
+        value: tag,
+        count: getBottleCountForTag(tag),
+      }))
+      .sort((a, b) => b.count - a.count);
   });
 
   // Get bottle count for a specific tag
