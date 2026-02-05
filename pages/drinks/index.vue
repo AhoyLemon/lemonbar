@@ -104,12 +104,19 @@
   const hydratedCount = ref(0);
 
   // Load data on mount
+  // Hydrate with drinks + drinksCommon
   onMounted(async () => {
     await loadInventory();
     await loadEssentials();
-    await loadLocalDrinks();
     loadStarredDrinks();
     await loadBeerWine();
+
+    // Custom hydration: drinks + drinksCommon
+    const { fetchDrinks, fetchDrinksCommon } = useCockpitAPI();
+    const [drinks, drinksCommon] = await Promise.all([fetchDrinks(), fetchDrinksCommon()]);
+    // Combine and dedupe by id
+    const combined = [...drinks, ...drinksCommon.filter((dc) => !drinks.some((d) => d.id === dc.id))];
+    localDrinks.value = combined;
 
     if (localDrinks.value.length < 20) {
       const needed = 20 - localDrinks.value.length;

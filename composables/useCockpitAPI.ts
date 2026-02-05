@@ -236,9 +236,53 @@ export const useCockpitAPI = () => {
     }
   };
 
+  const fetchDrinksCommon = async (): Promise<Drink[]> => {
+    try {
+      const data = await fetchFromCockpit<CockpitDrink[]>("/content/items/drinksCommon");
+      return data.map((item) => {
+        const ingredients = Array.isArray(item.ingredients)
+          ? (item.ingredients
+              .map((ing) => {
+                const name = ing["Ingredient Name"] || ing.name;
+                const qty = ing.Quantity || ing.qty;
+                const optional = ing.Optional ?? ing.optional ?? false;
+                return name && name.trim() ? { name, qty, optional } : null;
+              })
+              .filter(Boolean) as Array<{ name: string; qty?: string; optional?: boolean }>)
+          : [];
+
+        let instructions: string | string[] = "";
+        if (Array.isArray(item.steps)) {
+          const stepTexts = item.steps.map((s) => s.step).filter(Boolean) as string[];
+          instructions = stepTexts.length > 0 ? stepTexts : "";
+        } else if (item.instructions) {
+          instructions = item.instructions;
+        }
+
+        const imageUrl = item.image?.path ? `https://hirelemon.com/bar/storage/uploads${item.image.path}` : item.imageUrl;
+
+        return {
+          id: item._id,
+          name: item.cocktailName || item.name || "",
+          ingredients,
+          instructions,
+          image: imageUrl,
+          imageUrl,
+          prep: item["Preparation Method"] || item.prep,
+          category: item.category,
+          tags: Array.isArray(item.tags) ? item.tags : undefined,
+        };
+      });
+    } catch (error) {
+      console.error("Error fetching drinksCommon from Cockpit:", error);
+      throw error;
+    }
+  };
+
   return {
     fetchBottles,
     fetchDrinks,
+    fetchDrinksCommon,
     fetchEssentials,
     fetchBeerWine,
   };

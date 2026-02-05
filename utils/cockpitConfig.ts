@@ -6,7 +6,7 @@
  */
 
 export const COCKPIT_API_URL = "https://hirelemon.com/bar/api";
-export const COCKPIT_API_KEY = "API-d8dddbef2be84368b83f4fefb0ff15a0f4bf7a8e";
+export const COCKPIT_API_KEY = "API-9aa5e339d0d1f948a80f410dfdc0229eac75ad84";
 
 /**
  * Note about API Key Security:
