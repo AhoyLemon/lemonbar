@@ -19,8 +19,17 @@
   onMounted(async () => {
     await loadInventory();
     await loadEssentials();
-    await loadLocalDrinks();
     loadStarredDrinks();
+
+    // Hydrate localDrinks with both drinks and drinksCommon
+    const { fetchDrinks, fetchDrinksCommon } = useCockpitAPI();
+    const [drinks, drinksCommon] = await Promise.all([
+      fetchDrinks(),
+      fetchDrinksCommon(),
+    ]);
+    // Combine and dedupe by id
+    const combined = [...drinks, ...drinksCommon.filter((dc) => !drinks.some((d) => d.id === dc.id))];
+    localDrinks.value = combined;
 
     // Check if this is a finger drink
     const drinkId = route.params.id as string;
@@ -48,7 +57,7 @@
       }
       dataReady.value = true;
     } else {
-      // Local drink, not finger
+      // Local or common drink, not finger
       dataReady.value = true;
     }
   });
