@@ -35,3 +35,28 @@ section.bottles {
     }
   }
 }
+
+@media (max-width: 1000px) {
+  .bottle-grid {
+    grid-template-columns: 1fr;
+    .bottle-card {
+      display: grid;
+      grid-template-columns: 100px 1fr;
+      figure {
+        aspect-ratio: 1/2;
+      }
+    }
+  }
+
+  .fingers-grid {
+    grid-template-columns: 1fr;
+    .bottle-card {
+      display: grid;
+      grid-template-columns: 120px 1fr;
+      gap: 10px;
+      figure {
+        aspect-ratio: 2/3;
+      }
+    }
+  }
+}

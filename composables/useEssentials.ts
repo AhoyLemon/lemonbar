@@ -1,5 +1,5 @@
 // Composable for managing essential ingredients checklist
-import type { Essential, EssentialsRawData } from "~/types";
+import type { Essential, EssentialsRawData, BitterItem } from "~/types";
 
 // Process raw Cockpit data into Essential items - exported for use in other composables
 export const processEssentialsData = (data: EssentialsRawData): Essential[] => {
@@ -69,6 +69,7 @@ export const processEssentialsData = (data: EssentialsRawData): Essential[] => {
 
 export const useEssentials = () => {
   const essentials = useState<Essential[]>("essentials", () => []);
+  const bitters = useState<BitterItem[]>("bitters", () => []);
   const loading = useState<boolean>("essentialsLoading", () => false);
   const error = useState<string | null>("essentialsError", () => null);
 
@@ -93,6 +94,7 @@ export const useEssentials = () => {
       const rawData = await cockpitAPI.fetchEssentials();
       console.log("Raw essentials data from Cockpit:", rawData);
       essentials.value = processEssentialsData(rawData as EssentialsRawData);
+      bitters.value = (rawData as EssentialsRawData).bitters || [];
       console.log("Processed essentials:", essentials.value);
     } catch (e: any) {
       error.value = e.message || "Failed to load essentials";
@@ -118,6 +120,7 @@ export const useEssentials = () => {
 
   return {
     essentials,
+    bitters,
     essentialCategories,
     loading,
     error,

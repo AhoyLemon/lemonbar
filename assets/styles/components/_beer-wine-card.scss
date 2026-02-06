@@ -6,6 +6,11 @@
   gap: $spacing-md;
   margin-bottom: $spacing-xl;
   display: flex;
+  flex-wrap: wrap;
+  .beer-wine-card {
+    flex-basis: 220px;
+    flex-grow: 1;
+  }
 }
 
 .beer-wine-card {

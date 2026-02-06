@@ -2,7 +2,9 @@
 .fingers-page
   .container
       hgroup
-        h1 Special Fingers
+        h1.with-count
+          span Special Fingers
+          sup.count(v-if="fingerBottles.length > 0") ({{ fingerBottles.length }})
         p View special occasion bottles served as "two fingers" - these aren't used in cocktails
         p.info-text 
           span #[strong What are fingers?] Special occasion bottles that are too nice to mix in cocktails. 
@@ -15,23 +17,23 @@
           p {{ error }}
           p.error-help Make sure you can access https://hirelemon.com/bar/api and check your browser's ad blocker settings.
       
-      .bottle-grid
-
-        NuxtLink.bottle-card(
-          v-for="bottle in filteredBottles" 
-          :key="bottle.id"
-          :class="{ 'is-finger': bottle.isFingers, 'out-of-stock': !bottle.inStock }"
-          :to="`/bottles/${bottle.id}`"
-        )
-          figure.bottle-image(:class="{ 'placeholder': !bottle.image }")
-            img(:src="bottle.image" :alt="bottle.name" v-if="bottle.image")
-            span.icon(v-else) 🍾
-            span.category Fingers
-          .card-content
-            .card-header
-              .card-name {{ bottle.name || '(No Name)' }}
-            .card-meta
-              span.tag(v-for="tag in bottle.tags" :key="tag") {{ tag }}
+      section.fingers-section
+        .bottle-grid
+          NuxtLink.bottle-card(
+            v-for="bottle in filteredBottles" 
+            :key="bottle.id"
+            :class="{ 'is-finger': bottle.isFingers, 'out-of-stock': !bottle.inStock }"
+            :to="`/bottles/${bottle.id}`"
+          )
+            figure.bottle-image(:class="{ 'placeholder': !bottle.image }")
+              img(:src="bottle.image" :alt="bottle.name" v-if="bottle.image")
+              span.icon(v-else) 🍾
+              span.category Fingers
+            .card-content
+              .card-header
+                .card-name {{ bottle.name || '(No Name)' }}
+              .card-meta
+                span.tag(v-for="tag in bottle.tags" :key="tag") {{ tag }}
 
 </template>
 

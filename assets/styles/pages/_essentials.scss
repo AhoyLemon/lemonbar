@@ -1,0 +1,108 @@
+@use "sass:color";
+@use "@/assets/styles/variables" as *;
+@use "@/assets/styles/abstracts/mixins" as *;
+
+@mixin essentialBox() {
+  background: white;
+  border-radius: $border-radius-lg;
+  padding: $spacing-lg;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  .box-title {
+    font-family: $font-heading;
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: $secondary-color;
+    border-bottom: 1px solid $border-color;
+  }
+  .items-list {
+    list-style: none;
+    display: grid;
+    gap: $spacing-sm;
+    .item {
+      display: grid;
+      grid-template-columns: 24px 1fr;
+      gap: 0.5rem;
+      .status-indicator {
+        background: $accent-color;
+        width: 24px;
+        height: 24px;
+        border: 2px solid $border-color;
+        border-radius: $border-radius-sm;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s ease;
+        .checkmark {
+          color: white;
+          font-size: 0.75rem;
+          font-weight: bold;
+        }
+      }
+      .item-label {
+        color: $text-dark;
+      }
+    }
+  }
+}
+
+.essentials-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: $spacing-lg;
+}
+
+.bitters-box {
+  @include essentialBox();
+  dd {
+    display: grid;
+    gap: 1.5rem;
+  }
+  dl {
+    // padding-left: 1em;
+    .bottles-title,
+    .flavors-title {
+      font-weight: 700;
+      font-size: 125%;
+      text-transform: 0.1em;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      font-size: 0.875rem;
+    }
+    .flavors {
+      display: flex;
+      gap: 5px;
+      flex-wrap: wrap;
+    }
+    .tag {
+      background: $light-bg;
+      padding: $spacing-xs $spacing-sm;
+      border-radius: $border-radius-sm;
+      font-size: 0.75rem;
+      color: $text-dark;
+    }
+  }
+  // dl {
+  //   padding-left: 1em;
+  //   dt {
+  //     font-size: 1.25rem;
+  //   }
+  //   dd {
+  //     padding-left: 2em;
+  //   }
+  // }
+}
+
+.category-box {
+  @include essentialBox();
+  .box-title {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+    .count {
+      font-size: 0.875rem;
+      font-family: $font-primary;
+    }
+  }
+}

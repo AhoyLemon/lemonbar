@@ -2,8 +2,10 @@
 .beer-wine-page
   .container
     hgroup
-      h1 Beer & Wine
-      p View your beer and wine inventory
+      h1.with-count 
+        span Beer & Wine
+        sup.count(v-if="getBeers.length + getWines.length > 0") ({{ getBeers.length + getWines.length }})
+      p All beer and wine currently in the bar
     
     .loading(v-if="loading") Loading...
     
@@ -88,13 +90,6 @@
 
     .beer-section,
     .wine-section {
-      margin-bottom: $spacing-xxl;
-
-      h2 {
-        color: $dark-bg;
-        margin-bottom: $spacing-md;
-      }
-
       ul {
         display: grid;
         grid-template-columns: 1fr;

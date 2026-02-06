@@ -2,7 +2,9 @@
 .bottles-page
   .container
     hgroup
-      h1 Your Bottles
+      h1.with-count 
+        span Your Bottles
+        sup.count(v-if="inventory.length > 0") ({{ inventory.length }})
       p Browse your bottle collection
 
     .error-banner(v-if="error")
@@ -176,20 +178,6 @@
         font-size: 0.875rem;
         opacity: 0.9;
         margin-top: $spacing-sm;
-      }
-    }
-  }
-
-  @media (max-width: 1000px) {
-    .bottle-grid {
-      grid-template-columns: 1fr;
-      .bottle-card {
-        display: flex;
-        flex-direction: row;
-        font-size: 12px;
-        .bottle-card__image {
-          min-height: 0 !important;
-        }
       }
     }
   }

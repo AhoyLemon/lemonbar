@@ -17,4 +17,6 @@
 @use "components/drink-card";
 
 // PAGES is for any specific page template
+@use "pages/home";
 @use "pages/list";
+@use "pages/essentials";

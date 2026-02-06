@@ -6,10 +6,18 @@
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
   gap: $spacing-lg;
+  padding-bottom: $spacing-lg;
 }
 
+section.fingers-section {
+  padding-bottom: $spacing-lg;
+}
+
+// Container query for drink-card font size
 .drink-card {
   @include card();
+  container-type: inline-size;
+  container-name: drink-card;
 
   .external-source {
     position: absolute;
@@ -80,16 +88,15 @@
           opacity: 1;
           font-weight: 500;
         }
-
-        .ingredient-name {
-          flex: 1;
-        }
-
-        .ingredient-qty {
-          color: color.adjust($text-dark, $lightness: 30%);
-          font-size: 0.875rem;
-        }
       }
+    }
+    .ingredient-name {
+      flex: 1;
+    }
+
+    .ingredient-qty {
+      color: color.adjust($text-dark, $lightness: 30%);
+      font-size: 0.875rem;
     }
   }
 
@@ -137,6 +144,34 @@
       &:hover {
         background: color.adjust(gold, $lightness: -10%);
         border-color: color.adjust(gold, $lightness: -10%);
+      }
+    }
+  }
+}
+
+@media (max-width: 1000px) {
+  .drinks-grid {
+    grid-template-columns: 1fr;
+    .drink-card {
+      display: grid;
+      grid-template-columns: 160px 1fr;
+      figure {
+        //aspect-ratio: 1/1;
+        aspect-ratio: unset;
+        img {
+          height: 100%;
+        }
+      }
+    }
+  }
+}
+
+@container drink-card (max-width: 649px) {
+  .drink-ingredients {
+    span {
+      font-size: 12px;
+      &.ingredient-qty {
+        font-size: 10px !important;
       }
     }
   }
