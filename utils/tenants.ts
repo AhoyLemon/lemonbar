@@ -20,12 +20,12 @@ export const TENANT_CONFIG: Record<string, TenantConfig> = {
     barName: "Sample Bar",
     bottles: "bottlesSample",
     drinks: "drinksFoo",
-    essentials: "essentialsLemon",
+    essentials: "essentialsFoo",
     beerWine: "beerWineSample",
   },
   lemon: {
     slug: "lemon",
-    barName: "Wilkommen am Lemonhaus",
+    barName: "Willkommen am Lemonhaus",
     bottles: "bottles",
     drinks: "drinks",
     essentials: "essentials",
@@ -39,12 +39,13 @@ export const TENANT_CONFIG: Record<string, TenantConfig> = {
     essentials: "essentialsVictor",
     beerWine: "beerWineVictor",
   },
+  // Alias for default - foo tenant uses same config as default
   foo: {
     slug: "foo",
     barName: "Sample Bar",
     bottles: "bottlesSample",
     drinks: "drinksFoo",
-    essentials: "essentialsLemon",
+    essentials: "essentialsFoo",
     beerWine: "beerWineSample",
   },
 };

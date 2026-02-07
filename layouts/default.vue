@@ -36,6 +36,7 @@ const route = useRoute();
 // Extract tenant from route
 const tenant = computed(() => {
   const pathSegments = route.path.split('/').filter(Boolean);
+  // Fallback to default tenant slug as safety measure (middleware should handle redirects)
   return pathSegments[0] || getDefaultTenantConfig().slug;
 });
 
