@@ -1,14 +1,15 @@
 # 🍸 The Headless Bar
 
-A custom bar inventory and cocktail app built with Nuxt 3.
+A multi-tenant bar inventory and cocktail app built with Nuxt 3, supporting multiple bars with tenant-specific data from Cockpit CMS.
 
 ## Features
 
-- **Inventory Management**: Track your bottles with size, state, and images
+- **Multi-Tenant Support**: Host multiple bars with separate inventories and drinks using path-based routing (e.g., `/lemon`, `/victor`)
+- **Inventory Management**: Track bottles with size, state, and images per tenant
 - **Recipe Discovery**: Find cocktails from TheCocktailDB API
 - **Smart Matching**: See which drinks you can make with your current inventory
 - **Non-Alcoholic Support**: Includes mocktails, beer, and wine recipes
-- **Data Sync**: Import from Notion API, CSV, or local JSON files
+- **Live Data**: Fetches fresh data directly from Cockpit CMS API
 
 ## Made with
 
@@ -29,42 +30,60 @@ A custom bar inventory and cocktail app built with Nuxt 3.
 npm install
 ```
 
-### Sync Your Inventory Data
+### Multi-Tenant Configuration
 
-#### Option 1: With Notion Integration (Recommended)
+This app supports multiple tenants (bars), each with their own inventory and drinks. Tenants are configured in `utils/tenants.ts`.
 
-If you want to use your Notion database as the source of truth:
+#### Default Tenants
 
-1. Copy `.env.example` to `.env`:
+- **lemon** - `/lemon` - "Wilkommen am Lemonhaus"
+- **victor** - `/victor` - "Victor's Place"  
+- **foo** - `/foo` - "Sample Bar" (default tenant with demo data)
 
-   ```bash
-   cp .env.example .env
+When you visit the root URL (`/`) or any path without a tenant (e.g., `/drinks`), you'll be automatically redirected to the default tenant (`/foo`).
+
+#### Adding a New Tenant
+
+1. **Add Cockpit CMS Collections**: Create tenant-specific collections in your Cockpit CMS:
+   - `bottles{TenantName}` (e.g., `bottlesVictor`)
+   - `drinks{TenantName}` (e.g., `drinksVictor`)
+   - `essentials{TenantName}` (e.g., `essentialsVictor`)
+   - `beerWine{TenantName}` (e.g., `beerWineVictor`)
+
+2. **Update `utils/tenants.ts`**: Add your tenant configuration:
+   ```typescript
+   export const TENANT_CONFIG: Record<string, TenantConfig> = {
+     // ... existing tenants
+     mybar: {
+       slug: "mybar",
+       barName: "My Awesome Bar",
+       bottles: "bottlesMyBar",
+       drinks: "drinksMyBar",
+       essentials: "essentialsMyBar",
+       beerWine: "beerWineMyBar",
+     },
+   };
    ```
 
-2. Follow the [Notion Integration Setup](#notion-integration-optional) instructions below to get your API key and database ID
+3. **Access Your Tenant**: Navigate to `/mybar` to see your bar's data.
 
-3. Add your credentials to the `.env` file
+### Cockpit CMS Setup
 
-4. Run the sync script:
-   ```bash
-   npm run sync-data
-   ```
+All bar data is fetched from Cockpit CMS. You'll need:
 
-The script will fetch data from Notion and merge it with your local CSV. **Notion data takes priority** when the same bottle exists in both sources.
+1. A Cockpit CMS instance (e.g., `https://hirelemon.com/bar`)
+2. API access configured in `utils/cockpitConfig.ts`
+3. Collections/singletons for each tenant as defined in `utils/tenants.ts`
 
-#### Option 2: Without Notion (CSV only)
-
-```bash
-npm run sync-data
-```
-
-This will read from `data/bottles.csv` and `data/drinks.json` and generate normalized JSON files in `public/data/`.
+**Note**: All tenants share a common `drinksCommon` collection for shared cocktail recipes.
 
 ### Development
 
 ```bash
 npm run dev
 ```
+
+Visit `http://localhost:3000` (redirects to `/foo`) or go directly to a tenant like `http://localhost:3000/lemon`.
 
 ### Build for Production
 
@@ -110,12 +129,21 @@ This project is configured to automatically deploy to GitHub Pages when you push
    - You should see the "Deploy to GitHub Pages" workflow running
    - Once complete, your site will be available at: `https://[username].github.io/lemonbar/`
 
+#### Multi-Tenant URLs
+
+Once deployed, your tenants will be accessible at:
+- `https://[username].github.io/lemonbar/` (redirects to `/foo`)
+- `https://[username].github.io/lemonbar/lemon` - Lemon's bar
+- `https://[username].github.io/lemonbar/victor` - Victor's bar
+- `https://[username].github.io/lemonbar/foo` - Demo bar
+
 #### How It Works
 
 The deployed site fetches data directly from your Cockpit CMS API at runtime. This means:
 - Visitors see fresh, up-to-date inventory and drink data
 - No need to rebuild/redeploy when data changes in Cockpit CMS
 - Updates to your CMS are immediately reflected on the live site
+- Each tenant fetches from their configured Cockpit collections
 
 #### Manual Deployment
 
@@ -138,106 +166,99 @@ The site will be available at `http://localhost:3000`
 
 ## Data Structure
 
-### Inventory CSV
+### Cockpit CMS Collections
 
-Your `data/bottles.csv` should have these columns:
+Each tenant has its own set of collections in Cockpit CMS:
 
-- `id`, `name`, `category`, `tags`, `inStock`, `bottleSize`, `bottleState`, `image`
+#### Bottles Collection (`bottles{TenantName}`)
+- `_id` - Unique identifier
+- `name` - Bottle name
+- `category` - Category (Staples, Liqueur, Premix, etc.)
+- `baseSpirits` - Array of base spirits
+- `whiskeyTypes`, `tequilaTypes`, `ginTypes`, `rumTypes`, `liqueurTypes` - Specific type arrays
+- `bottleSize` - Size (e.g., "750ml")
+- `company` - Producer/brand
+- `abv` - Alcohol by volume
+- `origin` - Country/region
+- `bottleState` - "unopened", "opened", or "empty"
+- `image` - Image file
+- `isFingers` - Boolean for special occasion bottles
+- `inStock` - Boolean
+- `additionalTags` - Array of tags
 
-### Drinks JSON
+#### Drinks Collection (`drinks{TenantName}`)
+- `_id` - Unique identifier
+- `cocktailName` or `name` - Drink name
+- `ingredients` - Array of {name, qty, optional}
+- `steps` - Array of instruction steps
+- `image` - Image file
+- `category` - Drink category
+- `prep` - Preparation method
+- `tags` - Array of tags
 
-Your `data/drinks.json` should follow this structure:
+#### Common Drinks Collection (`drinksCommon`)
+- Shared across all tenants
+- Same structure as drinks collection
+- Merged with tenant-specific drinks
 
-```json
-{
-  "drinks": [
-    {
-      "id": "custom-1",
-      "name": "Drink Name",
-      "ingredients": [{ "name": "Ingredient", "qty": "2 oz" }],
-      "instructions": "Mix and serve",
-      "category": "Category",
-      "tags": ["tag1", "tag2"]
-    }
-  ]
+#### Essentials Singleton (`essentials{TenantName}`)
+- `basics` - Array of basic ingredients
+- `bitters` - Array of {name, flavors, company, image}
+- `carbonatedMixers` - Array of mixers
+- `fruitsBerries` - Array of fruits
+- `sweeteners` - Array of sweeteners
+- `dairyCream` - Array of dairy products
+- `juices` - Array of juices
+- `other` - Array of other ingredients
+
+#### Beer/Wine Singleton (`beerWine{TenantName}`)
+- `beer` - Array of {name, type, subtype, inStock, image}
+- `wine` - Array of {name, type, subtype, inStock, image}
+
+### Tenant Configuration
+
+Tenants are defined in `utils/tenants.ts`:
+
+```typescript
+export interface TenantConfig {
+  slug: string;           // URL path segment
+  barName: string;        // Display name
+  bottles: string;        // Cockpit collection name
+  drinks: string;         // Cockpit collection name
+  essentials: string;     // Cockpit singleton name
+  beerWine: string;       // Cockpit singleton name
 }
 ```
 
-### Notion Integration (Optional)
+## Architecture
 
-To use your Notion database as the primary source of truth for your inventory, follow these steps:
+### Multi-Tenant Routing
 
-#### Step 1: Create a Notion Integration
+The app uses Nuxt's dynamic routing with a `[tenant]` parameter:
 
-1. Go to [Notion Integrations](https://www.notion.so/my-integrations)
-2. Click "**+ New integration**"
-3. Give it a name (e.g., "Lemonbar Sync")
-4. Select the workspace that contains your database
-5. Click "**Submit**"
-6. Copy the "**Internal Integration Token**" (starts with `secret_`) - this is your `NOTION_API_KEY`
+- All pages are under `/pages/[tenant]/`
+- Middleware (`middleware/tenant.global.ts`) handles:
+  - Redirecting root paths to default tenant
+  - Validating tenant slugs
+  - Showing error pages for unknown tenants
 
-#### Step 2: Share Your Database with the Integration
+### Data Fetching
 
-1. Open your Liquor Cabinet database in Notion (e.g., https://ahoylemon.notion.site/c52ff95a53774261a8301435ee2c9be6)
-2. Click the "**•••**" menu in the top-right corner
-3. Scroll to "**Connections**" at the bottom
-4. Click "**+ Add connections**" and select your integration
-5. Click "**Confirm**"
+All composables accept an optional tenant parameter:
 
-#### Step 3: Get Your Database ID
-
-From your Notion database URL, extract the database ID:
-
-- **URL format**: `https://notion.so/workspace/<database_id>?v=<view_id>`
-- **Example**: For `https://ahoylemon.notion.site/c52ff95a53774261a8301435ee2c9be6?v=a9582664318d4f478b5922fa1b7bd2bd`
-- **Database ID**: `c52ff95a53774261a8301435ee2c9be6` (the part between the last `/` and `?v=`)
-
-#### Step 4: Configure Environment Variables
-
-1. Copy the example file:
-
-   ```bash
-   cp .env.example .env
-   ```
-
-2. Edit `.env` and add your credentials:
-   ```bash
-   NOTION_API_KEY=secret_xxxxxxxxxxxxx
-   NOTION_DATABASE_ID=c52ff95a53774261a8301435ee2c9be6
-   ```
-
-#### Step 5: Sync Your Data
-
-Run the sync script to fetch from Notion:
-
-```bash
-npm run sync-data
+```typescript
+const { fetchBottles, fetchDrinks } = useCockpitAPI(tenantSlug);
+const { loadInventory } = useCocktails(tenantSlug);
+const { loadBeerWine } = useBeerWine(tenantSlug);
 ```
 
-You should see output like:
+### State Management
 
+Each tenant has isolated state using tenant-prefixed keys:
+
+```typescript
+const inventory = useState(`${tenantSlug}_inventory`, () => []);
 ```
-📡 Fetching inventory from Notion...
-✅ Fetched X bottles from Notion
-```
-
-**Important Notes:**
-
-- The sync script merges Notion data with your local CSV
-- When both sources have the same bottle (matching ID), **Notion data takes priority**
-- The web management UI updates the local CSV only - run `npm run sync-data` to sync with Notion
-- Your Notion database must have these columns: `Name` (title), `Category` (select), `Tags` (multi-select), `InStock` (checkbox), `BottleSize` (text), `BottleState` (select), `Image` (files)
-
-### Managing Inventory via Web Interface
-
-You can add, edit, and delete bottles directly from the web interface:
-
-1. Start the development server: `npm run dev`
-2. Navigate to `/inventory`
-3. Click "Manage Inventory" button
-4. Use the form to add new bottles or click "Edit" on existing bottles to modify them
-
-Changes made through the web interface will update `data/bottles.csv` immediately. Run `npm run sync-data` afterward to regenerate the public JSON files.
 
 ## Testing
 
@@ -250,6 +271,12 @@ npm test
 ```bash
 npm run format
 ```
+
+## Further Documentation
+
+- **Tenant Configuration**: See `utils/tenants.ts` for adding/modifying tenants
+- **API Configuration**: See `utils/cockpitConfig.ts` for Cockpit CMS settings
+- **Copilot Instructions**: See `.github/copilot-instructions.md` for AI development guidelines
 
 ## License
 
