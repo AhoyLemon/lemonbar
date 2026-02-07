@@ -1,6 +1,6 @@
 /**
  * Cockpit CMS API Configuration
- * 
+ *
  * This file contains the API configuration for Cockpit CMS.
  * The API key is read-only and safe to expose publicly.
  */

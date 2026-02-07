@@ -1,6 +1,6 @@
 {
-  "name": "Lemonbar - Bar Inventory Management",
-  "short_name": "Lemonbar",
+  "name": "Bar Inventory Management",
+  "short_name": "lemonbar",
   "description": "Manage and explore cocktail recipes, bottle inventory, and bar essentials for multiple locations.",
   "icons": [
     {
@@ -20,5 +20,4 @@
   "background_color": "#ffffff",
   "display": "standalone",
   "start_url": "/"
-}
 }

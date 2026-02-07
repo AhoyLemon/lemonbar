@@ -1,18 +1,6 @@
 <template lang="pug">
 .site-layout
-  header.app-header
-    .container
-      .site-name {{ barName }}
-    .nav-holder
-      nav
-        NuxtLink.nav-link(:to="tenantPath('/')" :class="{ active: isActive('/') }") Home
-        NuxtLink.nav-link(:to="tenantPath('/bottles')" :class="{ active: isActive('/bottles') }") Bottles
-        NuxtLink.nav-link(:to="tenantPath('/drinks')" :class="{ active: isActive('/drinks') }") Drinks
-        NuxtLink.nav-link(:to="tenantPath('/essentials')" :class="{ active: isActive('/essentials') }") Essentials
-        NuxtLink.nav-link(:to="tenantPath('/beer-wine')" :class="{ active: isActive('/beer-wine') }") Beer & Wine
-        NuxtLink.nav-link(:to="tenantPath('/fingers')" :class="{ active: isActive('/fingers') }") Fingers
-        NuxtLink.nav-link(:to="tenantPath('/available')" :class="{ active: isActive('/available') }") Available
-      
+  Header
   main
     DummyDataNotice(v-if="isDefaultTenant")
     slot
@@ -27,6 +15,7 @@
 
 <script setup lang="ts">
   import DummyDataNotice from "~/components/DummyDataNotice.vue";
+  import Header from "~/components/Header.vue";
   import { getTenantConfig, getDefaultTenantConfig } from "~/utils/tenants";
 
   const route = useRoute();
@@ -43,7 +32,6 @@
     return getTenantConfig(tenant.value) || getDefaultTenantConfig();
   });
 
-  const barName = computed(() => tenantConfig.value.barName);
   const isDefaultTenant = computed(() => tenant.value === getDefaultTenantConfig().slug);
 
   // Determine page type and generate appropriate meta tags
@@ -59,66 +47,66 @@
     const pageType = segments[0] || "home";
     const subType = segments[1];
 
-    let title = `${barName.value} - Bar Inventory`;
+    let title = `${tenantConfig.value.barName} - Bar Inventory`;
     let description = tenantConfig.value.description || "Explore our bar inventory - spirits, cocktails, beer, and wine.";
 
     switch (pageType) {
       case "home":
-        title = `${barName.value} - Bar Inventory`;
+        title = `${tenantConfig.value.barName} - Bar Inventory`;
         description = tenantConfig.value.description || "Explore our bar inventory - spirits, cocktails, beer, and wine.";
         break;
 
       case "bottles":
         if (subType) {
           // Individual bottle page
-          title = `Bottle Details - ${barName.value}`;
-          description = `View bottle details and availability at ${barName.value}.`;
+          title = `Bottle Details - ${tenantConfig.value.barName}`;
+          description = `View bottle details and availability at ${tenantConfig.value.barName}.`;
         } else {
           // Bottles listing
-          title = `Bottles - ${barName.value}`;
-          description = `Browse our collection of spirits, liquors, and mixers at ${barName.value}.`;
+          title = `Bottles - ${tenantConfig.value.barName}`;
+          description = `Browse our collection of spirits, liquors, and mixers at ${tenantConfig.value.barName}.`;
         }
         break;
 
       case "drinks":
         if (subType) {
           // Individual drink page
-          title = `Drink Recipe - ${barName.value}`;
-          description = `View cocktail recipe and ingredients at ${barName.value}.`;
+          title = `Drink Recipe - ${tenantConfig.value.barName}`;
+          description = `View cocktail recipe and ingredients at ${tenantConfig.value.barName}.`;
         } else {
           // Drinks listing
-          title = `Drinks - ${barName.value}`;
-          description = `Explore our collection of cocktails and mixed drinks at ${barName.value}.`;
+          title = `Drinks - ${tenantConfig.value.barName}`;
+          description = `Explore our collection of cocktails and mixed drinks at ${tenantConfig.value.barName}.`;
         }
         break;
 
       case "available":
-        title = `Available Now - ${barName.value}`;
-        description = `Check what's currently available to drink at ${barName.value} - cocktails, beer, wine, and spirits.`;
+        title = `Available Now - ${tenantConfig.value.barName}`;
+        description = `Check what's currently available to drink at ${tenantConfig.value.barName} - cocktails, beer, wine, and spirits.`;
         break;
 
       case "fingers":
-        title = `Fingers - ${barName.value}`;
-        description = `Browse bottles served straight up or on the rocks at ${barName.value}.`;
+        title = `Fingers - ${tenantConfig.value.barName}`;
+        description = `Browse bottles served straight up or on the rocks at ${tenantConfig.value.barName}.`;
         break;
 
       case "essentials":
-        title = `Essentials - ${barName.value}`;
-        description = `View mixers, juices, and essential ingredients at ${barName.value}.`;
+        title = `Essentials - ${tenantConfig.value.barName}`;
+        description = `View mixers, juices, and essential ingredients at ${tenantConfig.value.barName}.`;
         break;
 
       case "beer-wine":
-        title = `Beer & Wine - ${barName.value}`;
-        description = `Browse our selection of beer and wine at ${barName.value}.`;
+        title = `Beer & Wine - ${tenantConfig.value.barName}`;
+        description = `Browse our selection of beer and wine at ${tenantConfig.value.barName}.`;
         break;
 
       case "error":
-        title = `Page Not Found - ${barName.value}`;
-        description = `The requested page could not be found at ${barName.value}.`;
+        title = `Page Not Found - ${tenantConfig.value.barName}`;
+        description = `The requested page could not be found at ${tenantConfig.value.barName}.`;
         break;
 
       default:
-        title = `${barName.value} - Bar Inventory`;
+        title = `${tenantConfig.value.barName} - Bar Inventory`;
         description = tenantConfig.value.description || "Explore our bar inventory - spirits, cocktails, beer, and wine.";
     }
 
@@ -148,23 +136,4 @@
       { rel: "apple-touch-icon", type: "image/png", sizes: "180x180", href: "/apple-touch-icon.png" },
     ],
   });
-
-  // Helper to construct tenant-aware paths
-  const tenantPath = (path: string) => {
-    const tenantSlug = tenant.value;
-    // Remove leading slash from path if present
-    const cleanPath = path.startsWith("/") ? path.slice(1) : path;
-    return `/${tenantSlug}${cleanPath ? "/" + cleanPath : ""}`;
-  };
-
-  // Helper to check if route is active
-  const isActive = (path: string) => {
-    const tenantSlug = tenant.value;
-    const fullPath = `/${tenantSlug}${path === "/" ? "" : path}`;
-
-    if (path === "/") {
-      return route.path === fullPath;
-    }
-    return route.path.startsWith(fullPath);
-  };
 </script>

@@ -25,6 +25,7 @@ const synonymGroups = [
   ["dark rum", "black rum"],
   ["egg", "eggs", "fresh egg", "fresh eggs"],
   ["grapefruit", "grapefruits", "fresh grapefruit"],
+  ["grapefruit soda", "squirt", "fresca", "grapefruit pop", "la croix pamplemousse"],
   ["grenadine", "pomegranate syrup", "rose's grenadine"],
   ["st-germain", "st. germain", "st germain", "elderflower liqueur", "elderflower cordial"],
   ["lemon", "lemons", "fresh lemon"],

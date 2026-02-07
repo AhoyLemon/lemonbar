@@ -1,4 +1,5 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
+import { baseURL } from "process";
 import { TENANT_CONFIG } from "./utils/tenants";
 
 export default defineNuxtConfig({
@@ -69,20 +70,20 @@ export default defineNuxtConfig({
         // OpenGraph
         { property: "og:title", content: "Lemonbar - Bar Inventory Management" },
         { property: "og:description", content: "Manage and explore cocktail recipes, bottle inventory, and bar essentials for multiple locations." },
-        { property: "og:image", content: "/opengraph-generic.png" },
+        { property: "og:image", content: `${baseURL}/opengraph-generic.png` },
         { property: "og:type", content: "website" },
-        { property: "og:url", content: "https://ahoylemon.github.io/lemonbar" },
+        { property: "og:url", content: `${baseURL}` },
         // Twitter Card
         { name: "twitter:card", content: "summary_large_image" },
         { name: "twitter:title", content: "Lemonbar - Bar Inventory Management" },
         { name: "twitter:description", content: "Manage and explore cocktail recipes, bottle inventory, and bar essentials for multiple locations." },
-        { name: "twitter:image", content: "/opengraph-generic.png" },
+        { name: "twitter:image", content: `${baseURL}/opengraph-generic.png` },
       ],
       link: [
-        { rel: "icon", type: "image/x-icon", href: "/favicon.ico" },
-        { rel: "icon", type: "image/svg+xml", href: "/favicon.svg" },
-        { rel: "apple-touch-icon", href: "/apple-touch-icon.png" },
-        { rel: "manifest", href: "/site.webmanifest" },
+        { rel: "icon", type: "image/x-icon", href: `${baseURL}/favicon.ico` },
+        { rel: "icon", type: "image/svg+xml", href: `${baseURL}/favicon.svg` },
+        { rel: "apple-touch-icon", href: `${baseURL}/apple-touch-icon.png` },
+        { rel: "manifest", href: `${baseURL}/site.webmanifest` },
         { rel: "preconnect", href: "https://fonts.googleapis.com" },
         { rel: "preconnect", href: "https://fonts.gstatic.com", crossorigin: "" },
         {
@@ -100,28 +101,22 @@ export default defineNuxtConfig({
   nitro: {
     prerender: {
       routes: [
-        '/',
-        '/foo',
-        '/lemon',
-        '/victor',
-        '/foo/drinks',
-        '/lemon/drinks',
-        '/victor/drinks',
-        '/foo/bottles',
-        '/lemon/bottles',
-        '/victor/bottles',
-        '/foo/essentials',
-        '/lemon/essentials',
-        '/victor/essentials',
-        '/foo/beer-wine',
-        '/lemon/beer-wine',
-        '/victor/beer-wine',
-        '/foo/fingers',
-        '/lemon/fingers',
-        '/victor/fingers',
-        '/foo/available',
-        '/lemon/available',
-        '/victor/available',
+        "/",
+        "/foo",
+
+        "/lemon",
+        "/lemon/available",
+        "/lemon/bottles",
+        "/lemon/drinks",
+        "/lemon/fingers",
+        "/lemon/qr",
+
+        "/victor",
+        "/victor/available",
+        "/victor/bottles",
+        "/victor/drinks",
+        "/victor/fingers",
+        "/victor/qr",
       ],
     },
   },
