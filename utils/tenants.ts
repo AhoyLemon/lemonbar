@@ -1,6 +1,6 @@
 /**
  * Tenant Configuration
- * 
+ *
  * Maps each tenant to their Cockpit CMS collection/singleton names and bar name.
  * This enables multi-tenant support with path-based routing.
  */
@@ -18,10 +18,10 @@ export const TENANT_CONFIG: Record<string, TenantConfig> = {
   default: {
     slug: "foo",
     barName: "Sample Bar",
-    bottles: "bottlesSample",
-    drinks: "drinksFoo",
-    essentials: "essentialsFoo",
-    beerWine: "beerWineSample",
+    bottles: "bottles",
+    drinks: "drinksVictor",
+    essentials: "essentials",
+    beerWine: "beerWineVictor",
   },
   lemon: {
     slug: "lemon",
@@ -43,10 +43,10 @@ export const TENANT_CONFIG: Record<string, TenantConfig> = {
   foo: {
     slug: "foo",
     barName: "Sample Bar",
-    bottles: "bottlesSample",
-    drinks: "drinksFoo",
-    essentials: "essentialsFoo",
-    beerWine: "beerWineSample",
+    bottles: "bottles",
+    drinks: "drinksVictor",
+    essentials: "essentials",
+    beerWine: "beerWineVictor",
   },
 };
 
@@ -72,7 +72,7 @@ export function getDefaultTenantConfig(): TenantConfig {
  * @returns Array of tenant slugs (excluding 'default')
  */
 export function getAllTenantSlugs(): string[] {
-  return Object.keys(TENANT_CONFIG).filter(slug => slug !== 'default');
+  return Object.keys(TENANT_CONFIG).filter((slug) => slug !== "default");
 }
 
 /**
@@ -81,5 +81,5 @@ export function getAllTenantSlugs(): string[] {
  * @returns True if the slug is valid, false otherwise
  */
 export function isValidTenant(slug: string): boolean {
-  return slug in TENANT_CONFIG && slug !== 'default';
+  return slug in TENANT_CONFIG && slug !== "default";
 }
