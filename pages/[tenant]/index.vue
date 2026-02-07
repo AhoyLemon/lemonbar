@@ -34,15 +34,18 @@
 <script setup lang="ts">
   const route = useRoute();
   const tenant = computed(() => route.params.tenant as string);
-  
-  const { loadInventory, loadLocalDrinks, fetchCocktailDBDrinks, inventory, getAvailableDrinks, localDrinks } = useCocktails(tenant.value);
+
+  const { loadInventory, fetchCocktailDBDrinks, inventory, getAvailableDrinks, localDrinks } = useCocktails(tenant.value);
   const { loadBeerWine, getInStockBeerWine } = useBeerWine(tenant.value);
 
   // Load data on mount
 
   onMounted(async () => {
     await loadInventory();
-    await loadLocalDrinks();
+    const cockpitAPI = useCockpitAPI(tenant.value);
+    const [drinks, drinksCommon] = await Promise.all([cockpitAPI.fetchDrinks(), cockpitAPI.fetchDrinksCommon()]);
+    // Combine and dedupe by id
+    localDrinks.value = [...drinks, ...drinksCommon.filter((dc) => !drinks.some((d) => d.id === dc.id))];
     await fetchCocktailDBDrinks("margarita");
     await loadBeerWine();
   });
