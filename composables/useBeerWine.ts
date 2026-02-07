@@ -1,9 +1,10 @@
 import type { BeerWine } from "~/types";
 
-export const useBeerWine = () => {
-  const beerWineItems = useState<BeerWine[]>("beerWineItems", () => []);
-  const loading = useState<boolean>("beerWineLoading", () => false);
-  const error = useState<string | null>("beerWineError", () => null);
+export const useBeerWine = (tenantSlug?: string) => {
+  const stateKey = tenantSlug ? `${tenantSlug}_` : '';
+  const beerWineItems = useState<BeerWine[]>(`${stateKey}beerWineItems`, () => []);
+  const loading = useState<boolean>(`${stateKey}beerWineLoading`, () => false);
+  const error = useState<string | null>(`${stateKey}beerWineError`, () => null);
 
   // Load beer-wine items from API
   const loadBeerWine = async () => {
@@ -11,7 +12,7 @@ export const useBeerWine = () => {
     error.value = null;
 
     try {
-      const cockpitAPI = useCockpitAPI();
+      const cockpitAPI = useCockpitAPI(tenantSlug);
       const items = await cockpitAPI.fetchBeerWine();
       beerWineItems.value = items;
     } catch (e) {

@@ -1,5 +1,6 @@
 import type { Bottle, Drink, Essential, BeerWine, EssentialsRawData } from "~/types";
 import { COCKPIT_API_URL, COCKPIT_API_KEY } from "~/utils/cockpitConfig";
+import { getTenantConfig, getDefaultTenantConfig, type TenantConfig } from "~/utils/tenants";
 
 interface CockpitBottle {
   _id: string;
@@ -59,9 +60,14 @@ interface CockpitBeerWine {
   wine?: Array<{ _id?: string; name: string; type?: string; subtype?: string; inStock?: boolean; image?: any }>;
 }
 
-export const useCockpitAPI = () => {
+export const useCockpitAPI = (tenantSlug?: string) => {
   const apiUrl = COCKPIT_API_URL;
   const apiKey = COCKPIT_API_KEY;
+  
+  // Get tenant configuration
+  const tenantConfig: TenantConfig = tenantSlug 
+    ? (getTenantConfig(tenantSlug) || getDefaultTenantConfig())
+    : getDefaultTenantConfig();
 
   const fetchFromCockpit = async <T>(endpoint: string): Promise<T> => {
     const url = `${apiUrl}${endpoint}`;
@@ -88,7 +94,7 @@ export const useCockpitAPI = () => {
 
   const fetchBottles = async (): Promise<Bottle[]> => {
     try {
-      const data = await fetchFromCockpit<CockpitBottle[]>("/content/items/bottles");
+      const data = await fetchFromCockpit<CockpitBottle[]>(`/content/items/${tenantConfig.bottles}`);
 
       return data.map((item) => {
         const tags: string[] = [];
@@ -145,7 +151,7 @@ export const useCockpitAPI = () => {
 
   const fetchDrinks = async (): Promise<Drink[]> => {
     try {
-      const data = await fetchFromCockpit<CockpitDrink[]>("/content/items/drinks");
+      const data = await fetchFromCockpit<CockpitDrink[]>(`/content/items/${tenantConfig.drinks}`);
 
       return data.map((item) => {
         const ingredients = Array.isArray(item.ingredients)
@@ -189,7 +195,7 @@ export const useCockpitAPI = () => {
 
   const fetchEssentials = async (): Promise<EssentialsRawData> => {
     try {
-      const data = await fetchFromCockpit<EssentialsRawData>("/content/item/essentials");
+      const data = await fetchFromCockpit<EssentialsRawData>(`/content/item/${tenantConfig.essentials}`);
       return data;
     } catch (error) {
       console.error("Error fetching essentials from Cockpit:", error);
@@ -199,7 +205,7 @@ export const useCockpitAPI = () => {
 
   const fetchBeerWine = async (): Promise<BeerWine[]> => {
     try {
-      const data = await fetchFromCockpit<CockpitBeerWine>("/content/item/beerWine");
+      const data = await fetchFromCockpit<CockpitBeerWine>(`/content/item/${tenantConfig.beerWine}`);
 
       const items: BeerWine[] = [];
 

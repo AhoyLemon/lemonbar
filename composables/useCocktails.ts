@@ -12,13 +12,14 @@ interface CocktailDBDrink {
   [key: string]: string | null;
 }
 
-export const useCocktails = () => {
-  const inventory = useState<Bottle[]>("inventory", () => []);
-  const essentials = useState<Essential[]>("essentials", () => []);
-  const localDrinks = useState<Drink[]>("localDrinks", () => []);
-  const apiDrinks = useState<Drink[]>("apiDrinks", () => []);
-  const loading = useState<boolean>("loading", () => false);
-  const error = useState<string | null>("error", () => null);
+export const useCocktails = (tenantSlug?: string) => {
+  const stateKey = tenantSlug ? `${tenantSlug}_` : '';
+  const inventory = useState<Bottle[]>(`${stateKey}inventory`, () => []);
+  const essentials = useState<Essential[]>(`${stateKey}essentials`, () => []);
+  const localDrinks = useState<Drink[]>(`${stateKey}localDrinks`, () => []);
+  const apiDrinks = useState<Drink[]>(`${stateKey}apiDrinks`, () => []);
+  const loading = useState<boolean>(`${stateKey}loading`, () => false);
+  const error = useState<string | null>(`${stateKey}error`, () => null);
 
   // Helper to safely get all drinks with defensive checks
   const safeGetAllDrinks = () => {
@@ -32,7 +33,7 @@ export const useCocktails = () => {
   // Load inventory from API
   const loadInventory = async () => {
     try {
-      const cockpitAPI = useCockpitAPI();
+      const cockpitAPI = useCockpitAPI(tenantSlug);
       const bottles = await cockpitAPI.fetchBottles();
       inventory.value = bottles;
     } catch (e) {
@@ -44,7 +45,7 @@ export const useCocktails = () => {
   // Load essentials from API
   const loadEssentials = async () => {
     try {
-      const cockpitAPI = useCockpitAPI();
+      const cockpitAPI = useCockpitAPI(tenantSlug);
       const rawData = await cockpitAPI.fetchEssentials();
       essentials.value = processEssentialsData(rawData as EssentialsRawData);
     } catch (e) {
@@ -56,7 +57,7 @@ export const useCocktails = () => {
   // Load local drinks from API
   const loadLocalDrinks = async () => {
     try {
-      const cockpitAPI = useCockpitAPI();
+      const cockpitAPI = useCockpitAPI(tenantSlug);
       const drinks = await cockpitAPI.fetchDrinks();
       localDrinks.value = drinks;
     } catch (e) {
