@@ -124,16 +124,16 @@ This project is configured to automatically deploy to GitHub Pages when you push
 3. **Monitor Deployment**:
    - Go to the **Actions** tab in your repository
    - You should see the "Deploy to GitHub Pages" workflow running
-   - Once complete, your site will be available at: `https://[username].github.io/lemonbar/`
+   - Once complete, your site will be available at: `https://ahoylemon.github.io/lemonbar/`
 
 #### Multi-Tenant URLs
 
 Once deployed, your tenants will be accessible at:
 
-- `https://[username].github.io/lemonbar/` (redirects to `/foo`)
-- `https://[username].github.io/lemonbar/lemon` - Lemon's bar
-- `https://[username].github.io/lemonbar/victor` - Victor's bar
-- `https://[username].github.io/lemonbar/foo` - Demo bar
+- `https://ahoylemon.github.io/lemonbar/` (redirects to `/foo`)
+- `https://ahoylemon.github.io/lemonbar/lemon` - Lemon's bar
+- `https://ahoylemon.github.io/lemonbar/victor` - Victor's bar
+- `https://ahoylemon.github.io/lemonbar/foo` - Demo bar
 
 #### How It Works
 
