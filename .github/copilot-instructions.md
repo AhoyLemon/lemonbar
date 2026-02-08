@@ -26,7 +26,7 @@ export interface TenantConfig {
 All pages use tenant-based dynamic routing:
 
 - **Pattern**: `/[tenant]/page` (e.g., `/lemon/drinks`, `/victor/bottles`)
-- **Root redirect**: `/` → `/foo` (default tenant)
+- **Root path**: `/` serves the home page (`pages/index.vue`)
 - **Non-tenant redirect**: `/drinks` → `/foo/drinks`
 - **Invalid tenant**: `/invalid` → `/invalid/error` (error page)
 
@@ -47,7 +47,7 @@ All pages are located under `/pages/[tenant]/`:
 
 `/middleware/tenant.global.ts` handles:
 
-1. Redirecting root paths to default tenant
+1. Redirecting non-tenant paths to default tenant (e.g., `/drinks` → `/foo/drinks`)
 2. Validating tenant slugs
 3. Redirecting invalid tenants to error pages
 4. Skipping static assets
