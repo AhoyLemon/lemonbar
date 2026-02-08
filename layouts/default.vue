@@ -58,7 +58,7 @@
 
     switch (pageType) {
       case "home":
-        if (path === '/') {
+        if (path === "/") {
           title = "Bar Inventory Management";
           description = "A multi-tenant bar inventory management system for managing cocktails, spirits, beer, and wine across multiple locations.";
         } else {
@@ -68,8 +68,8 @@
         break;
 
       case "about":
-        title = "About - Bar Inventory Management";
-        description = "Learn more about our multi-tenant bar inventory management system for bars and restaurants.";
+        title = "About BOOZ";
+        description = "Learn how to use BOOZ, and check out a couple demo bars.";
         break;
 
       case "bottles":
@@ -131,8 +131,8 @@
 
   // Determine og:image based on page
   const ogImage = computed(() => {
-    if (route.path === '/') return "/opengraph-home.png";
-    if (route.path === '/about') return "/opengraph-about.png";
+    if (route.path === "/") return "/opengraph-home.png";
+    if (route.path === "/about") return "/opengraph-about.png";
     return tenantConfig.value.ogImage || "/opengraph-generic.png";
   });
 
