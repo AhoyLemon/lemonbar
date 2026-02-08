@@ -9,16 +9,13 @@
   .container {
     display: flex;
     flex-direction: column;
-    // gap: 2rem;
     padding-top: 1rem;
-    section {
-      max-width: 72ch;
-      // margin-left: auto;
-      // margin-right: auto;
-    }
     h2 {
       color: $secondary-color;
     }
+  }
+  .sections-grid {
+    display: grid;
   }
   .explanation {
     display: grid;
@@ -96,20 +93,40 @@
   padding-bottom: 2em;
 }
 
-.about-page {
-  .sections-grid {
-    display: grid;
-    grid-template-columns: 72ch 1fr 40ch;
-    row-gap: $spacing-xl;
-    // .explanation {
-    //   background-color: red;
-    // }
-    // .demos {
-    //   background-color: blue;
-    // }
+@media (min-width: 1081px) {
+  .about-page {
+    .sections-grid {
+      display: grid;
+      grid-template-columns: 72ch 1fr 40ch;
+      row-gap: $spacing-xl;
+    }
+    .grid-item.explanation {
+      grid-row: 1;
+      grid-column: 1;
+    }
+    .grid-item.demos {
+      grid-row: 1;
+      grid-column: 3;
+    }
+    .next-steps {
+      grid-row: 2;
+      grid-column: 3;
+    }
   }
-  .next-steps {
-    grid-row: 2;
-    grid-column: 3;
+}
+@media (max-width: 1080px) {
+  .about-page {
+    .sections-grid {
+      grid-template-columns: repeat(2, 1fr);
+      gap: $spacing-xl;
+    }
+  }
+}
+@media (max-width: 820px) {
+  .about-page {
+    .sections-grid {
+      grid-template-columns: 1fr;
+      gap: $spacing-xl;
+    }
   }
 }

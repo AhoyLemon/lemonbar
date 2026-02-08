@@ -2,7 +2,7 @@
 .site-layout
   Header
   main
-    DummyDataNotice(v-if="isDefaultTenant")
+    DummyDataNotice(v-if="isDefaultTenant && route.path !== '/' && route.path !== '/about'")
     slot
   footer.app-footer
     .container

@@ -2,13 +2,11 @@
 .home-page
   .container
     .hero-section
-      h1 Welcome to BOOZ
-      p.lead The ultimate bar management system for cocktail enthusiasts and professional bartenders.
+      h1 BOOZ
+      p.lead Some sort of really clever tagline about BOOZ that makes you want to explore the demo bar and learn more about the project.
       .cta-section
-        p Visit our demo bar to explore the features:
-        NuxtLink.cta-button(to="/foo") Explore Demo Bar
-        br
-        NuxtLink.secondary-link(to="/about") Learn More About BOOZ
+        NuxtLink.cta-button.primary(to="/about") Learn More About BOOZ
+        NuxtLink.cta-button.secondary(to="/foo") Explore Demo Bar
 </template>
 
 <script setup lang="ts">
@@ -30,6 +28,11 @@
   .hero-section {
     text-align: center;
     padding: $spacing-xxl 0;
+    min-height: calc(100vh - 230px);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
     h1 {
       font-family: $font-heading;
       font-size: 3rem;
@@ -38,21 +41,19 @@
     }
     .lead {
       font-size: 1.25rem;
-      color: $text-dark;
+      color: #444;
       max-width: 600px;
       margin: 0 auto $spacing-xl;
     }
   }
 
   .cta-section {
-    p {
-      font-size: 1.1rem;
-      margin-bottom: $spacing-lg;
-    }
+    display: flex;
+    gap: $spacing-lg;
+    justify-content: center;
   }
 
   .cta-button {
-    display: inline-block;
     background-color: $primary-color;
     color: white;
     padding: $spacing-md $spacing-xl;
@@ -60,19 +61,17 @@
     text-decoration: none;
     font-weight: 600;
     transition: all 0.3s ease;
-    margin-bottom: $spacing-md;
+
+    &.primary {
+      background-color: $primary-color;
+    }
+    &.secondary {
+      background-color: $accent-color;
+    }
+
     &:hover {
       background-color: $secondary-color;
       transform: translateY(-2px);
-    }
-  }
-
-  .secondary-link {
-    color: $accent-color;
-    text-decoration: none;
-    font-weight: 500;
-    &:hover {
-      text-decoration: underline;
     }
   }
 
