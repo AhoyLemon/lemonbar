@@ -325,13 +325,11 @@ The `.github/workflows/deploy.yml` workflow:
 
 4. **External APIs**: TheCocktailDB API calls continue to work as they are client-side requests.
 
-5. **Base URL**: The production baseURL `/lemonbar/` is hardcoded in the config. If you rename the repository, update this value in `nuxt.config.ts`.
-
-6. **Repository Settings**: You must:
+5. **Repository Settings**: You must:
    - Enable GitHub Pages in repository settings and set the source to "GitHub Actions"
    - Configure GitHub secrets for `COCKPIT_API_URL` and `COCKPIT_API_KEY`
 
-7. **Build Time**: The static generation process pre-renders all routes, making the deployed site extremely fast with no server-side rendering needed at runtime.
+6. **Build Time**: The static generation process pre-renders all routes, making the deployed site extremely fast with no server-side rendering needed at runtime.
 
 ### Troubleshooting
 

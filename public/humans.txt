@@ -1,6 +1,6 @@
 /* TEAM */
 by: Lemon
-Repository: https://github.com/ahoylemon/booz
+Repository: https://github.com/ahoylemon/booz 
 Website: https://ahoylemon.xyz
 
 /* THANKS */
