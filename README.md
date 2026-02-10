@@ -31,9 +31,9 @@ A multi-tenant bar inventory and cocktail app built with Nuxt 3, supporting mult
 
 ### Prerequisites
 
-This project uses [Bun](https://bun.sh) as its primary runtime and package manager for faster installs and better performance. However, it remains fully compatible with Node.js/npm if you prefer.
+This project uses [Bun](https://bun.sh) as its primary runtime and package manager for faster installs and better performance. However, it remains fully compatible with [Node.js](https://nodejs.org) & npm if you prefer.
 
-**Option 1: Install Bun (Recommended)**
+**Option 1: Install [Bun](https://bun.com) (Recommended)**
 
 ```bash
 # Linux/macOS
@@ -98,7 +98,7 @@ When you visit any tenant path without a tenant (e.g., `/drinks`), you'll be aut
 ### Development
 
 ```bash
-# With Bun (recommended)
+# With Bun
 bun run dev
 
 # Or with npm
@@ -110,7 +110,7 @@ Visit `http://localhost:3000`.
 ### Build for Production
 
 ```bash
-# With Bun (recommended)
+# With Bun
 bun run build
 bun run preview
 
@@ -122,7 +122,7 @@ npm run preview
 ### Generate Static Site
 
 ```bash
-# With Bun (recommended)
+# With Bun
 bun run generate
 
 # Or with npm
@@ -185,7 +185,7 @@ You can also trigger a deployment manually:
 To preview what will be deployed:
 
 ```bash
-# With Bun (recommended)
+# With Bun
 bun run generate
 bunx serve .output/public
 
@@ -300,7 +300,7 @@ const inventory = useState(`${tenantSlug}_inventory`, () => []);
 ## Testing
 
 ```bash
-# With Bun (recommended)
+# With Bun
 bun test
 
 # Or with npm
@@ -310,7 +310,7 @@ npm test
 ## Code Formatting
 
 ```bash
-# With Bun (recommended)
+# With Bun
 bun run format
 
 # Or with npm
