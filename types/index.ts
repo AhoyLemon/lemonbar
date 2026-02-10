@@ -14,37 +14,33 @@ export interface Bottle {
   aka?: string[];
 }
 
-// New essentials data structure from Cockpit
-export interface BitterItem {
+export interface Beer {
+  id: string;
+  name: string;
+  type: string;
+  inStock: boolean;
+  image?: string;
+}
+
+export interface Wine {
+  id: string;
+  name: string;
+  type: string;
+  inStock: boolean;
+  image?: string;
+}
+
+export interface Bitter {
+  id: string;
   name: string;
   flavors: string[];
   company?: string;
-  image?: {
-    path: string;
-    title: string;
-    mime: string;
-    altText?: string;
-    [key: string]: any;
-  };
+  inStock: boolean;
+  image?: string;
 }
 
-export interface EssentialsRawData {
-  basics: string[];
-  bitters: BitterItem[];
-  carbonatedMixers: string[];
-  fruitsBerries: string[];
-  sweeteners: string[];
-  dairyCream: string[];
-  juices: string[];
-  other: string[];
-  _model?: string;
-  _modified?: number;
-  _mby?: string;
-  _created?: number;
-  _state?: number;
-  _cby?: string;
-  _id?: string;
-}
+// New essentials data structure - now just an array of strings
+export type EssentialsRawData = string[];
 
 // Processed essential item for display
 export interface Essential {
@@ -71,6 +67,7 @@ export interface Drink {
   category?: string;
   tags?: string[];
   starred?: boolean;
+  external?: boolean;
 }
 
 export interface InventoryData {
@@ -88,6 +85,22 @@ export interface DrinkData {
   lastUpdated: string;
 }
 
+export interface BeerData {
+  beers: Beer[];
+  lastUpdated: string;
+}
+
+export interface WineData {
+  wines: Wine[];
+  lastUpdated: string;
+}
+
+export interface BitterData {
+  bitters: Bitter[];
+  lastUpdated: string;
+}
+
+// Legacy BeerWine interface for backwards compatibility
 export interface BeerWine {
   id: string;
   name: string;
@@ -100,6 +113,17 @@ export interface BeerWine {
 export interface BeerWineData {
   items: BeerWine[];
   lastUpdated: string;
+}
+
+// New bar data interface
+export interface BarData {
+  name: string;
+  bottles: Bottle[];
+  drinks: Drink[];
+  beers: Beer[];
+  wines: Wine[];
+  bitters: Bitter[];
+  essentials: string[];
 }
 
 // Legacy type alias for backwards compatibility

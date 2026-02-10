@@ -14,8 +14,6 @@
     inventory,
     loadEssentials,
     loadLocalDrinks,
-    fetchCocktailDBDrinks,
-    fetchRandomCocktails,
     getAllDrinks,
     getAlcoholicDrinks,
     getNonAlcoholicDrinks,
@@ -23,7 +21,6 @@
     sortDrinksByAvailability,
     loading,
     error,
-    apiDrinks,
     localDrinks,
   } = useCocktails(tenant.value);
 
@@ -41,12 +38,6 @@
         tags.set(tag, (tags.get(tag) || 0) + 1);
       });
     });
-    // API drinks
-    apiDrinks.value.forEach((drink) => {
-      (drink.tags || []).forEach((tag) => {
-        tags.set(tag, (tags.get(tag) || 0) + 1);
-      });
-    });
     return Array.from(tags.entries()).map(([tag, count]) => ({ label: tag, value: tag, count }));
   });
 
@@ -58,30 +49,18 @@
   const hydratedCount = ref(0);
 
   // Load data on mount
-  // Hydrate with drinks + drinksCommon
   onMounted(async () => {
     await loadInventory();
     await loadEssentials();
     loadStarredDrinks();
     await loadBeerWine();
 
-    // Custom hydration: drinks + drinksCommon
-    const cockpitAPI = useCockpitAPI(tenant.value);
-    const [drinks, drinksCommon] = await Promise.all([cockpitAPI.fetchDrinks(), cockpitAPI.fetchDrinksCommon()]);
-    // Combine and dedupe by id
-    const combined = [...drinks, ...drinksCommon.filter((dc) => !drinks.some((d) => d.id === dc.id))];
-    localDrinks.value = combined;
-
-    if (localDrinks.value.length < 20) {
-      const needed = 20 - localDrinks.value.length;
-      await fetchRandomCocktails(needed);
-      hydratedCount.value = needed;
-    }
+    // Load drinks including common and random if configured
+    await loadLocalDrinks();
   });
 
   const hydrateMoreCocktailDB = async () => {
-    await fetchRandomCocktails(20);
-    hydratedCount.value += 20;
+    // CocktailDB functionality removed - focusing on tenant-specific data
   };
 
   const availableFingerBottles = computed(() => {
@@ -89,9 +68,7 @@
   });
 
   const handleSearch = async () => {
-    if (searchTerm.value.trim()) {
-      await fetchCocktailDBDrinks(searchTerm.value);
-    }
+    // Search functionality removed - focusing on tenant-specific data
   };
 
   // Helper to filter drinks by search term
@@ -109,9 +86,7 @@
 
   // Computed properties that apply search filter
   const combinedDrinks = computed(() => {
-    const local = localDrinks.value.map((d) => ({ ...d, external: false }));
-    const api = apiDrinks.value.map((d) => ({ ...d, external: true }));
-    return [...local, ...api];
+    return localDrinks.value.map((d) => ({ ...d, external: false }));
   });
   const filteredAllDrinks = computed(() => applySearchFilter(combinedDrinks.value));
   const filteredAlcoholicDrinks = computed(() => applySearchFilter(getAlcoholicDrinks.value));

@@ -8,52 +8,47 @@
 export interface TenantConfig {
   slug: string;
   barName: string;
-  bottles: string;
-  drinks: string;
-  essentials: string;
-  beerWine: string;
+  barData: string; // Cockpit singleton name (e.g., "sampleBar", "barLemon")
   description?: string;
   ogImage?: string;
+  includeCommonDrinks: boolean; // Include common cocktails from Cockpit API
+  includeRandomCocktails: boolean; // Include random cocktails from TheCocktailDB
 }
 
 export const TENANT_CONFIG: Record<string, TenantConfig> = {
   default: {
     slug: "foo",
     barName: "Sample Bar",
-    bottles: "bottles",
-    drinks: "drinksVictor",
-    essentials: "essentials",
-    beerWine: "beerWineVictor",
+    barData: "sampleBar",
     description: "Explore our sample bar inventory - spirits, cocktails, beer, and wine. Check what's available now!",
+    includeCommonDrinks: false,
+    includeRandomCocktails: false,
   },
   lemon: {
     slug: "lemon",
-    barName: "Willkommen am Lemonhaus",
-    bottles: "bottles",
-    drinks: "drinks",
-    essentials: "essentials",
-    beerWine: "beerWine",
+    barName: "Lemonhaus",
+    barData: "lemonBar",
     description: "See the drinks you can order if you go to lemon's bar.",
     ogImage: "/opengraph-lemon.png",
+    includeCommonDrinks: true,
+    includeRandomCocktails: false,
   },
   victor: {
     slug: "victor",
     barName: "Victor's Place",
-    bottles: "bottlesVictor",
-    drinks: "drinksVictor",
-    essentials: "essentialsVictor",
-    beerWine: "beerWineVictor",
+    barData: "barVictor",
     description: "Victor's Place - Your destination for premium spirits, expertly crafted cocktails, and fine wine selection. Check availability now!",
+    includeCommonDrinks: true,
+    includeRandomCocktails: true,
   },
   // Alias for default - foo tenant uses same config as default
   foo: {
     slug: "foo",
     barName: "Sample Bar",
-    bottles: "bottles",
-    drinks: "drinksVictor",
-    essentials: "essentials",
-    beerWine: "beerWineVictor",
+    barData: "sampleBar",
     description: "Explore our sample bar inventory - spirits, cocktails, beer, and wine. Check what's available now!",
+    includeCommonDrinks: false,
+    includeRandomCocktails: false,
   },
 };
 

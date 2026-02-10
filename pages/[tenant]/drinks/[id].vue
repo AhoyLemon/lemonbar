@@ -28,7 +28,7 @@
   const tenant = computed(() => route.params.tenant as string);
   const drinkId = computed(() => route.params.id as string);
 
-  const { loadInventory, inventory, loadEssentials, loadLocalDrinks, fetchCocktailDBDrinkById, getAllDrinks, isIngredientInStock } = useCocktails(tenant.value);
+  const { loadInventory, inventory, loadEssentials, loadLocalDrinks, getAllDrinks, isIngredientInStock } = useCocktails(tenant.value);
   const { loadStarredDrinks } = useStarredDrinks();
 
   const isLoading = ref(false);
@@ -70,7 +70,8 @@
 
       // Try to fetch the specific drink from CocktailDB
       isLoading.value = true;
-      const fetchedDrink = await fetchCocktailDBDrinkById(cocktailDbId);
+      const theCocktailDB = useTheCocktailDB();
+      const fetchedDrink = await theCocktailDB.fetchCocktailDBDrinkById(cocktailDbId);
       isLoading.value = false;
 
       if (!fetchedDrink) {
@@ -88,12 +89,7 @@
 
   // Find the drink by ID
   const drink = computed(() => {
-    // For CocktailDB drinks, check apiDrinks first since they might not be in getAllDrinks yet
-    if (drinkId.value.startsWith("cocktaildb-")) {
-      const { apiDrinks } = useCocktails(tenant.value);
-      return apiDrinks.value.find((r) => r.id === drinkId.value) || getAllDrinks.value.find((r) => r.id === drinkId.value);
-    }
-    return getAllDrinks.value.find((r) => r.id === drinkId.value);
+    return getAllDrinks.value.find((r: Drink) => r.id === drinkId.value);
   });
 
   // Update head with specific drink information when drink loads
@@ -127,7 +123,7 @@
   // Check if this is a local drink or from CocktailDB
   const isLocalDrink = computed(() => {
     if (!drink.value) return false;
-    return !drink.value.id.startsWith("cocktaildb-");
+    return !drink.value.id.startsWith("cocktaildb-") && !drink.value.id.startsWith("random-") && !drink.value.external;
   });
 
   // Get image URL (support both 'image' and 'imageUrl' fields)
@@ -144,14 +140,14 @@
 
     // Handle array of instruction steps (new format)
     if (Array.isArray(drink.value.instructions)) {
-      return drink.value.instructions.map((step) => step.trim());
+      return drink.value.instructions.map((step: string) => step.trim());
     }
 
     // Handle string instructions (old format from API)
     return drink.value.instructions
       .split(/\.\s+/)
-      .filter((step) => step.trim().length > 0)
-      .map((step) => step.trim() + (step.endsWith(".") ? "" : "."));
+      .filter((step: string) => step.trim().length > 0)
+      .map((step: string) => step.trim() + (step.endsWith(".") ? "" : "."));
   });
 
   const availableCount = computed(() => {

@@ -12,40 +12,44 @@ export default defineNuxtConfig({
     typeCheck: false,
   },
 
-  // Enable experimental view transitions
+  // Enable experimental view transitions (only in production)
   experimental: {
-    viewTransition: true,
+    viewTransition: process.env.NODE_ENV === "production",
   },
 
-  modules: [
-    [
-      "@nuxtjs/sitemap",
-      {
-        baseURL: process.env.NODE_ENV === "production" ? "https://booz.bar" : "http://127.0.0.1:3000",
-      },
-    ],
-  ],
-  site: {
-    url: process.env.NODE_ENV === "production" ? "https://booz.bar" : "http://127.0.0.1:3000",
+  // Development server configuration
+  devServer: {
+    port: 3000,
+    host: "localhost",
   },
-  sitemap: {
-    urls: () => {
-      const slugs = new Set(Object.values(TENANT_CONFIG).map((t) => t.slug));
-      const urls = [];
-      for (const slug of slugs) {
-        urls.push(`/${slug}`);
-        urls.push(`/${slug}/drinks`);
-        urls.push(`/${slug}/bottles`);
-        urls.push(`/${slug}/essentials`);
-        urls.push(`/${slug}/beer-wine`);
-        urls.push(`/${slug}/fingers`);
-        urls.push(`/${slug}/available`);
-      }
-      // Add lastModified as current date (build time)
-      const lastModified = new Date().toISOString();
-      return urls.map((loc) => ({ loc, lastModified }));
-    },
-  },
+
+  modules:
+    process.env.NODE_ENV === "production"
+      ? [
+          [
+            "@nuxtjs/sitemap",
+            {
+              baseURL: process.env.NODE_ENV === "production" ? "https://booz.bar" : "http://127.0.0.1:3000",
+              urls: () => {
+                const slugs = new Set(Object.values(TENANT_CONFIG).map((t) => t.slug));
+                const urls = [];
+                for (const slug of slugs) {
+                  urls.push(`/${slug}`);
+                  urls.push(`/${slug}/drinks`);
+                  urls.push(`/${slug}/bottles`);
+                  urls.push(`/${slug}/essentials`);
+                  urls.push(`/${slug}/beer-wine`);
+                  urls.push(`/${slug}/fingers`);
+                  urls.push(`/${slug}/available`);
+                }
+                // Add lastModified as current date (build time)
+                const lastModified = new Date().toISOString();
+                return urls.map((loc) => ({ loc, lastModified }));
+              },
+            },
+          ],
+        ]
+      : [],
 
   vite: {
     css: {
@@ -54,6 +58,10 @@ export default defineNuxtConfig({
           additionalData: '@use "@/assets/styles/_variables.scss" as *;',
         },
       },
+    },
+    define: {
+      // Prevent manifest import issues in development
+      __NUXT_MANIFEST__: "null",
     },
   },
 
@@ -95,11 +103,9 @@ export default defineNuxtConfig({
     },
   },
 
-  // SSG target for static generation
-  ssr: true,
-
-  // Prerender tenant routes
+  // Nitro configuration
   nitro: {
+    preset: "node-server",
     prerender: {
       routes: [
         // Home

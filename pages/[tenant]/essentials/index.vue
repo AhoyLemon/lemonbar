@@ -39,14 +39,14 @@
 
         // ...existing category sections...
         template(v-for="category in essentialCategories" :key="category.name")
-          .category-box(v-if="getCategoryItemCount(category) > 0 && category.name !== 'Bitters & Aromatics'")
+          .category-box(v-if="getCategoryItemCount(category) > 0 && category.name !== 'Bitters'")
             dt.box-title
               //-span.category-icon {{ category.icon }}
               span {{ category.name }}
               span.count ({{ getCategoryItemCount(category) }})
             ul.items-list
               li.item(
-                v-for="item in getItemsForCategory(category.name)"
+                v-for="item in getItemsForCategory(category.name).filter(item => item.name !== 'bitters')"
                 :key="item.id"
               )
                 .status-indicator
@@ -55,10 +55,26 @@
 </template>
 
 <script setup lang="ts">
+  import { getTenantConfig, getDefaultTenantConfig } from "~/utils/tenants";
+  import type { Bitter } from "~/types";
+
   const route = useRoute();
   const tenant = computed(() => route.params.tenant as string);
 
-  const { essentials, bitters, essentialCategories, loading, error, fetchEssentials, getItemsForCategory, totalEssentials } = useEssentials(tenant.value);
+  const { essentials, essentialCategories, loading, error, fetchEssentials, getItemsForCategory, totalEssentials } = useEssentials(tenant.value);
+
+  // Fetch bitters separately since they're now separate from essentials
+  const bitters = ref<Bitter[]>([]);
+  const fetchBitters = async () => {
+    try {
+      const cockpitAPI = useCockpitAPI(tenant.value);
+      const barData = await cockpitAPI.fetchBarData();
+      bitters.value = barData.bitters;
+    } catch (e) {
+      console.error("Failed to fetch bitters:", e);
+      bitters.value = [];
+    }
+  };
 
   // Collect unique flavors from all bitters bottles
   const bittersFlavors = computed(() => {
@@ -67,8 +83,8 @@
     return Array.from(new Set(flavors));
   });
 
-  // Fetch essentials - runs on every navigation to this page
-  await fetchEssentials();
+  // Fetch essentials and bitters - runs on every navigation to this page
+  await Promise.all([fetchEssentials(), fetchBitters()]);
 
   const getCategoryItemCount = (category: { name: string }) => {
     return getItemsForCategory(category.name).length;

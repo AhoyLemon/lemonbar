@@ -82,7 +82,7 @@
   const route = useRoute();
   const tenant = computed(() => route.params.tenant as string);
 
-  const { loadInventory, inventory, loadLocalDrinks, loadEssentials, fetchCocktailDBDrinks, getAvailableDrinks, error } = useCocktails(tenant.value);
+  const { loadInventory, inventory, loadLocalDrinks, loadEssentials, getAvailableDrinks, error } = useCocktails(tenant.value);
   const { loadStarredDrinks } = useStarredDrinks();
   const { loadBeerWine, getInStockBeerWine } = useBeerWine(tenant.value);
 
@@ -95,7 +95,6 @@
     await loadEssentials();
     await loadLocalDrinks();
     loadStarredDrinks();
-    await fetchCocktailDBDrinks("margarita");
     await loadBeerWine();
   });
 
