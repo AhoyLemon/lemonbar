@@ -58,8 +58,7 @@
   import { getTenantConfig, getDefaultTenantConfig } from "~/utils/tenants";
   import type { Bitter } from "~/types";
 
-  const route = useRoute();
-  const tenant = computed(() => route.params.tenant as string);
+  const tenant = useValidateTenant();
 
   const { essentials, essentialCategories, loading, error, fetchEssentials, getItemsForCategory, totalEssentials } = useEssentials(tenant.value);
 
