@@ -3,6 +3,7 @@
 <script setup lang="ts">
   import TagFilterSelect from "~/components/TagFilterSelect.vue";
   import type { Bottle } from "~/types";
+  import { getTenantConfig, getDefaultTenantConfig } from "~/utils/tenants";
 
   const route = useRoute();
   const tenant = computed(() => route.params.tenant as string);
@@ -14,8 +15,6 @@
     inventory,
     loadEssentials,
     loadLocalDrinks,
-    fetchCocktailDBDrinks,
-    fetchRandomCocktails,
     getAllDrinks,
     getAlcoholicDrinks,
     getNonAlcoholicDrinks,
@@ -23,8 +22,10 @@
     sortDrinksByAvailability,
     loading,
     error,
-    apiDrinks,
     localDrinks,
+    localDrinksLoading,
+    commonDrinksLoading,
+    randomDrinksLoading,
   } = useCocktails(tenant.value);
 
   const { loadStarredDrinks, isStarred } = useStarredDrinks();
@@ -41,12 +42,6 @@
         tags.set(tag, (tags.get(tag) || 0) + 1);
       });
     });
-    // API drinks
-    apiDrinks.value.forEach((drink) => {
-      (drink.tags || []).forEach((tag) => {
-        tags.set(tag, (tags.get(tag) || 0) + 1);
-      });
-    });
     return Array.from(tags.entries()).map(([tag, count]) => ({ label: tag, value: tag, count }));
   });
 
@@ -55,33 +50,42 @@
     return allTags.value.sort((a, b) => b.count - a.count);
   });
 
-  const hydratedCount = ref(0);
+  // Get tenant config for loading steps
+  const tenantConfig = computed(() => getTenantConfig(tenant.value) || getDefaultTenantConfig());
+
+  // Loading step computed properties
+  const loadingSteps = computed(() => [
+    {
+      status: localDrinksLoading.value ? "incomplete" : "complete",
+      text: localDrinksLoading.value ? "Fetching local drinks" : "Local drinks fetched",
+    },
+    {
+      status: tenantConfig.value.includeCommonDrinks ? (commonDrinksLoading.value ? "incomplete" : "complete") : "complete",
+      text: tenantConfig.value.includeCommonDrinks ? (commonDrinksLoading.value ? "Fetching common drinks" : "Common drinks fetched") : "Common drinks ignored",
+    },
+    {
+      status: tenantConfig.value.includeRandomCocktails ? (randomDrinksLoading.value ? "incomplete" : "complete") : "complete",
+      text: tenantConfig.value.includeRandomCocktails
+        ? randomDrinksLoading.value
+          ? "Fetching random drinks from The Cocktail DB"
+          : "Random drinks fetched"
+        : "Random drinks ignored",
+    },
+  ]);
 
   // Load data on mount
-  // Hydrate with drinks + drinksCommon
   onMounted(async () => {
     await loadInventory();
     await loadEssentials();
     loadStarredDrinks();
     await loadBeerWine();
 
-    // Custom hydration: drinks + drinksCommon
-    const cockpitAPI = useCockpitAPI(tenant.value);
-    const [drinks, drinksCommon] = await Promise.all([cockpitAPI.fetchDrinks(), cockpitAPI.fetchDrinksCommon()]);
-    // Combine and dedupe by id
-    const combined = [...drinks, ...drinksCommon.filter((dc) => !drinks.some((d) => d.id === dc.id))];
-    localDrinks.value = combined;
-
-    if (localDrinks.value.length < 20) {
-      const needed = 20 - localDrinks.value.length;
-      await fetchRandomCocktails(needed);
-      hydratedCount.value = needed;
-    }
+    // Load drinks including common and random if configured
+    await loadLocalDrinks();
   });
 
   const hydrateMoreCocktailDB = async () => {
-    await fetchRandomCocktails(20);
-    hydratedCount.value += 20;
+    // CocktailDB functionality removed - focusing on tenant-specific data
   };
 
   const availableFingerBottles = computed(() => {
@@ -89,9 +93,7 @@
   });
 
   const handleSearch = async () => {
-    if (searchTerm.value.trim()) {
-      await fetchCocktailDBDrinks(searchTerm.value);
-    }
+    // Search functionality removed - focusing on tenant-specific data
   };
 
   // Helper to filter drinks by search term
@@ -108,12 +110,7 @@
   };
 
   // Computed properties that apply search filter
-  const combinedDrinks = computed(() => {
-    const local = localDrinks.value.map((d) => ({ ...d, external: false }));
-    const api = apiDrinks.value.map((d) => ({ ...d, external: true }));
-    return [...local, ...api];
-  });
-  const filteredAllDrinks = computed(() => applySearchFilter(combinedDrinks.value));
+  const filteredAllDrinks = computed(() => applySearchFilter(localDrinks.value));
   const filteredAlcoholicDrinks = computed(() => applySearchFilter(getAlcoholicDrinks.value));
   const filteredNonAlcoholicDrinks = computed(() => applySearchFilter(getNonAlcoholicDrinks.value));
   const filteredAvailableDrinks = computed(() => applySearchFilter(getAvailableDrinks.value));

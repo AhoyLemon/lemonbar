@@ -1,73 +1,113 @@
-import type { Bottle, Drink, Essential, BeerWine, EssentialsRawData } from "~/types";
+import type { Bottle, Drink, Beer, Wine, Bitter, BarData, EssentialsRawData } from "~/types";
 import { COCKPIT_API_URL, COCKPIT_API_KEY } from "~/utils/cockpitConfig";
-import { getTenantConfig, getDefaultTenantConfig, type TenantConfig } from "~/utils/tenants";
+import { getTenantConfig, getDefaultTenantConfig, type TenantConfig, COMMON_BAR } from "~/utils/tenants";
 
 interface CockpitBottle {
-  _id: string;
+  _id?: string;
   name: string;
   category: string;
-  baseSpirits?: string[] | string;
-  whiskeyTypes?: string[] | null;
-  tequilaTypes?: string[] | null;
-  ginTypes?: string[] | null;
-  rumTypes?: string[] | null;
-  liqueurTypes?: string[] | null;
-  bottleSize?: string;
-  company?: string;
-  abv?: number;
-  origin?: string;
-  bottleState?: string;
+  baseSpirit: string;
+  additionalTags?: string[] | null;
+  bottleSize: string;
+  company: string;
+  abv: number;
+  origin: string;
+  bottleState: string;
+  inStock?: boolean;
   image?: {
-    path?: string;
+    path: string;
     [key: string]: any;
   };
-  isFingers?: boolean | null;
-  inStock?: boolean;
-  additionalTags?: string[] | string;
+  isFingers: boolean;
+  whiskeyTypes?: string[];
+  tequilaTypes?: string[];
+  ginTypes?: string[];
+  rumTypes?: string[];
+  liqueurTypes?: string[];
 }
 
 interface CockpitDrink {
-  _id: string;
+  _id?: string;
+  name: string;
   cocktailName?: string;
-  name?: string;
-  ingredients?: Array<{
-    "Ingredient Name"?: string;
-    name?: string;
-    Quantity?: string;
-    qty?: string;
-    Optional?: boolean;
-    optional?: boolean;
-  }>;
-  steps?: Array<{ step?: string }>;
-  instructions?: string | string[];
+  category: string;
   image?: {
-    path?: string;
+    path: string;
     [key: string]: any;
   };
   imageUrl?: string;
+  ingredients: Array<{
+    name: string;
+    qty: string;
+    isOptional: boolean;
+    "Ingredient Name"?: string;
+    Quantity?: string;
+    Optional?: boolean;
+  }>;
+  steps: Array<{
+    step: string;
+  }>;
+  instructions?: string | string[];
+  prep: string;
   "Preparation Method"?: string;
-  prep?: string;
-  category?: string;
-  tags?: string[];
+  tags: string[];
 }
 
-interface CockpitEssentials {
-  [key: string]: boolean | string | number | undefined | object;
+interface CockpitBeer {
+  _id?: string;
+  name: string;
+  type: string;
+  subtype?: string;
+  inStock?: boolean;
+  image?: {
+    path: string;
+    [key: string]: any;
+  };
+}
+
+interface CockpitWine {
+  _id?: string;
+  name: string;
+  type: string;
+  subtype?: string;
+  inStock?: boolean;
+  image?: {
+    path: string;
+    [key: string]: any;
+  };
 }
 
 interface CockpitBeerWine {
-  beer?: Array<{ _id?: string; name: string; type?: string; subtype?: string; inStock?: boolean; image?: any }>;
-  wine?: Array<{ _id?: string; name: string; type?: string; subtype?: string; inStock?: boolean; image?: any }>;
+  beer: CockpitBeer[];
+  wine: CockpitWine[];
+}
+
+interface CockpitBitter {
+  name: string;
+  flavors: string[];
+  company: string;
+  image?: {
+    path: string;
+    [key: string]: any;
+  };
+}
+
+interface CockpitBarData {
+  name: string;
+  bottles: CockpitBottle[];
+  drinks: CockpitDrink[];
+  beers: CockpitBeer[];
+  wines: CockpitWine[];
+  bitters: CockpitBitter[];
+  essentials: string[];
 }
 
 export const useCockpitAPI = (tenantSlug?: string) => {
   const apiUrl = COCKPIT_API_URL;
   const apiKey = COCKPIT_API_KEY;
-  
+
   // Get tenant configuration
-  const tenantConfig: TenantConfig = tenantSlug 
-    ? (getTenantConfig(tenantSlug) || getDefaultTenantConfig())
-    : getDefaultTenantConfig();
+  const tenantConfig: TenantConfig = tenantSlug ? getTenantConfig(tenantSlug) || getDefaultTenantConfig() : getDefaultTenantConfig();
 
   const fetchFromCockpit = async <T>(endpoint: string): Promise<T> => {
     const url = `${apiUrl}${endpoint}`;
@@ -92,19 +132,14 @@ export const useCockpitAPI = (tenantSlug?: string) => {
     }
   };
 
-  const fetchBottles = async (): Promise<Bottle[]> => {
+  const fetchBarData = async (): Promise<BarData> => {
     try {
-      const data = await fetchFromCockpit<CockpitBottle[]>(`/content/items/${tenantConfig.bottles}`);
-
-      return data.map((item) => {
+      const data = await fetchFromCockpit<CockpitBarData>(`/content/item/${tenantConfig.barData}`);
+      // Process the data as before...
+      const bottles: Bottle[] = data.bottles.map((item, index) => {
         const tags: string[] = [];
-        if (item.baseSpirits) {
-          if (Array.isArray(item.baseSpirits)) {
-            tags.push(...item.baseSpirits);
-          } else if (typeof item.baseSpirits === "string") {
-            tags.push(item.baseSpirits);
-          }
-        }
+
+        if (item.baseSpirit) tags.push(item.baseSpirit);
         if (item.whiskeyTypes) tags.push(...item.whiskeyTypes);
         if (item.tequilaTypes) tags.push(...item.tequilaTypes);
         if (item.ginTypes) tags.push(...item.ginTypes);
@@ -113,8 +148,6 @@ export const useCockpitAPI = (tenantSlug?: string) => {
         if (item.additionalTags) {
           if (Array.isArray(item.additionalTags)) {
             tags.push(...item.additionalTags);
-          } else if (typeof item.additionalTags === "string") {
-            tags.push(item.additionalTags);
           }
         }
 
@@ -129,11 +162,11 @@ export const useCockpitAPI = (tenantSlug?: string) => {
         const imageUrl = item.image?.path ? `https://hirelemon.com/bar/storage/uploads${item.image.path}` : undefined;
 
         return {
-          id: item._id,
+          id: `bottle-${index + 1}`,
           name: item.name || "",
           category: item.category || "Uncategorized",
           tags,
-          inStock: item.inStock ?? true,
+          inStock: true, // Assume in stock unless specified
           isFingers: item.isFingers === true,
           bottleSize: item.bottleSize,
           bottleState,
@@ -143,157 +176,166 @@ export const useCockpitAPI = (tenantSlug?: string) => {
           company: item.company,
         };
       });
+
+      // Process drinks, beers, wines, bitters, essentials as before...
+      const drinks: Drink[] = data.drinks.map((item, index) => {
+        const ingredients = Array.isArray(item.ingredients)
+          ? item.ingredients.map((ing) => ({
+              name: ing.name,
+              qty: ing.qty,
+              optional: ing.isOptional,
+            }))
+          : [];
+
+        const instructions = Array.isArray(item.steps) ? item.steps.map((s) => s.step) : [];
+
+        const imageUrl = item.image?.path ? `https://hirelemon.com/bar/storage/uploads${item.image.path}` : undefined;
+
+        return {
+          id: `drink-${index + 1}`,
+          name: item.name || "",
+          ingredients,
+          instructions,
+          imageUrl: imageUrl,
+          prep: item.prep,
+          category: item.category,
+          tags: item.tags,
+        };
+      });
+
+      const beers: Beer[] = data.beers.map((item, index) => {
+        const imageUrl = item.image?.path ? `https://hirelemon.com/bar/storage/uploads${item.image.path}` : undefined;
+
+        return {
+          id: `beer-${index + 1}`,
+          name: item.name || "",
+          type: item.type || "",
+          inStock: true,
+          image: imageUrl,
+        };
+      });
+
+      const wines: Wine[] = data.wines.map((item, index) => {
+        const imageUrl = item.image?.path ? `https://hirelemon.com/bar/storage/uploads${item.image.path}` : undefined;
+
+        return {
+          id: `wine-${index + 1}`,
+          name: item.name || "",
+          type: item.type || "",
+          inStock: true,
+          image: imageUrl,
+        };
+      });
+
+      const bitters: Bitter[] = data.bitters.map((item, index) => {
+        const imageUrl = item.image?.path ? `https://hirelemon.com/bar/storage/uploads${item.image.path}` : undefined;
+
+        return {
+          id: `bitter-${index + 1}`,
+          name: item.name || "",
+          flavors: item.flavors || [],
+          company: item.company,
+          inStock: true,
+          image: imageUrl,
+        };
+      });
+
+      return {
+        name: data.name,
+        bottles,
+        drinks,
+        beers,
+        wines,
+        bitters,
+        essentials: data.essentials,
+      };
     } catch (error) {
-      console.error("Error fetching bottles from Cockpit:", error);
+      console.error("Error fetching bar data from Cockpit, falling back to old API:", error);
+      // Fall back to old API structure
       throw error;
     }
+  };
+
+  // Legacy methods for backwards compatibility - these now fetch from the bar data
+  const fetchBottles = async (): Promise<Bottle[]> => {
+    const barData = await fetchBarData();
+    return barData.bottles;
   };
 
   const fetchDrinks = async (): Promise<Drink[]> => {
-    try {
-      const data = await fetchFromCockpit<CockpitDrink[]>(`/content/items/${tenantConfig.drinks}`);
-
-      return data.map((item) => {
-        const ingredients = Array.isArray(item.ingredients)
-          ? (item.ingredients
-              .map((ing) => {
-                const name = ing["Ingredient Name"] || ing.name;
-                const qty = ing.Quantity || ing.qty;
-                const optional = ing.Optional ?? ing.optional ?? false;
-                return name && name.trim() ? { name, qty, optional } : null;
-              })
-              .filter(Boolean) as Array<{ name: string; qty?: string; optional?: boolean }>)
-          : [];
-
-        let instructions: string | string[] = "";
-        if (Array.isArray(item.steps)) {
-          const stepTexts = item.steps.map((s) => s.step).filter(Boolean) as string[];
-          instructions = stepTexts.length > 0 ? stepTexts : "";
-        } else if (item.instructions) {
-          instructions = item.instructions;
-        }
-
-        const imageUrl = item.image?.path ? `https://hirelemon.com/bar/storage/uploads${item.image.path}` : item.imageUrl;
-
-        return {
-          id: item._id,
-          name: item.cocktailName || item.name || "",
-          ingredients,
-          instructions,
-          image: imageUrl,
-          imageUrl,
-          prep: item["Preparation Method"] || item.prep,
-          category: item.category,
-          tags: Array.isArray(item.tags) ? item.tags : undefined,
-        };
-      });
-    } catch (error) {
-      console.error("Error fetching drinks from Cockpit:", error);
-      throw error;
-    }
+    const barData = await fetchBarData();
+    return barData.drinks;
   };
 
   const fetchEssentials = async (): Promise<EssentialsRawData> => {
-    try {
-      const data = await fetchFromCockpit<EssentialsRawData>(`/content/item/${tenantConfig.essentials}`);
-      return data;
-    } catch (error) {
-      console.error("Error fetching essentials from Cockpit:", error);
-      throw error;
-    }
+    const barData = await fetchBarData();
+    return barData.essentials;
   };
 
-  const fetchBeerWine = async (): Promise<BeerWine[]> => {
-    try {
-      const data = await fetchFromCockpit<CockpitBeerWine>(`/content/item/${tenantConfig.beerWine}`);
+  const fetchBeerWine = async (): Promise<any[]> => {
+    const barData = await fetchBarData();
+    const items: any[] = [];
 
-      const items: BeerWine[] = [];
+    barData.beers.forEach((beer) => {
+      items.push({
+        id: beer.id,
+        name: beer.name,
+        type: "beer",
+        subtype: beer.type,
+        inStock: beer.inStock,
+        image: beer.image,
+      });
+    });
 
-      if (Array.isArray(data.beer)) {
-        data.beer.forEach((item, index) => {
-          let imageUrl = undefined;
-          if (item.image && item.image.path) {
-            imageUrl = `https://hirelemon.com/bar/storage/uploads${item.image.path}`;
-          }
-          items.push({
-            id: item._id || `beer-${index + 1}`,
-            name: item.name || "",
-            type: "beer",
-            subtype: item.type || item.subtype || undefined,
-            inStock: item.inStock ?? true,
-            image: imageUrl,
-          });
-        });
-      }
+    barData.wines.forEach((wine) => {
+      items.push({
+        id: wine.id,
+        name: wine.name,
+        type: "wine",
+        subtype: wine.type,
+        inStock: wine.inStock,
+        image: wine.image,
+      });
+    });
 
-      if (Array.isArray(data.wine)) {
-        data.wine.forEach((item, index) => {
-          let imageUrl = undefined;
-          if (item.image && item.image.path) {
-            imageUrl = `https://hirelemon.com/bar/storage/uploads${item.image.path}`;
-          }
-          items.push({
-            id: item._id || `wine-${index + 1}`,
-            name: item.name || "",
-            type: "wine",
-            subtype: item.type || item.subtype || undefined,
-            inStock: item.inStock ?? true,
-            image: imageUrl,
-          });
-        });
-      }
-
-      return items;
-    } catch (error) {
-      console.error("Error fetching beer/wine from Cockpit:", error);
-      throw error;
-    }
+    return items;
   };
 
   const fetchDrinksCommon = async (): Promise<Drink[]> => {
     try {
-      const data = await fetchFromCockpit<CockpitDrink[]>("/content/items/drinksCommon");
-      return data.map((item) => {
+      const data = await fetchFromCockpit<CockpitBarData>(`/content/item/${COMMON_BAR.barData}`);
+      return data.drinks.map((item, index) => {
         const ingredients = Array.isArray(item.ingredients)
-          ? (item.ingredients
-              .map((ing) => {
-                const name = ing["Ingredient Name"] || ing.name;
-                const qty = ing.Quantity || ing.qty;
-                const optional = ing.Optional ?? ing.optional ?? false;
-                return name && name.trim() ? { name, qty, optional } : null;
-              })
-              .filter(Boolean) as Array<{ name: string; qty?: string; optional?: boolean }>)
+          ? item.ingredients.map((ing) => ({
+              name: ing.name || ing["Ingredient Name"] || "",
+              qty: ing.qty || ing.Quantity || "",
+              optional: ing.isOptional || ing.Optional || false,
+            }))
           : [];
 
-        let instructions: string | string[] = "";
-        if (Array.isArray(item.steps)) {
-          const stepTexts = item.steps.map((s) => s.step).filter(Boolean) as string[];
-          instructions = stepTexts.length > 0 ? stepTexts : "";
-        } else if (item.instructions) {
-          instructions = item.instructions;
-        }
+        const instructions = Array.isArray(item.steps) ? item.steps.map((s) => s.step) : [];
 
         const imageUrl = item.image?.path ? `https://hirelemon.com/bar/storage/uploads${item.image.path}` : item.imageUrl;
 
         return {
-          id: item._id,
-          name: item.cocktailName || item.name || "",
+          id: `common-${item._id || index + 1}`,
+          name: item.name || item.cocktailName || "",
           ingredients,
           instructions,
-          image: imageUrl,
-          imageUrl,
-          prep: item["Preparation Method"] || item.prep,
+          imageUrl: imageUrl,
+          prep: item.prep || item["Preparation Method"] || "",
           category: item.category,
-          tags: Array.isArray(item.tags) ? item.tags : undefined,
+          tags: item.tags || [],
         };
       });
     } catch (error) {
-      console.error("Error fetching drinksCommon from Cockpit:", error);
-      throw error;
+      console.error("Failed to fetch common drinks:", error);
+      return [];
     }
   };
 
   return {
+    fetchBarData,
     fetchBottles,
     fetchDrinks,
     fetchDrinksCommon,

@@ -32,15 +32,15 @@
 </template>
 
 <script setup lang="ts">
-  import { TENANT_CONFIG } from "~/utils/tenants";
+  import { getTenantConfig, getDefaultTenantConfig } from "~/utils/tenants";
 
   const route = useRoute();
   const tenant = computed(() => route.params.tenant as string);
 
   // Set page meta dynamically based on tenant
-  const tenantConfig = computed(() => TENANT_CONFIG[tenant.value] || TENANT_CONFIG.default);
+  const tenantConfig = computed(() => getTenantConfig(tenant.value) || getDefaultTenantConfig());
 
-  const { loadInventory, fetchCocktailDBDrinks, inventory, getAvailableDrinks, localDrinks } = useCocktails(tenant.value);
+  const { loadInventory, inventory, getAvailableDrinks, localDrinks } = useCocktails(tenant.value);
   const { loadBeerWine, getInStockBeerWine } = useBeerWine(tenant.value);
 
   // Load data on mount
@@ -48,10 +48,8 @@
   onMounted(async () => {
     await loadInventory();
     const cockpitAPI = useCockpitAPI(tenant.value);
-    const [drinks, drinksCommon] = await Promise.all([cockpitAPI.fetchDrinks(), cockpitAPI.fetchDrinksCommon()]);
-    // Combine and dedupe by id
-    localDrinks.value = [...drinks, ...drinksCommon.filter((dc) => !drinks.some((d) => d.id === dc.id))];
-    await fetchCocktailDBDrinks("margarita");
+    const barData = await cockpitAPI.fetchBarData();
+    localDrinks.value = barData.drinks;
     await loadBeerWine();
   });
 

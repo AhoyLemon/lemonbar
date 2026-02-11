@@ -2,30 +2,25 @@ import type { Bottle, Drink, InventoryData, DrinkData, Essential, EssentialsData
 import { ingredientSynonyms } from "../types/ingredientSynonyms";
 import { ingredientHierarchy } from "../types/ingredientHierarchy";
 import { processEssentialsData } from "./useEssentials";
-
-interface CocktailDBDrink {
-  idDrink: string;
-  strDrink: string;
-  strInstructions: string;
-  strDrinkThumb: string;
-  strCategory: string;
-  [key: string]: string | null;
-}
+import { getTenantConfig, getDefaultTenantConfig } from "~/utils/tenants";
 
 export const useCocktails = (tenantSlug?: string) => {
-  const stateKey = tenantSlug ? `${tenantSlug}_` : '';
+  const stateKey = tenantSlug ? `${tenantSlug}_` : "";
   const inventory = useState<Bottle[]>(`${stateKey}inventory`, () => []);
   const essentials = useState<Essential[]>(`${stateKey}essentials`, () => []);
   const localDrinks = useState<Drink[]>(`${stateKey}localDrinks`, () => []);
-  const apiDrinks = useState<Drink[]>(`${stateKey}apiDrinks`, () => []);
   const loading = useState<boolean>(`${stateKey}loading`, () => false);
   const error = useState<string | null>(`${stateKey}error`, () => null);
+
+  // Loading step states
+  const localDrinksLoading = useState<boolean>(`${stateKey}localDrinksLoading`, () => false);
+  const commonDrinksLoading = useState<boolean>(`${stateKey}commonDrinksLoading`, () => false);
+  const randomDrinksLoading = useState<boolean>(`${stateKey}randomDrinksLoading`, () => false);
 
   // Helper to safely get all drinks with defensive checks
   const safeGetAllDrinks = () => {
     const local = Array.isArray(localDrinks.value) ? localDrinks.value : [];
-    const api = Array.isArray(apiDrinks.value) ? apiDrinks.value : [];
-    return [...local, ...api];
+    return local;
   };
 
   // Centralized ingredient synonym mapping (imported at top)
@@ -46,8 +41,9 @@ export const useCocktails = (tenantSlug?: string) => {
   const loadEssentials = async () => {
     try {
       const cockpitAPI = useCockpitAPI(tenantSlug);
-      const rawData = await cockpitAPI.fetchEssentials();
-      essentials.value = processEssentialsData(rawData as EssentialsRawData);
+      const [essentialsData, barData] = await Promise.all([cockpitAPI.fetchEssentials(), cockpitAPI.fetchBarData()]);
+      const bittersData = barData.bitters || [];
+      essentials.value = processEssentialsData(essentialsData as EssentialsRawData, bittersData);
     } catch (e) {
       console.error("Failed to load essentials:", e);
       error.value = "Failed to load essentials data";
@@ -56,112 +52,52 @@ export const useCocktails = (tenantSlug?: string) => {
 
   // Load local drinks from API
   const loadLocalDrinks = async () => {
+    loading.value = true;
+    error.value = null;
     try {
       const cockpitAPI = useCockpitAPI(tenantSlug);
-      const drinks = await cockpitAPI.fetchDrinks();
+      const theCocktailDB = useTheCocktailDB();
+      const tenantConfig = tenantSlug ? getTenantConfig(tenantSlug) || getDefaultTenantConfig() : getDefaultTenantConfig();
+
+      // Start loading local drinks
+      localDrinksLoading.value = true;
+      let drinks = await cockpitAPI.fetchDrinks();
+      localDrinksLoading.value = false;
+
+      if (tenantConfig.includeCommonDrinks) {
+        commonDrinksLoading.value = true;
+        const commonDrinks = await cockpitAPI.fetchDrinksCommon();
+        // Merge, avoiding duplicates by name
+        const combined = [...drinks];
+        for (const common of commonDrinks) {
+          if (!combined.some((d) => d.name.toLowerCase() === common.name.toLowerCase())) {
+            combined.push(common);
+          }
+        }
+        drinks = combined;
+        commonDrinksLoading.value = false;
+      }
+
+      if (tenantConfig.includeRandomCocktails) {
+        randomDrinksLoading.value = true;
+        // Calculate how many random cocktails we need to reach minimum 20 total
+        const minTotalDrinks = 20;
+        const currentCount = drinks.length;
+        const neededRandom = Math.max(0, minTotalDrinks - currentCount);
+
+        if (neededRandom > 0) {
+          const randomDrinks = await theCocktailDB.fetchRandomCocktails(neededRandom);
+          drinks = [...drinks, ...randomDrinks];
+        }
+        randomDrinksLoading.value = false;
+      }
+
       localDrinks.value = drinks;
     } catch (e) {
       console.error("Failed to load local drinks:", e);
       error.value = "Failed to load local drinks";
-    }
-  };
-
-  // Helper to convert CocktailDB drink to Drink format
-  const convertCocktailDBDrinkToDrink = (drink: CocktailDBDrink): Drink => {
-    const ingredients = [];
-    for (let i = 1; i <= 15; i++) {
-      const ingredient = drink[`strIngredient${i}`];
-      const measure = drink[`strMeasure${i}`];
-      if (ingredient && ingredient.trim()) {
-        ingredients.push({
-          name: ingredient.trim(),
-          qty: measure?.trim() || "to taste",
-        });
-      }
-    }
-
-    return {
-      id: `cocktaildb-${drink.idDrink}`,
-      name: drink.strDrink,
-      ingredients,
-      instructions: drink.strInstructions,
-      imageUrl: drink.strDrinkThumb,
-      category: drink.strCategory,
-    };
-  };
-
-  // Fetch random cocktails from TheCocktailDB API
-  const fetchRandomCocktails = async (count: number = 8) => {
-    loading.value = true;
-    error.value = null;
-
-    try {
-      const fetchPromises = [];
-      for (let i = 0; i < count; i++) {
-        fetchPromises.push($fetch<{ drinks: CocktailDBDrink[] | null }>("https://www.thecocktaildb.com/api/json/v1/1/random.php"));
-      }
-
-      const responses = await Promise.all(fetchPromises);
-      const drinks: Drink[] = [];
-
-      for (const response of responses) {
-        if (response.drinks && response.drinks[0]) {
-          drinks.push(convertCocktailDBDrinkToDrink(response.drinks[0]));
-        }
-      }
-
-      apiDrinks.value = drinks;
-    } catch (e) {
-      console.error("Failed to fetch from CocktailDB:", e);
-      error.value = "Failed to fetch cocktail drinks";
     } finally {
       loading.value = false;
-    }
-  };
-
-  // Fetch drinks from TheCocktailDB API
-  const fetchCocktailDBDrinks = async (searchTerm: string = "") => {
-    loading.value = true;
-    error.value = null;
-
-    try {
-      const endpoint = `https://www.thecocktaildb.com/api/json/v1/1/search.php?s=${searchTerm}`;
-      const response = await $fetch<{ drinks: CocktailDBDrink[] | null }>(endpoint);
-
-      if (response.drinks) {
-        const drinks: Drink[] = response.drinks.map((drink) => convertCocktailDBDrinkToDrink(drink));
-        apiDrinks.value = drinks;
-      }
-    } catch (e) {
-      console.error("Failed to fetch from CocktailDB:", e);
-      error.value = "Failed to fetch cocktail drinks";
-    } finally {
-      loading.value = false;
-    }
-  };
-
-  // Fetch a single drink by CocktailDB ID
-  const fetchCocktailDBDrinkById = async (cocktailDbId: string): Promise<Drink | null> => {
-    try {
-      const endpoint = `https://www.thecocktaildb.com/api/json/v1/1/lookup.php?i=${cocktailDbId}`;
-      const response = await $fetch<{ drinks: CocktailDBDrink[] | null }>(endpoint);
-
-      if (response.drinks && response.drinks[0]) {
-        const drink = convertCocktailDBDrinkToDrink(response.drinks[0]);
-
-        // Add to apiDrinks if not already there
-        const existingIndex = apiDrinks.value.findIndex((d) => d.id === drink.id);
-        if (existingIndex === -1) {
-          apiDrinks.value = [...apiDrinks.value, drink];
-        }
-
-        return drink;
-      }
-
-      return null;
-    } catch (e) {
-      console.error("Failed to fetch drink from CocktailDB:", e);
-      return null;
     }
   };
 
@@ -310,6 +246,7 @@ export const useCocktails = (tenantSlug?: string) => {
   // Fetch drinks from CocktailDB that use a specific ingredient
   const fetchDrinksByIngredient = async (ingredient: string): Promise<Drink[]> => {
     try {
+      const theCocktailDB = useTheCocktailDB();
       const endpoint = `https://www.thecocktaildb.com/api/json/v1/1/filter.php?i=${encodeURIComponent(ingredient)}`;
       const response = await $fetch<{
         drinks: Array<{ idDrink: string; strDrink: string; strDrinkThumb: string }> | null;
@@ -323,7 +260,7 @@ export const useCocktails = (tenantSlug?: string) => {
         const drinksToFetch = response.drinks.slice(0, 10);
 
         for (const drink of drinksToFetch) {
-          const fullDrink = await fetchCocktailDBDrinkById(drink.idDrink);
+          const fullDrink = await theCocktailDB.fetchCocktailDBDrinkById(drink.idDrink);
           if (fullDrink) {
             fullDrinks.push(fullDrink);
           }
@@ -377,26 +314,48 @@ export const useCocktails = (tenantSlug?: string) => {
     return (matched / requiredIngredients.length) * 100;
   };
 
-  // Sort drinks by ingredient availability percentage, then by favorited status, then alphabetically
-  // Drinks with higher percentage of ingredients available appear first (100% before 83%, etc.)
-  // Within each percentage tier, favorited drinks appear first
+  // Helper function to calculate percentage of ALL ingredients available (including optional)
+  const getTotalAvailabilityPercentage = (drink: Drink): number => {
+    if (drink.ingredients.length === 0) return 0;
+    const matched = drink.ingredients.filter((ingredient) => isIngredientInStock(ingredient.name)).length;
+    return (matched / drink.ingredients.length) * 100;
+  };
+
+  // Sort drinks by ingredient availability percentage, then by favorited status, then by total availability, then by source, then alphabetically
+  // Drinks with higher percentage of REQUIRED ingredients available appear first (100% before 83%, etc.)
+  // Within each required percentage tier, favorited drinks appear first
+  // Within each favorites tier, drinks with more TOTAL ingredients available appear first
+  // Within each total percentage tier, locally sourced drinks (Cockpit) appear before external (The Cocktail DB)
   // Then alphabetically by name if still tied
   const sortDrinksByAvailability = (drinks: Drink[], isStarredFn: (id: string) => boolean): Drink[] => {
     return [...drinks].sort((a, b) => {
-      const aPercentage = getAvailabilityPercentage(a);
-      const bPercentage = getAvailabilityPercentage(b);
+      const aRequiredPercentage = getAvailabilityPercentage(a);
+      const bRequiredPercentage = getAvailabilityPercentage(b);
 
-      // First, sort by percentage of matched ingredients (descending)
-      if (aPercentage !== bPercentage) {
-        return bPercentage - aPercentage;
+      // First, sort by percentage of REQUIRED ingredients (descending)
+      if (aRequiredPercentage !== bRequiredPercentage) {
+        return bRequiredPercentage - aRequiredPercentage;
       }
 
-      // If percentage is the same, prioritize favorited drinks
+      // If required percentages are equal, prioritize favorited drinks
       const aStarred = isStarredFn(a.id);
       const bStarred = isStarredFn(b.id);
 
       if (aStarred && !bStarred) return -1;
       if (bStarred && !aStarred) return 1;
+
+      // If favorites are equal, sort by TOTAL ingredient availability
+      const aTotalPercentage = getTotalAvailabilityPercentage(a);
+      const bTotalPercentage = getTotalAvailabilityPercentage(b);
+
+      if (aTotalPercentage !== bTotalPercentage) {
+        return bTotalPercentage - aTotalPercentage;
+      }
+
+      // If total percentages are equal, prioritize locally sourced drinks before external
+      if (a.external !== b.external) {
+        return (a.external ? 1 : 0) - (b.external ? 1 : 0);
+      }
 
       // Finally, sort alphabetically by name
       return a.name.localeCompare(b.name);
@@ -406,17 +365,14 @@ export const useCocktails = (tenantSlug?: string) => {
   return {
     inventory,
     localDrinks,
-    apiDrinks,
     loading,
     error,
+    localDrinksLoading,
+    commonDrinksLoading,
+    randomDrinksLoading,
     loadInventory,
     loadEssentials,
     loadLocalDrinks,
-    fetchCocktailDBDrinks,
-    fetchCocktailDBDrinkById,
-    fetchRandomCocktails,
-    fetchDrinksByIngredient,
-    getDrinksUsingBottle,
     getAvailableDrinks,
     getAllDrinks,
     getDrinksWithAvailability,

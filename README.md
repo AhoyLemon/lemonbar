@@ -28,7 +28,53 @@ A multi-tenant bar inventory and cocktail app built with Nuxt 3, supporting mult
 [![JSON](https://img.shields.io/badge/JSON-000?style=for-the-badge&labelColor=000000&logo=json&logoColor=fff&color=222)](https://getcockpit.com)
 [![GitHub Pages](https://img.shields.io/badge/GitHub%20Pages-000?style=for-the-badge&labelColor=000000&logo=github&logoColor=fff&color=222)](https://getcockpit.com)
 
-## Getting Started
+## TLDR
+
+```bash
+bun install
+bun run dev
+# All data is fetched from an external API
+```
+
+## Documentation
+
+- **[Drinks and Cocktails](./docs/drinks.md)** - How drinks are sourced, sorted, and displayed
+
+## Multi-Tenant Configuration
+
+This app supports multiple tenants (bars), each with their own inventory and drinks. Tenants are configured in [`utils/tenants.ts`](./utils/tenants.ts), with one tenant set as the default.
+
+### Adding a New Tenant
+
+1. **Creae A New Tenant in Cockpit CMS**:
+   1. Log into Cockpit as Admin
+   1. Clone an existing bar tree
+      - **RECOMMENDED:** Clone `_The Sample Bar` for a quick start)
+   1. give the clone a unique id (ex: `mySpecialNewBar`)
+   1. Inside your newly created tenant, **Create Item**, which will create a bar for that tenant.
+   1. Give this new bar a name
+   1. ALL DONE
+
+1. **Update `utils/tenants.ts`**: Add your tenant configuration:
+
+   ```typescript
+   export const TENANT_CONFIG: Record<string, TenantConfig> = {
+     // ... existing tenants
+     mybar: {
+       slug: "mybar",
+       barData: "mySpecialNewBar", // This should match the unique id you created in 1.3
+       barName: "My New Bar",
+       description: "This is the Page meta description in case you want something special here",
+       includeCommonDrinks: false, // Set to true if you want to include drinks from the common collection
+       includeRandomCocktails: true, // Set to true if you want to include random cocktails from The Cocktail DB
+       isSampleData: true, // Set to true if this tenant is meant for sample/demo purposes (affects UI and data handling in some places)
+     },
+   };
+   ```
+
+1. **Access Your Tenant**: Navigate to `/mybar` to see your bar's data.
+
+## Local Development
 
 ### Prerequisites
 
@@ -59,42 +105,6 @@ bun install
 # Or with npm
 npm install
 ```
-
-### Multi-Tenant Configuration
-
-This app supports multiple tenants (bars), each with their own inventory and drinks. Tenants are configured in [`utils/tenants.ts`](./utils/tenants.ts), with one tenant set as the default.
-
-When you visit any tenant path without a tenant (e.g., `/drinks`), you'll be automatically redirected to the default tenant (`/foo`).
-
-#### Adding a New Tenant
-
-1. **Add Cockpit CMS Models**: Create tenant-specific collections in your Cockpit CMS:
-   | dataName | Type | Description | example |
-   |----------|------|-------------|---------|
-   | bottles{TenantName} | Collection | Bottle inventory for the tenant | bottlesMyBar |
-   | drinks{TenantName} | Collection | Custom cocktails for the tenant | drinksMyBar |
-   | essentials{TenantName} | Singleton | Essentials ingredients for the tenant | essentialsMyBar |
-   | beerWine{TenantName} | Singleton | Beer and wine data for the tenant | beerWineMyBar |
-
-2. **Update `utils/tenants.ts`**: Add your tenant configuration:
-
-   ```typescript
-   export const TENANT_CONFIG: Record<string, TenantConfig> = {
-     // ... existing tenants
-     mybar: {
-       slug: "mybar",
-       barName: "My Awesome Bar", // This will be displayed in the UI
-       bottles: "bottlesMyBar",
-       drinks: "drinksMyBar",
-       essentials: "essentialsMyBar",
-       beerWine: "beerWineMyBar",
-     },
-   };
-   ```
-
-3. **Access Your Tenant**: Navigate to `/mybar` to see your bar's data.
-
-**Note**: All tenants share a common `drinksCommon` collection for shared cocktail recipes.
 
 ### Development
 
@@ -161,12 +171,12 @@ Once deployed, your tenants will be accessible at:
 
 - `https://booz.bar/` (Home Page)
 - `https://booz.bar/about` - About Page
-- `https://booz.bar/myBar` - Home page for a tenant named "myBar"
-- `https://booz.bar/myBar/available` - Available drinks for "myBar" (follow similar structure for drinks, bottles, essentials, et al)
+- `https://booz.bar/foo` - Home page for a tenant named "foo"
+- `https://booz.bar/foo/available` - Available drinks for "foo" (follow similar structure for drinks, bottles, essentials, et al)
 
 #### How It Works
 
-The GitHub Actions workflow now uses Bun for faster builds and deployments. The deployed site fetches data directly from your Cockpit CMS API at runtime. This means:
+The deployed site fetches data directly from your Cockpit CMS API at runtime. This means:
 
 - Visitors see fresh, up-to-date inventory and drink data
 - No need to rebuild/redeploy when data changes in Cockpit CMS
@@ -199,74 +209,94 @@ The site will be available at `http://localhost:3000`
 
 ## Data Structure
 
-### Cockpit CMS Collections
+### Individual Tenant
 
-Each tenant has its own set of collections in Cockpit CMS:
+The Root object is a tenant, which is an array containing a single `bar` object.
 
-#### Bottles Collection (`bottles{TenantName}`)
+The bar object looks like this:
 
-- `_id` - Unique identifier
-- `name` - Bottle name
-- `category` - Category (Staples, Liqueur, Premix, etc.)
-- `baseSpirits` - Array of base spirits
-- `whiskeyTypes`, `tequilaTypes`, `ginTypes`, `rumTypes`, `liqueurTypes` - Specific type arrays
-- `bottleSize` - Size (e.g., "750ml")
-- `company` - Producer/brand
-- `abv` - Alcohol by volume
-- `origin` - Country/region
-- `bottleState` - "unopened", "opened", or "empty"
-- `image` - Image file
-- `isFingers` - Boolean for special occasion bottles
-- `inStock` - Boolean
-- `additionalTags` - Array of tags
-
-#### Drinks Collection (`drinks{TenantName}`)
-
-- `_id` - Unique identifier
-- `cocktailName` or `name` - Drink name
-- `ingredients` - Array of {name, qty, optional}
-- `steps` - Array of instruction steps
-- `image` - Image file
-- `category` - Drink category
-- `prep` - Preparation method
-- `tags` - Array of tags
-
-#### Common Drinks Collection (`drinksCommon`)
-
-- Shared across all tenants
-- Same structure as drinks collection
-- Merged with tenant-specific drinks
-
-#### Essentials Singleton (`essentials{TenantName}`)
-
-- `basics` - Array of basic ingredients
-- `bitters` - Array of {name, flavors, company, image}
-- `carbonatedMixers` - Array of mixers
-- `fruitsBerries` - Array of fruits
-- `sweeteners` - Array of sweeteners
-- `dairyCream` - Array of dairy products
-- `juices` - Array of juices
-- `other` - Array of other ingredients
-
-#### Beer/Wine Singleton (`beerWine{TenantName}`)
-
-- `beer` - Array of {name, type, subtype, inStock, image}
-- `wine` - Array of {name, type, subtype, inStock, image}
-
-### Tenant Configuration
-
-Tenants are defined in [utils/tenants.ts](utils/tenants.ts):
-
-```typescript
-export interface TenantConfig {
-  slug: string; // URL path segment
-  barName: string; // Display name
-  bottles: string; // Cockpit collection name
-  drinks: string; // Cockpit collection name
-  essentials: string; // Cockpit singleton name
-  beerWine: string; // Cockpit singleton name
+```ts
+{
+  name: String // Name of the bar
+  bottles: Array<{...}> // Array of bottle objects
+  drinks: Array<{...}> // Array of drink objects
+  beers: Array<{...}> // Array of beer objects
+  wines: Array<{...}> // Array of wine objects
+  bitters: Array<{...}> // Array of bitters objects
+  essentials: String[] // Array of essential ingredients (strings)
 }
 ```
+
+#### Bottle Object
+
+```ts
+{
+  name: String // Name of the bottle
+  category: String // Category (e.g., "Staples", "Liqueur", etc.)
+  baseSpirit: String[] // Array of base spirits (e.g., ["Whiskey", "Rum"])
+  whiskeyTypes: String[] // Array of whiskey types (if applicable)
+  tequilaTypes: String[] // Array of tequila types (if applicable)
+  ginTypes: String[] // Array of gin types (if applicable)
+  rumTypes: String[] // Array of rum types (if applicable)
+  liqueurTypes: String[] // Array of liqueur types (if applicable)
+  additionalTags: String[], // Any additional tags for categorization
+  bottleSize: String // Size of the bottle (e.g., "750ml (Fifth)")
+  company: String // Producer/brand
+  abv: Number // Alcohol by volume percentage
+  origin: String // Country or region of origin
+  bottleState: String // "Unopened", "Opened","Empty" or null
+  image: ImageObject // Usually a picture of the bottle
+  isFingers: Boolean // Whether this bottle should be excluded from cocktails and served only as fingers
+}
+```
+
+#### Drink Object
+
+```ts
+{
+  name: String // Name of the drink
+  category: String // Category (e.g., "Classic", "Tiki", etc.)
+  ingredients: Array<{ name: String, qty: String, optional: Boolean }> // List of ingredients with quantity and optional flag
+  steps: Array<{ step: String }> // Preparation steps
+  prep: String // Preparation method (e.g., "Shake", "Build", etc.)
+  image: ImageObject // Usually a picture of the drink
+  tags: String[] // Any additional tags for categorization
+```
+
+#### Beer Object
+
+```ts
+{
+  name: String; // Name of the beer
+  type: String; // Type of beer (e.g., "Lager", "IPA", etc.)
+  image: ImageObject; // Usually a picture of the beer
+}
+```
+
+#### Wine Object
+
+```ts
+{
+  name: String; // Name of the wine
+  type: String; // Type of wine (e.g., "Red", "White", etc.)
+  image: ImageObject; // Usually a picture of the wine
+}
+```
+
+#### Bitters Object
+
+```ts
+{
+  name: String; // Name of the bitters
+  flavors: String[]; // Array of flavor profiles (e.g., ["Citrus", "Spicy"])
+  company: String; // Producer/brand
+  image: ImageObject; // Usually a picture of the bitters
+}
+```
+
+#### Essentials
+
+The essentials are passed through as a single array of strings. They are broken into categories in the frontend using `utils\essentialCategories.ts`
 
 ## Architecture
 
@@ -276,6 +306,7 @@ The app uses Nuxt's dynamic routing with a `[tenant]` parameter:
 
 - All pages are under `/pages/[tenant]/`
 - Middleware (`middleware/tenant.global.ts`) handles:
+  - Non-tenant routes (home, about)
   - Redirecting root paths to default tenant
   - Validating tenant slugs
   - Showing error pages for unknown tenants
@@ -320,6 +351,7 @@ npm run format
 
 ## Further Documentation
 
+- The [docs](docs) folder
 - **Tenant Configuration**: See `utils/tenants.ts` for adding/modifying tenants
 - **API Configuration**: See `utils/cockpitConfig.ts` for Cockpit CMS settings
 - **Copilot Instructions**: See `.github/copilot-instructions.md` for AI development guidelines
