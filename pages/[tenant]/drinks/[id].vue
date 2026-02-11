@@ -36,21 +36,14 @@
   const isFingerDrink = ref(false);
   const fingerBottle = ref<Bottle | null>(null);
   const servingStyle = ref<"straight" | "rocks">("straight");
+  const fetchedDrink = ref<Drink | null>(null);
 
-  // Declare localDrinks state for hydration
-  const localDrinks = useState<Drink[]>("localDrinks", () => []);
   // Load data on mount
   onMounted(async () => {
     await loadInventory();
     await loadEssentials();
+    await loadLocalDrinks();
     loadStarredDrinks();
-
-    // Hydrate localDrinks with both drinks and drinksCommon
-    const cockpitAPI = useCockpitAPI(tenant.value);
-    const [drinks, drinksCommon] = await Promise.all([cockpitAPI.fetchDrinks(), cockpitAPI.fetchDrinksCommon()]);
-    // Combine and dedupe by id
-    const combined = [...drinks, ...drinksCommon.filter((dc) => !drinks.some((d) => d.id === dc.id))];
-    localDrinks.value = combined;
 
     // Check if this is a finger drink
     if (drinkId.value.startsWith("finger-")) {
@@ -64,31 +57,31 @@
       dataReady.value = true;
     } else if (drinkId.value.startsWith("cocktaildb-")) {
       // This is a CocktailDB drink
-      // Note: Direct links to CocktailDB drinks may not work on static hosting
-      // because the pages aren't pre-generated during build
       const cocktailDbId = drinkId.value.replace("cocktaildb-", "");
 
       // Try to fetch the specific drink from CocktailDB
       isLoading.value = true;
       const theCocktailDB = useTheCocktailDB();
-      const fetchedDrink = await theCocktailDB.fetchCocktailDBDrinkById(cocktailDbId);
+      const drinkData = await theCocktailDB.fetchCocktailDBDrinkById(cocktailDbId);
       isLoading.value = false;
 
-      if (!fetchedDrink) {
-        // Drink not found in CocktailDB - this will show the "Drink Not Found" message
-        dataReady.value = true;
-      } else {
-        // Drink was fetched successfully
-        dataReady.value = true;
+      if (drinkData) {
+        fetchedDrink.value = drinkData;
       }
+      dataReady.value = true;
     } else {
-      // Local or common drink, not finger
+      // Local or common drink
       dataReady.value = true;
     }
   });
 
   // Find the drink by ID
   const drink = computed(() => {
+    // If we have a fetched drink (CocktailDB), return it
+    if (fetchedDrink.value) {
+      return fetchedDrink.value;
+    }
+    // Otherwise look in getAllDrinks (local + common)
     return getAllDrinks.value.find((r: Drink) => r.id === drinkId.value);
   });
 

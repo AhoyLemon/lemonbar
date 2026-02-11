@@ -18,7 +18,7 @@
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 
     .notice-content {
-      max-width: 1200px;
+      max-width: 1400px;
       margin: 0 auto;
       display: flex;
       gap: $spacing-sm;
@@ -29,13 +29,14 @@
         line-height: 1.5;
         display: flex;
         gap: 1em;
+        padding-left: 1em;
 
         strong {
           font-weight: 700;
         }
         a {
-          color: $primary-color;
-          font-weight: 600;
+          color: $text-dark;
+          font-weight: 725;
           &:hover,
           &:focus {
             text-decoration: underline;

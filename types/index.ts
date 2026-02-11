@@ -2,6 +2,7 @@ export interface Bottle {
   id: string;
   name: string;
   category: string;
+  baseSpirit: string;
   tags: string[];
   inStock: boolean;
   isFingers?: boolean;

@@ -84,8 +84,17 @@ Each tenant has a single Cockpit CMS singleton ("tree") containing all their bar
   - Drinks marked with `external: true` and show 📡 indicator
   - Used to ensure minimum drink count (20 drinks) when local drinks are insufficient
   - **Search Integration**: In `pages/[tenant]/drinks/index.vue`, search filters existing drinks (including external ones) by name, category, and ingredients
-  - **Bottle Matching**: In `pages/[tenant]/bottles/[id].vue`, actively queries The Cocktail DB API to find matching cocktails for specific bottles using `fetchDrinksByIngredient()` with bottle name, tags, or category
-  - API endpoint: The Cocktail DB random cocktail endpoint
+  - **Bottle Matching**: In `pages/[tenant]/bottles/[id].vue`, the `useCocktailMatching` composable searches for cocktails using progressive specificity:
+    1. First searches by bottle name (most specific)
+    2. Then searches by bottle tags (medium specificity)
+    3. Finally searches by base spirit (least specific)
+    - Stops when 3-10 drinks are found
+    - Prioritizes local drinks > common drinks > external drinks
+    - See `docs/bottles.md` for complete search and sort logic
+  - API endpoints:
+    - Random: `https://www.thecocktaildb.com/api/json/v1/1/random.php`
+    - Filter by ingredient: `https://www.thecocktaildb.com/api/json/v1/1/filter.php?i={ingredient}`
+    - Lookup by ID: `https://www.thecocktaildb.com/api/json/v1/1/lookup.php?i={id}`
 
 #### Legacy API Methods (Backwards Compatible)
 
@@ -274,6 +283,40 @@ When creating reusable components that link to pages:
 2. Implement proper serialization/deserialization
 3. Handle missing or corrupt data gracefully
 4. Consider adding export/import functionality for user backup
+
+### Working with Bottles
+
+#### Bottle Data Structure
+
+Each bottle in Cockpit CMS has the following key fields:
+
+- **name**: The bottle's brand/product name
+- **category**: The type of spirit (e.g., "Whiskey", "Gin", "Rum")
+- **baseSpirit**: The primary spirit category - one of: "Absinthe", "Aquavit", "Brandy", "Gin", "Liqueur", "Rum", "Tequila", "Vodka", "Whiskey", "Other Spirit"
+- **tags**: Array of more specific descriptors (e.g., "Bourbon", "London Dry Gin", "Reposado")
+- **isFingers**: Boolean flag for special occasion bottles served neat or on the rocks
+- **inStock**: Boolean indicating current availability
+
+#### Bottle-to-Drink Matching
+
+The app uses `useCocktailMatching` composable to find cocktails for each bottle:
+
+1. **Progressive Search**: Searches by name → tags → baseSpirit until 3-10 drinks found
+2. **Multi-Source**: Combines local drinks, common drinks, and external API results
+3. **Smart Sorting**: Prioritizes by availability, source, match specificity, then alphabetically
+4. **Loading State**: Shows real-time search progress with "Stop Search" option
+5. **Error Handling**: Gracefully handles API rate limits and failures
+
+For complete implementation details, see `docs/bottles.md`.
+
+#### Finger Bottles
+
+Bottles marked with `isFingers: true` are special occasion bottles:
+
+- Not included in regular cocktail ingredient matching
+- Show two serving options: "Straight Up" and "On The Rocks"
+- Have dedicated routes: `/[tenant]/drinks/finger-[bottleId]-straight` and `/[tenant]/drinks/finger-[bottleId]-rocks`
+- Listed separately at `/[tenant]/fingers`
 
 ### Working with Drinks
 
