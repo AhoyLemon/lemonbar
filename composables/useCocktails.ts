@@ -52,6 +52,11 @@ export const useCocktails = (tenantSlug?: string) => {
 
   // Load local drinks from API
   const loadLocalDrinks = async () => {
+    // Skip if already loaded
+    if (localDrinks.value.length > 0) {
+      return;
+    }
+
     loading.value = true;
     error.value = null;
     try {
