@@ -37,6 +37,14 @@ jobs:
           COCKPIT_API_URL: ${{ secrets.COCKPIT_API_URL }}
           COCKPIT_API_KEY: ${{ secrets.COCKPIT_API_KEY }}
 
+      - name: Validate sitemap
+        run: |
+          chmod +x scripts/validate-sitemap.sh
+          ./scripts/validate-sitemap.sh
+        env:
+          # Optional: set SITE_URL in repo secrets to override default (https://booz.bar)
+          SITE_URL: ${{ secrets.SITE_URL }}
+
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
