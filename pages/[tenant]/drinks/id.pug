@@ -9,8 +9,8 @@
         .drink-hero__content
           h1 {{ fingerBottle.name }}{{ servingStyle === 'rocks' ? ' On The Rocks' : ', Straight Up' }}
           .badge-row
-            span.source-badge.local 🥃 Special Finger
-            span.category-badge {{ fingerBottle.category }}
+            span.source-badge.local 🥃 Special Fingers
+            span.category-badge {{ servingStyle === 'rocks' ? 'On The Rocks' : 'Straight Up' }}
           .availability-info
             p(v-if="fingerBottle.inStock") ✅ Available now!
             p(v-else) ⚠️ Currently out of stock
