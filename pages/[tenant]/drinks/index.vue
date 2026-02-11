@@ -44,6 +44,8 @@
     return Array.from(tags.entries()).map(([tag, count]) => ({ label: tag, value: tag, count }));
   });
 
+  const barName = computed(() => tenantConfig.value.barName);
+
   // Tag options sorted by count
   const tagOptions = computed(() => {
     return allTags.value.sort((a, b) => b.count - a.count);
@@ -82,10 +84,6 @@
     // Load drinks including common and random if configured
     await loadLocalDrinks();
   });
-
-  const hydrateMoreCocktailDB = async () => {
-    // CocktailDB functionality removed - focusing on tenant-specific data
-  };
 
   const availableFingerBottles = computed(() => {
     return inventory.value.filter((b) => b.inStock && b.isFingers);

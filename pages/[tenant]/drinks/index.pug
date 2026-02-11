@@ -4,7 +4,7 @@
       .header-section
         hgroup
           h2 All Drinks
-          p Explore drinks from your inventory and TheCocktailDB
+          p Explore cocktail potentials from the ingredients in {{barName}}.
 
       .error-banner(v-if="error")
         .error-icon ⚠️
@@ -26,10 +26,10 @@
       section.filters
         .filter-buttons
           button.filter-btn(:class="{ active: filter === 'all' }" @click="filter = 'all'") All ({{ allDrinksCount }})
-          button.filter-btn(:class="{ active: filter === 'beerWine' }" @click="filter = 'beerWine'") Beer & Wine ({{ getInStockBeerWine.length }})
-          button.filter-btn(:class="{ active: filter === 'available' }" @click="filter = 'available'") Available ({{ filteredAvailableDrinks.length + availableFingerBottles.length + getInStockBeerWine.length }})
-          button.filter-btn(:class="{ active: filter === 'alcoholic' }" @click="filter = 'alcoholic'") Alcoholic ({{ filteredAlcoholicDrinks.length + availableFingerBottles.length }})
+          //button.filter-btn(:class="{ active: filter === 'beerWine' }" @click="filter = 'beerWine'") Beer & Wine ({{ getInStockBeerWine.length }})
+          //button.filter-btn(:class="{ active: filter === 'available' }" @click="filter = 'available'") Available ({{ filteredAvailableDrinks.length + availableFingerBottles.length + getInStockBeerWine.length }})
           button.filter-btn(:class="{ active: filter === 'nonAlcoholic' }" @click="filter = 'nonAlcoholic'") Non-Alcoholic ({{ filteredNonAlcoholicDrinks.length }})
+          //button.filter-btn(:class="{ active: filter === 'fingers' }" @click="filter = 'fingers'") Fingers ({{ availableFingerBottles.length }})
 
 
         // Tag filter selector (moved below filter buttons)
@@ -65,11 +65,11 @@
             :external="drink.external"
             :tenant="tenant"
           )
-        .hydrate-btn-container
-          button.hydrate-btn(@click="hydrateMoreCocktailDB") Get More Random Cocktails!
+        //.hydrate-btn-container
+          button.hydrate-btn(@click="hydrateMoreCocktailDB") RANDOM! COCKTAILS!
 
       // Beer & Wine Section
-      section.beer-wine-section(v-if="getInStockBeerWine.length > 0 && (filter === 'beerWine' || filter === 'all' || filter === 'available' || filter === 'alcoholic')")
+      //-section.beer-wine-section(v-if="getInStockBeerWine.length > 0 && (filter === 'beerWine' || filter === 'all' || filter === 'available' || filter === 'alcoholic')")
         h2.section-title Beer & Wine
         .beer-wine-grid
           .beer-wine-card(v-for="item in getInStockBeerWine" :key="item.id")
@@ -81,7 +81,7 @@
               .type(v-if="item.subtype") {{ item.subtype }}
       
       // Finger bottles section
-      section.fingers-section(v-if="availableFingerBottles.length > 0 && (filter === 'all' || filter === 'available' || filter === 'alcoholic')")
+      //-section.fingers-section(v-if="availableFingerBottles.length > 0 && (filter === 'all' || filter === 'available' || filter === 'alcoholic')")
         h2.section-title Special Fingers
         .fingers-grid
           NuxtLink.bottle-card(
