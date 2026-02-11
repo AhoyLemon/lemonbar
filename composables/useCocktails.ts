@@ -24,7 +24,7 @@ export const useCocktails = (tenantSlug?: string) => {
   };
 
   // Version number for drink data format - increment when ID format changes
-  const DRINKS_DATA_VERSION = 1;
+  const DRINKS_DATA_VERSION = 2;
   const drinksVersion = useState<number>(`${stateKey}drinksVersion`, () => 0);
 
   // Centralized ingredient synonym mapping (imported at top)
