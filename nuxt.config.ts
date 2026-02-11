@@ -23,33 +23,30 @@ export default defineNuxtConfig({
     host: "localhost",
   },
 
-  modules:
-    process.env.NODE_ENV === "production"
-      ? [
-          [
-            "@nuxtjs/sitemap",
-            {
-              baseURL: process.env.NODE_ENV === "production" ? "https://booz.bar" : "http://127.0.0.1:3000",
-              urls: () => {
-                const slugs = new Set(Object.values(TENANT_CONFIG).map((t) => t.slug));
-                const urls = [];
-                for (const slug of slugs) {
-                  urls.push(`/${slug}`);
-                  urls.push(`/${slug}/drinks`);
-                  urls.push(`/${slug}/bottles`);
-                  urls.push(`/${slug}/essentials`);
-                  urls.push(`/${slug}/beer-wine`);
-                  urls.push(`/${slug}/fingers`);
-                  urls.push(`/${slug}/available`);
-                }
-                // Add lastModified as current date (build time)
-                const lastModified = new Date().toISOString();
-                return urls.map((loc) => ({ loc, lastModified }));
-              },
-            },
-          ],
-        ]
-      : [],
+  modules: [
+    [
+      "@nuxtjs/sitemap",
+      {
+        baseURL: process.env.NODE_ENV === "production" ? "https://booz.bar" : "http://127.0.0.1:3000",
+        urls: () => {
+          const slugs = new Set(Object.values(TENANT_CONFIG).map((t) => t.slug));
+          const urls = [];
+          for (const slug of slugs) {
+            urls.push(`/${slug}`);
+            urls.push(`/${slug}/drinks`);
+            urls.push(`/${slug}/bottles`);
+            urls.push(`/${slug}/essentials`);
+            urls.push(`/${slug}/beer-wine`);
+            urls.push(`/${slug}/fingers`);
+            urls.push(`/${slug}/available`);
+          }
+          // Add lastModified as current date (build time)
+          const lastModified = new Date().toISOString();
+          return urls.map((loc) => ({ loc, lastModified }));
+        },
+      },
+    ],
+  ],
 
   vite: {
     css: {

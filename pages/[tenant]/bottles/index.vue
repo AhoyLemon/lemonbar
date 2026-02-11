@@ -52,8 +52,7 @@
 </template>
 
 <script setup lang="ts">
-  const route = useRoute();
-  const tenant = computed(() => route.params.tenant as string);
+  const tenant = useValidateTenant();
 
   const { loadInventory, inventory, error } = useCocktails(tenant.value);
 

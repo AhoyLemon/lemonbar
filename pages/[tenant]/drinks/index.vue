@@ -5,8 +5,7 @@
   import type { Bottle } from "~/types";
   import { getTenantConfig, getDefaultTenantConfig } from "~/utils/tenants";
 
-  const route = useRoute();
-  const tenant = computed(() => route.params.tenant as string);
+  const tenant = useValidateTenant();
 
   const { loadBeerWine, getInStockBeerWine } = useBeerWine(tenant.value);
 

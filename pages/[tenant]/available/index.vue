@@ -79,8 +79,7 @@
 <script setup lang="ts">
   import type { Bottle } from "~/types";
 
-  const route = useRoute();
-  const tenant = computed(() => route.params.tenant as string);
+  const tenant = useValidateTenant();
 
   const { loadInventory, inventory, loadLocalDrinks, loadEssentials, getAvailableDrinks, error } = useCocktails(tenant.value);
   const { loadStarredDrinks } = useStarredDrinks();

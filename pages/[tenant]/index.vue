@@ -34,8 +34,7 @@
 <script setup lang="ts">
   import { getTenantConfig, getDefaultTenantConfig } from "~/utils/tenants";
 
-  const route = useRoute();
-  const tenant = computed(() => route.params.tenant as string);
+  const tenant = useValidateTenant();
 
   // Set page meta dynamically based on tenant
   const tenantConfig = computed(() => getTenantConfig(tenant.value) || getDefaultTenantConfig());

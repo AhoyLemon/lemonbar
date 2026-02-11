@@ -17,10 +17,9 @@
   import QRCode from "qrcode";
   import { getTenantConfig, getDefaultTenantConfig } from "~/utils/tenants";
 
-  const route = useRoute();
   const config = useRuntimeConfig();
 
-  const tenant = computed(() => route.params.tenant as string);
+  const tenant = useValidateTenant();
   const tenantConfig = computed(() => {
     return getTenantConfig(tenant.value) || getDefaultTenantConfig();
   });
