@@ -6,6 +6,11 @@ const baseURL = process.env.NODE_ENV === "production" ? "/" : "/";
 export default defineNuxtConfig({
   devtools: { enabled: true },
 
+  // Site base URL used by Nuxt site-config and sitemap module
+  site: {
+    url: process.env.NODE_ENV === "production" ? "https://booz.bar" : "http://127.0.0.1:3000",
+  },
+
   // TypeScript strict mode
   typescript: {
     strict: true,
@@ -27,23 +32,26 @@ export default defineNuxtConfig({
     [
       "@nuxtjs/sitemap",
       {
-        baseURL: process.env.NODE_ENV === "production" ? "https://booz.bar" : "http://127.0.0.1:3000",
+        // `hostname` produces absolute <loc> values in sitemap
+        hostname: process.env.NODE_ENV === "production" ? "https://booz.bar" : "http://127.0.0.1:3000",
         urls: async () => {
           const slugs = new Set(Object.values(TENANT_CONFIG).map((t) => t.slug));
           const urls = [];
+          // Use configured hostname when generating URLs so generated sitemap is absolute
+          const hostnameForSitemap = process.env.NODE_ENV === "production" ? "https://booz.bar" : "http://127.0.0.1:3000";
           
           // Use build time as lastmod (represents when site was last deployed)
           const lastmod = new Date().toISOString();
           
           for (const slug of slugs) {
-            urls.push({ loc: `/${slug}`, lastmod });
-            urls.push({ loc: `/${slug}/drinks`, lastmod });
-            urls.push({ loc: `/${slug}/bottles`, lastmod });
-            urls.push({ loc: `/${slug}/essentials`, lastmod });
-            urls.push({ loc: `/${slug}/beer-wine`, lastmod });
-            urls.push({ loc: `/${slug}/fingers`, lastmod });
-            urls.push({ loc: `/${slug}/available`, lastmod });
-            urls.push({ loc: `/${slug}/qr`, lastmod });
+            urls.push({ url: `${hostnameForSitemap}/${slug}`, lastmod });
+            urls.push({ url: `${hostnameForSitemap}/${slug}/drinks`, lastmod });
+            urls.push({ url: `${hostnameForSitemap}/${slug}/bottles`, lastmod });
+            urls.push({ url: `${hostnameForSitemap}/${slug}/essentials`, lastmod });
+            urls.push({ url: `${hostnameForSitemap}/${slug}/beer-wine`, lastmod });
+            urls.push({ url: `${hostnameForSitemap}/${slug}/fingers`, lastmod });
+            urls.push({ url: `${hostnameForSitemap}/${slug}/available`, lastmod });
+            urls.push({ url: `${hostnameForSitemap}/${slug}/qr`, lastmod });
           }
           
           return urls;
