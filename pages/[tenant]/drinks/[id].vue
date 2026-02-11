@@ -24,6 +24,9 @@
   import type { Bottle, Drink } from "~/types";
   import { getTenantConfig, getDefaultTenantConfig } from "~/utils/tenants";
 
+  // Constant for "finger-" prefix length
+  const FINGER_PREFIX_LENGTH = 7;
+
   const route = useRoute();
   const tenant = computed(() => route.params.tenant as string);
   const drinkId = computed(() => route.params.id as string);
@@ -49,7 +52,7 @@
     if (drinkId.value.startsWith("finger-")) {
       isFingerDrink.value = true;
       // Remove "finger-" prefix
-      const withoutPrefix = drinkId.value.substring(7); // "finger-" is 7 chars
+      const withoutPrefix = drinkId.value.substring(FINGER_PREFIX_LENGTH);
       // Extract serving style from the end (either "-straight" or "-rocks")
       const lastDashIndex = withoutPrefix.lastIndexOf("-");
       servingStyle.value = withoutPrefix.substring(lastDashIndex + 1) as "straight" | "rocks";
