@@ -76,6 +76,21 @@
         fetchedDrink.value = drinkData;
       }
       dataReady.value = true;
+    } else if (drinkId.value.startsWith("random-")) {
+      // This is a random CocktailDB drink with format: random-{timestamp}-{cocktailDbId}
+      const parts = drinkId.value.split("-");
+      const cocktailDbId = parts[parts.length - 1]; // Get the last part (the actual CocktailDB ID)
+
+      // Try to fetch the specific drink from CocktailDB
+      isLoading.value = true;
+      const theCocktailDB = useTheCocktailDB();
+      const drinkData = await theCocktailDB.fetchCocktailDBDrinkById(cocktailDbId);
+      isLoading.value = false;
+
+      if (drinkData) {
+        fetchedDrink.value = drinkData;
+      }
+      dataReady.value = true;
     } else {
       // Local or common drink
       dataReady.value = true;
