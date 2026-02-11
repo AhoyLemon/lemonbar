@@ -9,9 +9,9 @@ NuxtLink.bottle-card(:class="{ 'out-of-stock': !bottle.inStock }" :to="bottleLin
       .card-name {{ bottle.name || '(No Name)' }}
     .card-meta
       span.tag(v-if="bottle.bottleSize") 
-        | 📏 {{ bottle.bottleSize }}
+        | {{ bottle.bottleSize }}
       span.tag(v-if="bottle.abv") 
-        | 🍷 {{ bottle.abv }}% ABV
+        | {{ bottle.abv }}% ABV
       span.tag(v-if="bottle.origin") 
         | 🌍 {{ bottle.origin }}
       span.tag(v-if="bottle.bottleState" :class="`state-${bottle.bottleState}`") 
@@ -31,7 +31,7 @@ NuxtLink.bottle-card(:class="{ 'out-of-stock': !bottle.inStock }" :to="bottleLin
   const bottleStateLabel = computed(() => {
     const states = {
       unopened: "🔒 Unopened",
-      opened: "🍾 Opened",
+      opened: "🔓 Opened",
       empty: "⚠️ Empty",
     };
     return props.bottle.bottleState ? states[props.bottle.bottleState] : "";

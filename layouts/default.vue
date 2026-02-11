@@ -2,7 +2,7 @@
 .site-layout
   Header
   main
-    DummyDataNotice(v-if="isSampleDataTenant && route.path !== '/' && route.path !== '/about'")
+    DummyDataNotice(v-if="isSampleDataTenant && normalizedPath !== '/' && normalizedPath !== '/about'")
     slot
   footer.app-footer
     .container
@@ -39,6 +39,8 @@
   });
 
   const isSampleDataTenant = computed(() => tenantConfig.value.isSampleData === true);
+
+  const normalizedPath = computed(() => route.path.replace(/\/$/, "") || "/");
 
   // Determine page type and generate appropriate meta tags
   const pageMeta = computed(() => {
