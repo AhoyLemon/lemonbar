@@ -1,8 +1,4 @@
 <script setup lang="ts">
-// Redirect /sitemap to /sitemap.xml
-navigateTo("/sitemap.xml", { redirectCode: 301, external: false });
+// Redirect /sitemap to /sitemap.xml with permanent redirect
+await navigateTo("/sitemap.xml", { redirectCode: 301 });
 </script>
-
-<template>
-  <div>Redirecting to sitemap...</div>
-</template>

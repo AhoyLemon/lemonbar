@@ -45,9 +45,6 @@
   // Parse the requested path to detect tenant-related issues
   const pathSegments = computed(() => requestedPath.value.split("/").filter(Boolean));
   const possibleTenant = computed(() => pathSegments.value[0] || "");
-  const remainingPath = computed(() => 
-    pathSegments.value.length > 1 ? "/" + pathSegments.value.slice(1).join("/") : ""
-  );
 
   // Define known page routes (tenant-based pages)
   const knownTenantPages = ["drinks", "bottles", "available", "essentials", "beer-wine", "fingers", "qr"];
@@ -136,9 +133,6 @@
     const config = getTenantConfig(slug);
     return config ? config.barName : slug;
   };
-
-  // Set status code
-  const statusCode = computed(() => props.error?.statusCode || 404);
 </script>
 
 <style lang="scss" scoped>
