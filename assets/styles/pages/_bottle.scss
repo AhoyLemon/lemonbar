@@ -94,6 +94,115 @@
       font-style: italic;
     }
 
+    .loading.fetching-drinks {
+      .loader-wrapper {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding-bottom: $spacing-lg;
+        .loader {
+          flex-basis: 100px;
+          padding: 20px;
+        }
+      }
+      background-color: color.adjust($accent-color, $lightness: 50%, $saturation: -20%);
+      padding: $spacing-lg;
+      border-radius: $border-radius-md;
+      text-align: center;
+
+      p {
+        margin-bottom: $spacing-sm;
+        font-weight: 550;
+        color: rgba(0, 0, 0, 0.7);
+      }
+
+      .found-count {
+        font-size: 0.875rem;
+        color: rgba(0, 0, 0, 0.6);
+      }
+
+      .stop-search {
+        margin-top: $spacing-md;
+        padding: $spacing-xs $spacing-md;
+        background: $text-dark;
+        color: white;
+        border: none;
+        border-radius: $border-radius-sm;
+        font-size: 0.875rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s ease;
+
+        &:hover {
+          background: color.adjust($text-dark, $lightness: -10%);
+        }
+      }
+    }
+
+    .rate-limit-message {
+      margin-top: $spacing-md;
+      padding: $spacing-sm $spacing-md;
+      background: color.adjust($color-unavailable, $lightness: 45%);
+      color: color.adjust($color-unavailable, $lightness: -25%);
+      border-left: 4px solid $color-unavailable;
+      border-radius: $border-radius-sm;
+      font-size: 0.875rem;
+      font-weight: 500;
+    }
+
+    .source-filters {
+      display: flex;
+      gap: $spacing-sm;
+      margin-bottom: $spacing-md;
+      justify-content: center;
+
+      .filter-btn {
+        padding: $spacing-xs $spacing-md;
+        background: white;
+        border: 2px solid $border-color;
+        border-radius: $border-radius-sm;
+        font-size: 0.875rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        color: $text-dark;
+
+        &:hover {
+          border-color: $primary-color;
+          background: color.adjust($primary-color, $lightness: 45%);
+        }
+
+        &.active {
+          background: $primary-color;
+          border-color: $primary-color;
+          color: white;
+        }
+      }
+    }
+
+    .source-badge {
+      font-size: 0.7rem;
+      font-weight: 600;
+      border-radius: $border-radius-sm;
+      text-transform: uppercase;
+      cursor: help;
+
+      // &.source-local {
+      //   background: color.adjust($accent-color, $lightness: 35%);
+      //   color: color.adjust($accent-color, $lightness: -30%);
+      // }
+
+      // &.source-common {
+      //   background: color.adjust($secondary-color, $lightness: 35%);
+      //   color: color.adjust($secondary-color, $lightness: -30%);
+      // }
+
+      // &.source-external {
+      //   background: color.adjust(orange, $lightness: 35%);
+      //   color: color.adjust(orange, $lightness: -30%);
+      // }
+    }
+
     .drinks-list {
       display: flex;
       flex-direction: column;
@@ -182,9 +291,22 @@
       gap: $spacing-xs;
     }
 
+    .drink-matched-term {
+      font-size: 0.7rem;
+      color: rgba(0, 0, 0, 0.5);
+      font-style: italic;
+
+      small {
+        font-weight: 500;
+      }
+    }
+
     .drink-name {
       font-weight: 600;
       color: $text-dark;
+      align-items: center;
+      display: flex;
+      gap: 0.5em;
     }
 
     .drink-availability {

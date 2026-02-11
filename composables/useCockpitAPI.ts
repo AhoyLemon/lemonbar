@@ -165,6 +165,7 @@ export const useCockpitAPI = (tenantSlug?: string) => {
           id: `bottle-${index + 1}`,
           name: item.name || "",
           category: item.category || "Uncategorized",
+          baseSpirit: item.baseSpirit || "Other Spirit",
           tags,
           inStock: true, // Assume in stock unless specified
           isFingers: item.isFingers === true,

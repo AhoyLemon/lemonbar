@@ -41,7 +41,7 @@
                 span.tag(v-for="tag in bottle.tags" :key="tag") {{ tag }}
       
       .drinks-section
-        h3 {{ bottle.isFingers ? 'Serving Options' : (searchingDrinks ? 'Searching Drinks...' : `Drinks Using ${drinksSearchTerm}`) }}
+        h3 {{ getHeadline() }}
         
         // Show finger options if this is a finger bottle
         .drinks-list(v-if="bottle.isFingers")
@@ -64,23 +64,49 @@
         
         // Show regular drinks if not a finger bottle
         template(v-else)
-          .loading(v-if="drinksLoading") Loading drinks...
-          .drinks-list(v-else-if="sortedDrinksUsingBottle.length > 0")
-            .drink-list-item(
-              v-for="drink in sortedDrinksUsingBottle" 
-              :key="drink.id"
-              :class="{ 'has-missing-ingredients': !drinkHasAllIngredients(drink), 'fully-available': drinkHasAllIngredients(drink) }"
-            )
-              .drink-thumbnail
-                img(v-if="drink.imageUrl" :src="drink.imageUrl" :alt="drink.name")
-                img(v-else-if="drink.image" :src="`/images/drinks/${drink.image}`" :alt="drink.name")
-                .no-image(v-else) 🍹
-              .drink-info
-                .drink-name {{ drink.name }}
-                .drink-availability
-                  span.availability-label(:class="{ 'fully-available': drinkHasAllIngredients(drink) }") {{ getAvailabilityLabel(drink) }}
-              NuxtLink.drink-view-btn(:to="`/${tenant}/drinks/${drink.id}`") View
-          p.no-drinks(v-else) No drinks found using this bottle yet.
+          // Loading state while searching
+          .loading.fetching-drinks(v-if="searching")
+            .loader-wrapper
+              .loader
+            p {{ searchingFor }}
+            p.found-count(v-if="foundCount > 0") Found {{ foundCount }} drink{{ foundCount === 1 ? '' : 's' }} so far...
+            button.stop-search(@click="stopSearch") Stop Search
+          
+          // Not searching anymore
+          template(v-else)
+            // Filter buttons (only show if we have multiple sources)
+            .source-filters(v-if="showSourceFilters")
+              button.filter-btn(:class="{ active: sourceFilter === 'all' }" @click="sourceFilter = 'all'") All
+              button.filter-btn(:class="{ active: sourceFilter === 'local' }" @click="sourceFilter = 'local'") Local
+              button.filter-btn(:class="{ active: sourceFilter === 'external' }" @click="sourceFilter = 'external'") CocktailsDB
+            
+            // Drinks list (show if we have drinks)
+            .drinks-list(v-if="filteredDrinks.length > 0")
+              .drink-list-item.drink-card(
+                v-for="drink in filteredDrinks"
+                :key="drink.id"
+                :class="{ 'has-missing-ingredients': !drinkHasAllIngredients(drink), 'fully-available': drinkHasAllIngredients(drink) }"
+              )
+                .drink-thumbnail
+                  img(v-if="drink.imageUrl" :src="drink.imageUrl" :alt="drink.name")
+                  img(v-else-if="drink.image" :src="`/images/drinks/${drink.image}`" :alt="drink.name")
+                  .no-image(v-else) 🍹
+                .drink-info
+                  .drink-name 
+                    | {{ drink.name }}
+                    //- span.source-badge(:class="getDrinkSourceClass(drink)" :title="getDrinkSourceTitle(drink)") {{ getDrinkSourceLabel(drink) }}
+                    span.source-badge(v-if="isDrinkFromCocktailsDB(drink)" title="This drink is from TheCocktailDB") 📡
+                  .drink-availability
+                    span.availability-label(:class="{ 'fully-available': drinkHasAllIngredients(drink) }") {{ getAvailabilityLabel(drink) }}
+                  .drink-matched-term(v-if="drink.matchedTerm")
+                    small Matched: {{ drink.matchedTerm }}
+                NuxtLink.drink-view-btn(:to="`/${tenant}/drinks/${drink.id}`") View
+              
+              // Rate limit message if API failures occurred
+              p.rate-limit-message(v-if="showRateLimitMessage") API rate limit hit. Some drinks may be missing from this list.
+            
+            // Empty state (no drinks found)
+            p.no-drinks(v-else) No drinks found using this bottle. Try checking back later or explore other bottles!
     
     .loading(v-else-if="loading") Loading bottle details...
     .error(v-else-if="error") {{ error }}
@@ -99,27 +125,18 @@
   const tenant = computed(() => route.params.tenant as string);
   const bottleId = computed(() => route.params.id as string);
 
-  const {
-    loadInventory,
-    loadEssentials,
-    loadLocalDrinks,
-    fetchDrinksByIngredient,
-    getDrinksUsingBottle,
-    isIngredientInStock,
-    countMatchedIngredients,
-    getAvailabilityPercentage,
-    sortDrinksByAvailability,
-  } = useCocktails(tenant.value);
-
+  const { loadInventory, loadEssentials, isIngredientInStock, getAvailabilityPercentage } = useCocktails(tenant.value);
   const { loadStarredDrinks, isStarred } = useStarredDrinks();
-  const { isFingers } = useFingers();
+  const { searching, searchingFor, foundCount, showRateLimitMessage, findMatchingDrinks, sortMatchedDrinks, stopSearch } = useCocktailMatching(tenant.value);
 
   const bottle = ref<BottleWithFingers | null>(null);
   const loading = ref(true);
   const error = ref<string | null>(null);
-  const drinksLoading = ref(false);
 
-  const drinksUsingBottle = ref<Drink[]>([]);
+  const drinksUsingBottle = ref<any[]>([]);
+  const matchType = ref<"name" | "tag" | "baseSpirit" | null>(null);
+  const matchedTerm = ref("");
+  const sourceFilter = ref<"all" | "local" | "external">("all");
 
   // Update head with specific bottle information when bottle loads
   watch(
@@ -150,36 +167,128 @@
   );
 
   // Computed: sorted drinks by availability and starred status
-  const sortedDrinksUsingBottle = computed(() => sortDrinksByAvailability(drinksUsingBottle.value, isStarred));
+  const sortedDrinksUsingBottle = computed(() => sortMatchedDrinks(drinksUsingBottle.value as any, isIngredientInStock, isStarred));
 
-  // Track the search term used for display
-  const drinksSearchTerm = ref("");
-  const searchingDrinks = computed(() => !drinksSearchTerm.value);
-
-  // Helper to check if drink has all ingredients
+  // Helper to check if drink has all required ingredients
   const drinkHasAllIngredients = (drink: Drink): boolean => {
-    return drink.ingredients.every((ingredient) => isIngredientInStock(ingredient.name));
+    const requiredIngredients = drink.ingredients.filter((ingredient) => !ingredient.optional);
+    return requiredIngredients.every((ingredient) => isIngredientInStock(ingredient.name));
   };
 
-  // Helper to get availability percentage
-  const getDrinkAvailabilityPercentage = (drink: Drink): number => {
-    return Math.round(getAvailabilityPercentage(drink));
+  // Helper to check if drink has missing optional ingredients
+  const drinkHasMissingOptional = (drink: Drink): boolean => {
+    const optionalIngredients = drink.ingredients.filter((ingredient) => ingredient.optional);
+    return optionalIngredients.some((ingredient) => !isIngredientInStock(ingredient.name));
   };
 
   // Helper to get availability label for bottle detail page
   const getAvailabilityLabel = (drink: Drink): string => {
-    const percentage = getDrinkAvailabilityPercentage(drink);
-    if (percentage === 100) {
-      return "Available";
+    const requiredIngredients = drink.ingredients.filter((ingredient) => !ingredient.optional);
+    const availableRequired = requiredIngredients.filter((ingredient) => isIngredientInStock(ingredient.name)).length;
+    const totalRequired = requiredIngredients.length;
+
+    if (availableRequired === totalRequired) {
+      if (drinkHasMissingOptional(drink)) {
+        return "Optional ingredient(s) missing";
+      }
+      return "All ingredients available!";
     }
-    return `${percentage}% available`;
+
+    return `${availableRequired}/${totalRequired} required ingredients available`;
+  };
+
+  // Get headline based on match type
+  const getHeadline = (): string => {
+    if (!bottle.value) return "Drinks";
+
+    if (bottle.value.isFingers) {
+      return "Serving Options";
+    }
+
+    if (searching.value) {
+      return "Searching for Drinks...";
+    }
+
+    if (matchType.value === "name" && matchedTerm.value) {
+      return `Drinks Using ${matchedTerm.value}`;
+    }
+
+    if (matchType.value === "tag" && matchedTerm.value) {
+      return `Drinks Using ${matchedTerm.value}`;
+    }
+
+    if (matchType.value === "baseSpirit" && matchedTerm.value) {
+      return `Drinks Using ${matchedTerm.value}`;
+    }
+
+    return "Drinks";
+  };
+
+  // Check if we have both local and external drinks
+  const hasLocalDrinks = computed(() => {
+    return sortedDrinksUsingBottle.value.some((d: any) => d.source === "local" || d.source === "common");
+  });
+
+  const hasExternalDrinks = computed(() => {
+    return sortedDrinksUsingBottle.value.some((d: any) => d.source === "external");
+  });
+
+  // Show filters only if we have both local and external drinks
+  const showSourceFilters = computed(() => {
+    return hasLocalDrinks.value && hasExternalDrinks.value && !searching.value && sortedDrinksUsingBottle.value.length > 0;
+  });
+
+  // Filtered drinks based on source filter
+  const filteredDrinks = computed(() => {
+    if (sourceFilter.value === "all") {
+      return sortedDrinksUsingBottle.value;
+    }
+    if (sourceFilter.value === "local") {
+      return sortedDrinksUsingBottle.value.filter((d: any) => d.source === "local" || d.source === "common");
+    }
+    if (sourceFilter.value === "external") {
+      return sortedDrinksUsingBottle.value.filter((d: any) => d.source === "external");
+    }
+    return sortedDrinksUsingBottle.value;
+  });
+
+  // Get drink source label
+  const getDrinkSourceLabel = (drink: any): string => {
+    if (drink.source === "local") return "Local";
+    if (drink.source === "common") return "Common";
+    if (drink.source === "external") return "API";
+    return "";
+  };
+
+  // Get drink source CSS class
+  const getDrinkSourceClass = (drink: any): string => {
+    if (drink.source === "local") return "source-local";
+    if (drink.source === "common") return "source-common";
+    if (drink.source === "external") return "source-external";
+    return "";
+  };
+
+  // Get drink source title (tooltip)
+  const getDrinkSourceTitle = (drink: any): string => {
+    if (drink.source === "local") return "This drink is from this bar's local collection";
+    if (drink.source === "common") return "This drink is from the shared common collection";
+    if (drink.source === "external") return "This drink is from TheCocktailDB";
+    return "";
+  };
+  const isDrinkFromCocktailsDB = (drink: any): boolean => {
+    if (drink.source === "external") {
+      return true;
+    } else {
+      return false;
+    }
   };
 
   onMounted(async () => {
     await loadBottle();
-    await loadDrinks();
+    await loadInventory();
     await loadEssentials();
     loadStarredDrinks();
+    await loadDrinks();
   });
 
   async function loadBottle() {
@@ -211,80 +320,18 @@
     // If this is a finger bottle, do not load any other drinks
     if (bottle.value.isFingers) {
       drinksUsingBottle.value = [];
-      drinksSearchTerm.value = bottle.value.name || "";
       return;
     }
 
-    // Forbidden search terms (too generic)
-    const forbiddenTerms = ["liqueur", "staples"];
-
     try {
-      drinksLoading.value = true;
-      await Promise.all([loadInventory(), loadLocalDrinks()]);
-
-      // Get local drinks that use this bottle
-      const localDrinks = getDrinksUsingBottle(bottle.value as Bottle);
-
-      // 1. Try searching by bottle name (if not forbidden)
-      let apiDrinks: Drink[] = [];
-      let searchSource = "name";
-      let searchTerm = bottle.value.name || "";
-      if (searchTerm && !forbiddenTerms.includes(searchTerm.toLowerCase())) {
-        apiDrinks = await fetchDrinksByIngredient(searchTerm);
-      }
-
-      // 2. If no results, try last tag (if present and not forbidden)
-      if (apiDrinks.length === 0 && bottle.value.tags && bottle.value.tags.length > 0) {
-        for (let i = 0; i < bottle.value.tags.length; i++) {
-          const tag = bottle.value.tags[i];
-          if (tag && !forbiddenTerms.includes(tag.toLowerCase())) {
-            const tagDrinks = await fetchDrinksByIngredient(tag);
-            if (tagDrinks.length > 0) {
-              apiDrinks = tagDrinks;
-              searchSource = "tag";
-              searchTerm = tag;
-              break;
-            }
-          }
-        }
-      }
-
-      // 3. If still no results, try category (if not forbidden)
-      if (apiDrinks.length === 0 && bottle.value.category && !forbiddenTerms.includes(bottle.value.category.toLowerCase())) {
-        apiDrinks = await fetchDrinksByIngredient(bottle.value.category);
-        searchSource = "category";
-        searchTerm = bottle.value.category;
-      }
-
-      drinksSearchTerm.value = searchTerm;
-
-      // Combine and deduplicate drinks
-      const allDrinks = [...localDrinks, ...apiDrinks];
-      const uniqueDrinks = allDrinks.filter((drink, index, self) => index === self.findIndex((d) => d.id === drink.id));
-
-      // Filter: Only show drinks where at least one ingredient matches bottle name, aka, or search term
-      drinksUsingBottle.value = uniqueDrinks.filter((drink) => drink.ingredients.some((ing) => ingredientMatchesBottle(ing.name)));
-
-      // Show warning if category search was used
-      if (searchSource === "category" && apiDrinks.length > 0) {
-        error.value = "Results found by category. These may not be accurate.";
-      } else {
-        error.value = null;
-      }
+      const result = await findMatchingDrinks(bottle.value as Bottle);
+      drinksUsingBottle.value = result.drinks;
+      matchType.value = result.matchType;
+      matchedTerm.value = result.matchedTerm;
     } catch (e) {
       console.error("Failed to load drinks:", e);
-    } finally {
-      drinksLoading.value = false;
+      error.value = "Failed to load drinks";
     }
-  }
-
-  function ingredientMatchesBottle(ingredientName: string): boolean {
-    if (!bottle.value) return false;
-    const name = bottle.value.name?.toLowerCase() || "";
-    const aliases = (bottle.value.aka || []).map((a: string) => a.toLowerCase());
-    const searchTerm = drinksSearchTerm.value.toLowerCase();
-    const ing = ingredientName.toLowerCase();
-    return ing === name || aliases.includes(ing) || (!!searchTerm && ing === searchTerm);
   }
 
   function bottleStateLabel(state: string) {

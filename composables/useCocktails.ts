@@ -104,12 +104,6 @@ export const useCocktails = (tenantSlug?: string) => {
   // Helper function to check for strict match (case-insensitive)
   const matchesStrict = (a: string, b: string): boolean => a.trim().toLowerCase() === b.trim().toLowerCase();
 
-  // Helper function to check if a term matches as a whole word in a string
-  const matchesAsWord = (text: string, term: string): boolean => {
-    const regex = new RegExp(`\\b${term}\\b`, "i");
-    return regex.test(text);
-  };
-
   // Strict ingredient matching: only exact name, synonym, or hierarchy matches
   // Excludes bottles marked as "fingers" from being available for cocktails
   const isIngredientInStock = (ingredientName: string): boolean => {
@@ -242,63 +236,6 @@ export const useCocktails = (tenantSlug?: string) => {
         !drink.tags?.some((tag) => tag.toLowerCase().includes("mocktail")),
     );
   });
-
-  // Fetch drinks from CocktailDB that use a specific ingredient
-  const fetchDrinksByIngredient = async (ingredient: string): Promise<Drink[]> => {
-    try {
-      const theCocktailDB = useTheCocktailDB();
-      const endpoint = `https://www.thecocktaildb.com/api/json/v1/1/filter.php?i=${encodeURIComponent(ingredient)}`;
-      const response = await $fetch<{
-        drinks: Array<{ idDrink: string; strDrink: string; strDrinkThumb: string }> | null;
-      }>(endpoint);
-
-      if (response.drinks) {
-        // The filter endpoint only returns basic info, we need to fetch full details for each drink
-        const fullDrinks: Drink[] = [];
-
-        // Limit to first 10 drinks to avoid too many requests
-        const drinksToFetch = response.drinks.slice(0, 10);
-
-        for (const drink of drinksToFetch) {
-          const fullDrink = await theCocktailDB.fetchCocktailDBDrinkById(drink.idDrink);
-          if (fullDrink) {
-            fullDrinks.push(fullDrink);
-          }
-        }
-
-        return fullDrinks;
-      }
-
-      return [];
-    } catch (e) {
-      console.error("Failed to fetch drinks by ingredient:", e);
-      return [];
-    }
-  };
-
-  // Get all drinks (local + API) that use a specific bottle
-  const getDrinksUsingBottle = (bottle: Bottle): Drink[] => {
-    const allDrinks = safeGetAllDrinks();
-    const bottleName = bottle.name.toLowerCase();
-
-    // Create list of search terms from bottle name, tags, and aka
-    const searchTerms = [bottleName, ...(bottle.tags || []).map((tag) => tag.toLowerCase()), ...(bottle.aka || []).map((aka) => aka.toLowerCase())];
-
-    return allDrinks.filter((drink) => {
-      return drink.ingredients.some((ingredient) => {
-        const ingredientLower = ingredient.name.toLowerCase();
-
-        // Check if any search term matches the ingredient
-        return searchTerms.some((term) => {
-          // Direct match
-          if (ingredientLower === term) return true;
-
-          // Word boundary match
-          return matchesAsWord(ingredientLower, term);
-        });
-      });
-    });
-  };
 
   // Helper function to count how many non-optional ingredients are in stock
   const countMatchedIngredients = (drink: Drink): number => {
