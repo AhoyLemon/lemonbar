@@ -170,7 +170,12 @@ section.fingers-section {
   .card-name {
     transition: color 0.3s linear;
   }
+
+  filter: grayscale(0.3);
+  opacity: 0.9;
   &:hover {
+    filter: grayscale(0);
+    opacity: 1;
     .card-name {
       color: $secondary-color;
     }

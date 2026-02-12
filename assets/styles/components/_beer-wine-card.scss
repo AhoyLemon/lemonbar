@@ -24,6 +24,12 @@
   grid-template-columns: 70px 1fr;
   gap: $spacing-md;
   transition: all 0.3s ease;
+  filter: grayscale(0.25);
+  opacity: 0.7;
+  &:hover {
+    filter: grayscale(0);
+    opacity: 1;
+  }
 
   figure {
     aspect-ratio: 1/1;

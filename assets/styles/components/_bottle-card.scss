@@ -21,6 +21,14 @@ section.bottles {
 
 .bottle-card {
   @include card();
+
+  filter: grayscale(0.25);
+  opacity: 0.9;
+  &:hover {
+    filter: grayscale(0);
+    opacity: 1;
+  }
+
   .card-links {
     display: flex;
     gap: $spacing-md;

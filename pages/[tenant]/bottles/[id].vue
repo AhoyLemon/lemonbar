@@ -100,7 +100,8 @@
                     span.availability-label(:class="{ 'fully-available': drinkHasAllIngredients(drink) }") {{ getAvailabilityLabel(drink) }}
                   .drink-matched-term(v-if="drink.matchedTerm")
                     small Matched: {{ drink.matchedTerm }}
-                NuxtLink.drink-view-btn(:to="`/${tenant}/drinks/${drink.id}`") View
+                .view-btn-holder
+                  NuxtLink.drink-view-btn(:to="`/${tenant}/drinks/${drink.id}`") View
               
               // Rate limit message if API failures occurred
               p.rate-limit-message(v-if="showRateLimitMessage") API rate limit hit. Some drinks may be missing from this list.

@@ -3,6 +3,7 @@
 @use "@/assets/styles/abstracts/mixins" as *;
 
 .bottle-detail-page {
+  padding-bottom: $spacing-xl;
   // Page Content
   .content-grid {
     display: grid;
@@ -77,6 +78,7 @@
     background: white;
     padding: $spacing-xl;
     border-radius: $border-radius-lg;
+    margin-bottom: 200px;
     align-self: start;
 
     h3 {
@@ -186,27 +188,14 @@
       border-radius: $border-radius-sm;
       text-transform: uppercase;
       cursor: help;
-
-      // &.source-local {
-      //   background: color.adjust($accent-color, $lightness: 35%);
-      //   color: color.adjust($accent-color, $lightness: -30%);
-      // }
-
-      // &.source-common {
-      //   background: color.adjust($secondary-color, $lightness: 35%);
-      //   color: color.adjust($secondary-color, $lightness: -30%);
-      // }
-
-      // &.source-external {
-      //   background: color.adjust(orange, $lightness: 35%);
-      //   color: color.adjust(orange, $lightness: -30%);
-      // }
     }
 
     .drinks-list {
       display: flex;
       flex-direction: column;
       gap: $spacing-sm;
+      container-type: inline-size;
+      container-name: drinkslist;
     }
 
     .drink-list-item {
@@ -217,6 +206,9 @@
       border: 1px solid $border-color;
       border-radius: $border-radius-sm;
       transition: all 0.2s ease;
+      .drink-matched-term {
+        display: none;
+      }
 
       &:hover {
         background: $light-bg;
@@ -258,6 +250,26 @@
             color: $text-light;
             background-color: $color-unavailable;
           }
+        }
+      }
+    }
+
+    @container drinkslist (max-width: 370px) {
+      .drink-list-item {
+        display: grid;
+        grid-template-columns: 60px 1fr;
+        .drink-info {
+          order: 1;
+          flex-basis: 100%;
+        }
+        .drink-thumbnail {
+          order: 1;
+          grid-row: span 2;
+        }
+        .view-btn-holder {
+          order: 3;
+          display: flex;
+          justify-content: end;
         }
       }
     }
@@ -339,5 +351,11 @@
         background: color.adjust($primary-color, $lightness: -10%);
       }
     }
+  }
+}
+
+@media (max-width: 520px) {
+  .bottle-detail-page .drinks-section {
+    padding: 1rem;
   }
 }
