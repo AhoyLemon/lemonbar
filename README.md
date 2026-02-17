@@ -1,7 +1,16 @@
-[![kinda.fun](/_NFW/repo-opengraph.png)](https://kinda.fun)
+[![kinda.fun](/_NFW/repo-opengraph.png)](https://booz.bar)
 
-[![Last Deploy](https://img.shields.io/github/last-commit/AhoyLemon/booz/main?label=Last%20Deploy&style=for-the-badge&color=green)](https://github.com/AhoyLemon/booz/actions)
-[![Live Site](https://img.shields.io/badge/Live%20Site-booz.bar-blue?style=for-the-badge)](https://booz.bar)
+[![Last Deploy](https://img.shields.io/github/last-commit/AhoyLemon/booz?label=Last%20Deploy&style=for-the-badge&color=green&logo=github&logoColor=white)](https://github.com/AhoyLemon/booz/actions)
+[![Live Site](https://img.shields.io/badge/Live%20Site-booz.bar-blue?style=for-the-badge&logo=globe&logoColor=white)](https://booz.bar)
+
+[![Open Issues](https://img.shields.io/github/issues/AhoyLemon/booz?label=Issues&style=for-the-badge&color=orange)](https://github.com/AhoyLemon/booz/issues)
+[![Closed Issues](https://img.shields.io/github/issues-closed/AhoyLemon/booz?label=&style=for-the-badge&color=222)](https://github.com/AhoyLemon/booz/issues?q=is%3Aissue+is%3Aclosed)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+[![Open PRs](https://img.shields.io/github/issues-pr/AhoyLemon/booz?label=Pull%20Requests&style=for-the-badge&color=orange)](https://github.com/AhoyLemon/booz/pulls)
+[![Closed PRs](https://img.shields.io/github/issues-pr-closed/AhoyLemon/booz?label=&style=for-the-badge&color=222)](https://github.com/AhoyLemon/booz/pulls?q=is%3Apr+is%3Aclosed)
+[![Commit Activity](https://img.shields.io/github/commit-activity/w/AhoyLemon/booz?style=for-the-badge&label=Commit%20Activity&color=blue&logo=git&logoColor=white)](https://github.com/AhoyLemon/booz/graphs/commit-activity)
+[![License: CC BY 4.0](https://img.shields.io/badge/License-CC%20BY%204.0-white?style=for-the-badge&logo=creativecommons&logoColor=white)](LICENSE)
+[![Docs](https://img.shields.io/badge/Docs-Available-4FC08D?style=for-the-badge&logo=readthedocs&logoColor=white)](docs/)
 
 A multi-tenant bar inventory and cocktail app built with Nuxt 3, supporting multiple bars with tenant-specific data from Cockpit CMS.
 
@@ -25,145 +34,8 @@ A multi-tenant bar inventory and cocktail app built with Nuxt 3, supporting mult
 [![Vitest](https://img.shields.io/badge/Vitest-000?style=for-the-badge&labelColor=6E9F18&logo=vitest&logoColor=white&color=222)](https://vitest.dev)
 [![Prettier](https://img.shields.io/badge/Prettier-000?style=for-the-badge&labelColor=F7B93E&logo=prettier&logoColor=111&color=222)](https://prettier.io)
 [![Cockpit](https://img.shields.io/badge/Cockpit-000?style=for-the-badge&labelColor=0066CC&logo=cockpit&logoColor=fff&color=222)](https://getcockpit.com)
-[![JSON](https://img.shields.io/badge/JSON-000?style=for-the-badge&labelColor=000000&logo=json&logoColor=fff&color=222)](https://getcockpit.com)
-[![GitHub Pages](https://img.shields.io/badge/GitHub%20Pages-000?style=for-the-badge&labelColor=000000&logo=github&logoColor=fff&color=222)](https://getcockpit.com)
-
-## TLDR
-
-```bash
-bun install
-bun run dev
-# All data is fetched from an external API
-```
-
-## Documentation
-
-- **[Drinks and Cocktails](./docs/drinks.md)** - How drinks are sourced, sorted, and displayed
-
-## Multi-Tenant Configuration
-
-This app supports multiple tenants (bars), each with their own inventory and drinks. Tenants are configured in [`utils/tenants.ts`](./utils/tenants.ts), with one tenant set as the default.
-
-### Adding a New Tenant
-
-1. **Creae A New Tenant in Cockpit CMS**:
-   1. Log into Cockpit as Admin
-   1. Clone an existing bar tree
-      - **RECOMMENDED:** Clone `_The Sample Bar` for a quick start)
-   1. give the clone a unique id (ex: `mySpecialNewBar`)
-   1. Inside your newly created tenant, **Create Item**, which will create a bar for that tenant.
-   1. Give this new bar a name
-   1. ALL DONE
-
-1. **Update `utils/tenants.ts`**: Add your tenant configuration (see `TenantConfig` interface in [`types/index.ts`](./types/index.ts)):
-
-   ```typescript
-   export const TENANT_CONFIG: Record<string, TenantConfig> = {
-     // ... existing tenants
-     mybar: {
-       slug: "mybar",
-       barData: "mySpecialNewBar", // This should match the unique id you created in 1.3
-       barName: "My New Bar",
-       description: "This is the Page meta description in case you want something special here",
-       includeCommonDrinks: true, // Set to true if you want to include drinks from the common collection
-       includeRandomCocktails: true, // Set to true if you want to include random cocktails from The Cocktail DB
-       isSampleData: false, // Set to true if this tenant is meant for sample/demo purposes (affects UI and data handling in some places)
-     },
-   };
-   ```
-
-1. **Access Your Tenant**: Navigate to `/mybar` to see your bar's data.
-
-## Local Development
-
-### Prerequisites
-
-This project uses [Bun](https://bun.sh) as its primary runtime and package manager for faster installs and better performance. However, it remains fully compatible with [Node.js](https://nodejs.org) & npm if you prefer.
-
-**Option 1: Install [Bun](https://bun.com) (Recommended)**
-
-```bash
-# Linux/macOS
-curl -fsSL https://bun.sh/install | bash
-
-# Windows (PowerShell)
-powershell -c "irm bun.sh/install.ps1 | iex"
-
-# Or visit https://bun.sh/docs/installation for more options
-```
-
-**Option 2: Use Node.js/npm**
-
-If you prefer to continue using npm, that works too! All commands work with both package managers.
-
-### Install Dependencies
-
-```bash
-# With Bun (recommended)
-bun install
-
-# Or with npm
-npm install
-```
-
-### Development
-
-```bash
-# With Bun
-bun run dev
-
-# Or with npm
-npm run dev
-```
-
-Visit `http://localhost:3000`.
-
-### Build for Production
-
-```bash
-# With Bun
-bun run build
-bun run preview
-
-# Or with npm
-npm run build
-npm run preview
-```
-
-### Generate Static Site
-
-```bash
-# With Bun
-bun run generate
-
-# Or with npm
-npm run generate
-```
-
-## Deployment
-
-### GitHub Pages
-
-This project is configured to automatically deploy to GitHub Pages when you push to the `main` branch. The deployed site fetches live data from your Cockpit CMS API.
-
-#### Initial Setup
-
-1. **Enable GitHub Pages in Repository Settings**:
-   - Go to your repository on GitHub
-   - Navigate to **Settings** → **Pages**
-   - Under "Build and deployment", set:
-     - **Source**: "GitHub Actions"
-
-2. **Push to Main Branch**:
-
-   ```bash
-   git push origin main
-   ```
-
-3. **Monitor Deployment**:
-   - Go to the **Actions** tab in your repository
-   - You should see the "Deploy to GitHub Pages" workflow running
-   - Once complete, your site will be available at: `https://booz.bar/`
+[![JSON](https://img.shields.io/badge/JSON-000?style=for-the-badge&labelColor=000000&logo=json&logoColor=fff&color=222)](https://www.json.org/json-en.html)
+[![GitHub Pages](https://img.shields.io/badge/GitHub%20Pages-000?style=for-the-badge&labelColor=000000&logo=github&logoColor=fff&color=222)](http://pages.github.com/)
 
 #### Multi-Tenant URLs
 
@@ -182,30 +54,6 @@ The deployed site fetches data directly from your Cockpit CMS API at runtime. Th
 - No need to rebuild/redeploy when data changes in Cockpit CMS
 - Updates to your CMS are immediately reflected on the live site
 - Each tenant fetches from their configured Cockpit collections
-
-#### Manual Deployment
-
-You can also trigger a deployment manually:
-
-1. Go to the **Actions** tab
-2. Select "Deploy to GitHub Pages" workflow
-3. Click **Run workflow** → **Run workflow**
-
-#### Local Preview of Production Build
-
-To preview what will be deployed:
-
-```bash
-# With Bun
-bun run generate
-bunx serve .output/public
-
-# Or with npm
-npm run generate
-npx serve .output/public
-```
-
-The site will be available at `http://localhost:3000`
 
 ## Data Structure
 

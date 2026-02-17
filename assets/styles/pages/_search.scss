@@ -10,7 +10,7 @@
   }
 
   .container {
-    min-height: calc(100dvh - 260px);
+    min-height: $height-minus-chrome;
     display: flex;
     align-items: center;
     justify-content: center;
