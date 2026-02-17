@@ -15,6 +15,9 @@
     "watch-data": "chokidar \"data/bottles.csv\" \"data/drinks.json\" -c \"npm run sync-data\"",
     "test": "vitest run",
     "test:watch": "vitest watch",
+    "typecheck": "tsc --noEmit",
+    "test:ci": "vitest run --reporter=dot",
+    "ci": "npx nuxi prepare && npm run typecheck && npm run test:ci",
     "format": "prettier --write .",
     "format:check": "prettier --check ."
   },
@@ -28,7 +31,6 @@
     "vue": "^3.5.28"
   },
   "devDependencies": {
-    "@nuxt/test-utils": "^3.23.0",
     "@types/node": "^20.19.33",
     "@types/qrcode": "^1.5.6",
     "@vue/test-utils": "^2.4.6",
