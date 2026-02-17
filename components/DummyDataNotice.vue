@@ -11,7 +11,8 @@
   @use "@/assets/styles/variables" as *;
 
   .dummy-data-notice {
-    background: linear-gradient(135deg, #17a2b8 0%, color.adjust(#17a2b8, $lightness: -10%) 100%);
+    background-color: $secondary-color;
+    background: linear-gradient(-45deg, $primary-color, $secondary-color);
     color: white;
     padding: $spacing-sm $spacing-lg;
     margin: -16px 0 26px 0;

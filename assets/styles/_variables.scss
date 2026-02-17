@@ -40,6 +40,7 @@ $breakpoint-xl: 1200px;
 
 // Container
 $container-max-width: 1400px;
+$height-minus-chrome: calc(100dvh - 260px);
 
 // Border Radius
 $border-radius-sm: 0.25rem;

@@ -4,7 +4,7 @@
 .home-navigation {
   display: flex;
   gap: 40px;
-  min-height: calc(100dvh - 200px);
+  min-height: $height-minus-chrome;
   justify-content: center;
   flex-wrap: wrap;
   align-items: center;
