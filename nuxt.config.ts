@@ -193,6 +193,14 @@ export default defineNuxtConfig({
         "/victor/fingers",
         "/victor/qr",
 
+        // YaM pages
+        "/yam",
+        "/yam/available",
+        "/yam/bottles",
+        "/yam/drinks",
+        "/yam/fingers",
+        "/yam/qr",
+
         // Sample bar
         "/sample",
       ],
