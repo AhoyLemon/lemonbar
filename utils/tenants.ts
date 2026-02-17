@@ -91,6 +91,22 @@ export const TENANT_CONFIG: Record<string, TenantConfig> = {
       },
     },
   },
+  yam: {
+    slug: "yam",
+    barName: "House In The Trees",
+    barData: "yamBar",
+    includeCommonDrinks: true,
+    includeRandomCocktails: true,
+    metaInfo: {
+      description: "House In The Trees - Your destination for expertly crafted cocktails and premium spirits.",
+      ogImage: "/opengraph-yam.png",
+      pages: {
+        drinks: {
+          title: "Cocktails | House In The Trees",
+        },
+      },
+    },
+  },
 };
 
 /**
