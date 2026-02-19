@@ -3,7 +3,7 @@ import { TENANT_CONFIG } from "./utils/tenants";
 import { promises as fs } from "fs";
 import { join } from "path";
 
-const baseURL = process.env.NODE_ENV === "production" ? "/" : "/";
+const siteOrigin = process.env.NODE_ENV === "production" ? "https://booz.bar" : `http://localhost:${process.env.PORT || 3000}`;
 
 export default defineNuxtConfig({
   devtools: { enabled: true },
@@ -141,20 +141,20 @@ export default defineNuxtConfig({
         // OpenGraph
         { property: "og:title", content: "BOOZ - Bar Inventory Management" },
         { property: "og:description", content: "Manage and explore cocktail recipes, bottle inventory, and bar essentials for multiple locations." },
-        { property: "og:image", content: `${baseURL}/opengraph-generic.png` },
+        { property: "og:image", content: `${siteOrigin}/opengraph-generic.png` },
         { property: "og:type", content: "website" },
-        { property: "og:url", content: `${baseURL}` },
+        { property: "og:url", content: `${siteOrigin}` },
         // Twitter Card
         { name: "twitter:card", content: "summary_large_image" },
         { name: "twitter:title", content: "BOOZ - Bar Inventory Management" },
         { name: "twitter:description", content: "Manage and explore cocktail recipes, bottle inventory, and bar essentials for multiple locations." },
-        { name: "twitter:image", content: `${baseURL}/opengraph-generic.png` },
+        { name: "twitter:image", content: `${siteOrigin}/opengraph-generic.png` },
       ],
       link: [
-        { rel: "icon", type: "image/x-icon", href: `${baseURL}/favicon.ico` },
-        { rel: "icon", type: "image/svg+xml", href: `${baseURL}/favicon.svg` },
-        { rel: "apple-touch-icon", href: `${baseURL}/apple-touch-icon.png` },
-        { rel: "manifest", href: `${baseURL}/site.webmanifest` },
+        { rel: "icon", type: "image/x-icon", href: `${siteOrigin}/favicon.ico` },
+        { rel: "icon", type: "image/svg+xml", href: `${siteOrigin}/favicon.svg` },
+        { rel: "apple-touch-icon", href: `${siteOrigin}/apple-touch-icon.png` },
+        { rel: "manifest", href: `${siteOrigin}/site.webmanifest` },
         { rel: "preconnect", href: "https://fonts.googleapis.com" },
         { rel: "preconnect", href: "https://fonts.gstatic.com", crossorigin: "" },
         {
@@ -162,6 +162,7 @@ export default defineNuxtConfig({
           href: "https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Lora:ital,wght@0,400..700;1,400..700&display=swap",
           // href: "https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap",
         },
+        { rel: "icon", type: "image/png", href: `${siteOrigin}/favicon.png` },
       ],
     },
   },
@@ -216,6 +217,7 @@ export default defineNuxtConfig({
     public: {
       cockpitApiUrl: process.env.COCKPIT_API_URL || "https://hirelemon.com/bar/api",
       cockpitApiKey: process.env.COCKPIT_API_KEY || "", // Made public for client-side API calls
+      siteOrigin: siteOrigin,
     },
   },
 
