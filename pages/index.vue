@@ -7,10 +7,14 @@
       .cta-section
         NuxtLink.cta-button.primary(to="/about") Learn More About BOOZ
         NuxtLink.cta-button.secondary(to="/sample") Explore Demo Bar
+  //- JSON-LD is injected via `useHead` in the page script (avoids side-effect tags in template)
 </template>
 
 <script setup lang="ts">
   import { usePageMeta } from "~/composables/usePageMeta";
+  import staticSchema from "~/utils/schema/boozSchema.json";
+  import { ref } from "vue";
+  import { useHead } from "#app";
 
   // Set page meta (SSR-friendly)
   usePageMeta({
@@ -18,9 +22,17 @@
     title: "BOOZ",
     description: "Your new favorite way to manage your home bar.",
   });
+
+  // Expose JSON-LD for this page as well and inject into body end
+  const ldJson = ref(JSON.stringify(staticSchema, null, 2));
+  useHead({
+    // cast to any because the head type definitions are conservative about script children
+    script: [{ type: "application/ld+json", children: ldJson.value, body: true } as unknown as any],
+  });
 </script>
 
 <style scoped lang="scss">
+  @use "sass:color";
   @use "@/assets/styles/variables" as *;
 
   .hero-section {
@@ -31,10 +43,13 @@
     flex-direction: column;
     justify-content: center;
     align-items: center;
+    container-name: hero-section;
+    container-type: inline-size;
     h1 {
       font-family: $font-heading;
-      font-size: 3rem;
-      color: $primary-color;
+      font-size: clamp(2.6rem, 20dvw, 11rem);
+      line-height: 90%;
+      color: rgba($primary-color, 0.9);
       margin-bottom: $spacing-md;
     }
     .lead {
@@ -59,23 +74,36 @@
     text-decoration: none;
     font-weight: 600;
     transition: all 0.3s ease;
+    box-shadow: $shadow-sm;
+    border: 2px solid color.adjust($accent-color, $lightness: -11%);
 
     &.primary {
-      background-color: $primary-color;
+      background-color: $accent-color;
+      &:hover,
+      &:focus-visible {
+        background-color: color.adjust($accent-color, $lightness: -11%);
+      }
     }
     &.secondary {
-      background-color: $accent-color;
+      background-color: transparent;
+      color: color.adjust($accent-color, $lightness: -9%);
+      &:hover,
+      &:focus-visible {
+        background-color: color.adjust($accent-color, $lightness: 54%);
+      }
     }
 
     &:hover {
-      background-color: $secondary-color;
-      transform: translateY(-2px);
+      transform: translateY(-4px);
+      box-shadow: $shadow-lg;
     }
   }
 
-  @media (max-width: $breakpoint-md) {
-    .hero-section h1 {
-      font-size: 2rem;
+  @container hero-section (max-width: 600px) {
+    .cta-section {
+      flex-direction: column;
+      width: 100%;
+      max-width: 370px;
     }
   }
 </style>

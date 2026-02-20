@@ -23,6 +23,20 @@
             li Create and share your own custom cocktails.
             li Let your guessts know what's available right now with the "Available Now" feature and QR code menu.
       
+      section.grid-item.admin-screens
+        h2 Behind The Scenes
+        p Some screenshots of the bar management.
+        .admin-screens
+          //- Each anchor keeps a normal href for non-JS fallback, but opens modal when JS available
+          button.full-link(type="button" aria-haspopup="dialog" data-full="/images/screenshots/admin/full-1.webp" data-alt="BOOZ admin interface — inventory management" @click.prevent="openModalFromEvent($event)")
+            img(src="/images/screenshots/admin/thumb-1.webp" alt="BOOZ admin interface — inventory management")
+          button.full-link(type="button" aria-haspopup="dialog" data-full="/images/screenshots/admin/full-2.webp" data-alt="BOOZ admin interface — cocktail creation editor" @click.prevent="openModalFromEvent($event)")
+            img(src="/images/screenshots/admin/thumb-2.webp" alt="BOOZ admin interface — cocktail creation editor")
+          button.full-link(type="button" aria-haspopup="dialog" data-full="/images/screenshots/admin/full-3.webp" data-alt="BOOZ admin interface — bottle details and tags" @click.prevent="openModalFromEvent($event)")
+            img(src="/images/screenshots/admin/thumb-3.webp" alt="BOOZ admin interface — bottle details and tags")
+          button.full-link(type="button" aria-haspopup="dialog" data-full="/images/screenshots/admin/full-4.webp" data-alt="BOOZ admin interface — availability and QR menu" @click.prevent="openModalFromEvent($event)")
+            img(src="/images/screenshots/admin/thumb-4.webp" alt="BOOZ admin interface — availability and QR menu")
+
       .grid-item.demos
         section.demo-links
           h2 Try The Demo
@@ -58,3 +72,14 @@
             dt Sponsor
             dd 
               a(href="https://github.com/sponsors/AhoyLemon" target="_blank") github.com/sponsors/AhoyLemon
+
+
+  //- Accessible modal for screenshots. Keeps fallback links working when JS is disabled.
+  #screenshot-modal(v-if="modalOpen" role="dialog" aria-modal="true" :aria-label="modalLabel" @click="closeModal")
+    .modal-overlay
+    .modal-content
+      button.close-button(type="button" aria-label="Close screenshot" @click="closeModal") ×
+      h2.sr-only Screenshot viewer
+      img.modal-image(:src="currentSrc" :alt="currentAlt")
+
+  //- JSON-LD is injected via `useHead` in the page component (avoids side-effect tags in template)
