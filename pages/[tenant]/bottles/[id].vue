@@ -17,7 +17,7 @@
             .detail-row
               span.label Category:
               span.value {{ bottle.category }}
-            .detail-row(v-if="bottle.baseSpirit")
+            .detail-row(v-if="bottle.baseSpirit && bottle.baseSpirit !== bottle.category")
               span.label Spirit:
               span.value {{ bottle.baseSpirit }}
             .detail-row(v-if="bottle.bottleSize")
