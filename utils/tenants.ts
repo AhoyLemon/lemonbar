@@ -51,6 +51,18 @@ export const TENANT_CONFIG: Record<string, TenantConfig> = {
       ogImage: "/opengraph-lemon.png",
     },
   },
+  ofox: {
+    slug: "ofox",
+    barName: "O'Fox Tav",
+    barData: "barOfox",
+    description: "O'Fox Tav - your friendly neighborhood bar from Steve & Tara Clark.",
+    includeCommonDrinks: true,
+    includeRandomCocktails: true,
+    metaInfo: {
+      description: "O'Fox Tav: your friendly neighborhood bar from Steve & Tara Clark.",
+      ogImage: "/opengraph-ofox.png",
+    },
+  },
   victor: {
     slug: "victor",
     barName: "Yay, Victor's!",

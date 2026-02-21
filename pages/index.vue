@@ -7,7 +7,6 @@
       .cta-section
         NuxtLink.cta-button.primary(to="/about") Learn More About BOOZ
         NuxtLink.cta-button.secondary(to="/sample") Explore Demo Bar
-  //- JSON-LD is injected via `useHead` in the page script (avoids side-effect tags in template)
 </template>
 
 <script setup lang="ts">
