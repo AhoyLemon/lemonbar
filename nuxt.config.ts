@@ -186,6 +186,14 @@ export default defineNuxtConfig({
         "/lemon/fingers",
         "/lemon/qr",
 
+        // Steve & Tara's pages
+        "/ofox",
+        "/ofox/available",
+        "/ofox/bottles",
+        "/ofox/drinks",
+        "/ofox/fingers",
+        "/ofox/qr",
+
         // Victor's pages
         "/victor",
         "/victor/available",
