@@ -1,0 +1,247 @@
+// Finger drink display
+.drink-detail-page(v-if="isFingerDrink && fingerBottle")
+  .container
+    .drink-hero(:class="{ 'full-width': !fingerBottle.image, 'has-image': fingerBottle.image }")
+      .hero-content
+        hgroup
+          h1.drink-name {{ fingerBottle.name }}{{ servingStyle === 'rocks' ? ' On The Rocks' : ', Straight Up' }}
+        //.badge-row
+        .back-navigation
+          NuxtLink.back-btn(:to="`/${tenant}/fingers`") ← Back to Fingers
+        .badge-row
+          abbr.badge.category(title="This drink's category is Special Fingers") 🥃 Special Fingers
+          abbr.badge.category {{ servingStyle === 'rocks' ? '🧊 On The Rocks' : '🧔‍♂️ Straight Up' }}
+        .tags-row
+          span.tag(v-for="tag in fingerBottle.tags" :key="tag") {{ tag }}
+          span.tag(v-if="servingStyle === 'rocks'") ice
+      .drink-hero__image(v-if="fingerBottle.image")
+        img(:src="fingerBottle.image" :alt="fingerBottle.name")
+    .drink-content
+      .drink-ingredients
+        h2 What You'll Need
+        ul.ingredients-list
+          li.available
+            span.ingredient-name {{ fingerBottle.name }}
+            span.ingredient-qty 2 oz
+          li.available(v-if="servingStyle === 'rocks'")
+            span.ingredient-name Ice
+            span.ingredient-qty 2 large cubes
+
+      .drink-instructions
+        h2 Instructions
+        .instructions-container
+          .instruction-step.scroll-animated(v-if="servingStyle === 'straight'")
+            .step-number 1
+            p Pour 2 ounces of {{ fingerBottle.name }} into a rocks glass.
+          .instruction-step.scroll-animated(v-else-if="servingStyle === 'rocks'")
+            .step-number 1
+            p Put 2 large ice cubes into a rocks glass.
+          .instruction-step.scroll-animated(v-if="servingStyle === 'rocks'")
+            .step-number 2
+            p Pour 2 ounces of {{ fingerBottle.name }} over the ice.
+          .instruction-step.scroll-animated
+            .step-number {{ servingStyle === 'rocks' ? '3' : '2' }}
+            p Serve and enjoy this special occasion spirit on its own, without any mixers.
+
+// Beer drink display
+.drink-detail-page(v-else-if="isBeerDrink && beerWineItem")
+  .container
+    .drink-hero(:class="{ 'full-width': !beerWineItem.image, 'has-image': beerWineItem.image }")
+      .hero-content
+        hgroup
+          h1.drink-name {{ beerWineItem.name }}{{ servingStyle === 'glass' ? ' in a Glass' : ' from the Bottle' }}
+        .back-navigation
+          NuxtLink.back-btn(:to="`/${tenant}/beer-wine`") ← Back to Beer & Wine
+        .badge-row
+          abbr.badge.category(title="This is a beer") 🍺 Beer
+          abbr.badge.category {{ servingStyle === 'glass' ? '🍺 In a Glass' : '🍾 From the Bottle' }}
+        .tags-row(v-if="beerWineItem.subtype")
+          span.tag {{ beerWineItem.subtype }}
+      .drink-hero__image(v-if="beerWineItem.image")
+        img(:src="beerWineItem.image" :alt="beerWineItem.name")
+      
+    .drink-content
+      .drink-ingredients
+        h2 What You'll Need
+        ul.ingredients-list
+          li.available
+            span.ingredient-name {{ beerWineItem.name }}
+            span.ingredient-qty 1
+          li.available(v-if="servingStyle === 'glass'")
+            span.ingredient-name Glass
+            span.ingredient-qty 1
+
+      .drink-instructions
+        h2 Instructions
+        .instructions-container
+          .instruction-step.scroll-animated(v-if="servingStyle === 'bottle'")
+            .step-number 1
+            p Grab a {{ beerWineItem.name }}
+          .instruction-step.scroll-animated(v-if="servingStyle === 'bottle'")
+            .step-number 2
+            p Drink it.
+          .instruction-step.scroll-animated(v-else-if="servingStyle === 'glass'")
+            .step-number 1
+            p Get a {{ beerWineItem.name }} and a pint glass
+          .instruction-step.scroll-animated(v-if="servingStyle === 'glass'")
+            .step-number 2
+            p Pour the {{ beerWineItem.name }} into the glass, leaving about an inch of head at the top of the glass.
+          .instruction-step.scroll-animated(v-if="servingStyle === 'glass'")
+            .step-number 3
+            p Drink your beer.
+
+// Wine drink display
+.drink-detail-page(v-else-if="isWineDrink && beerWineItem")
+  .container
+    .drink-hero(:class="{ 'full-width': !beerWineItem.image, 'has-image': beerWineItem.image }")
+      .hero-content
+        hgroup
+          h1.drink-name {{ beerWineItem.name }}{{ servingStyle === 'ice' ? ' in a Glass with Ice' : ' in a Glass' }}
+        .back-navigation
+          NuxtLink.back-btn(:to="`/${tenant}/beer-wine`") ← Back to Beer & Wine
+        .badge-row
+          abbr.badge.category(title="This is a wine") 🍷 Wine
+          abbr.badge.category {{ servingStyle === 'ice' ? '🧊 With Ice' : '🍷 In a Glass' }}
+        .tags-row(v-if="beerWineItem.subtype")
+          span.tag {{ beerWineItem.subtype }}
+          span.tag(v-if="servingStyle === 'ice'") ice!?
+      .drink-hero__image(v-if="beerWineItem.image")
+        img(:src="beerWineItem.image" :alt="beerWineItem.name")
+    .drink-content
+      .drink-ingredients
+        h2 What You'll Need
+        ul.ingredients-list
+          li.available
+            span.ingredient-name {{ beerWineItem.name }}
+            span.ingredient-qty 5 oz
+          li.available
+            span.ingredient-name Glass
+            span.ingredient-qty 1
+          li.available(v-if="servingStyle === 'ice'")
+            span.ingredient-name Ice
+            span.ingredient-qty Really!? 
+
+      .drink-instructions
+        h2 Instructions
+        .instructions-container
+          .instruction-step.scroll-animated(v-if="servingStyle === 'glass'")
+            .step-number 1
+            p Ask for a glass of {{ beerWineItem.name }}
+          .instruction-step.scroll-animated(v-else-if="servingStyle === 'ice'")
+            .step-number 1
+            p Ask for a glass of {{ beerWineItem.name }}, but nervously ask if you can have ice in your glass
+          .instruction-step.scroll-animated(v-if="servingStyle === 'glass'")
+            .step-number 2
+            p Drink the {{ beerWineItem.name }} when it's given to you
+          .instruction-step.scroll-animated(v-else-if="servingStyle === 'ice'")
+            .step-number 2
+            p Make direct eye contact with the person you're talking to
+          .instruction-step.scroll-animated(v-if="servingStyle === 'ice'")
+            .step-number 3
+            p Try to hide the shame you feel
+          .instruction-step.scroll-animated(v-if="servingStyle === 'ice'")
+            .step-number 4
+            p When finally presented with your iced glass of {{ beerWineItem.name }}, drink it quickly, and talk endlessly about how, in other countries, it's actually pretty normal to order a glass of wine with ice
+          .instruction-step.scroll-animated(v-if="servingStyle === 'ice'")
+            .step-number 5
+            p Try to convince yourself that you're perfectly fine with the person you've become.
+
+// Regular drink display
+.drink-detail-page(v-else-if="drink && !isLoading")
+  .container
+    .drink-hero(:class="{ 'full-width': !drinkImageUrl, 'has-image': drinkImageUrl }")      
+      .hero-content
+        hgroup
+          h1.drink-name {{ drink ? drink.name : '' }}
+          p.fully-available(v-if="drink && isFullyAvailable") All ingredients available
+          p.partially-available(v-else-if="drink && !isFullyAvailable") ⚠️ {{ availableCount }}/{{ totalCount }} ingredients available
+        .back-navigation
+          NuxtLink.back-btn(:to="`/${tenant}/drinks`") ← Back to Drinks
+        .badge-row
+          abbr.badge.source(
+            v-if="drink"
+            :class="isLocalDrink ? 'local' : 'external'"
+            :title="isLocalDrink ? 'This drink is made with ingredients from your bar' : 'This drink is from the CocktailDB API'"
+            ) {{ isLocalDrink ? 'Local Drink' : 'CocktailDB' }}
+          abbr.badge.category(v-if="drink && drink.category" :title="`This drink's category is ${drink.category}`") {{ drink.category }}
+          abbr.badge.prep(v-if="drink && drink.prep" :title="`This drink's preparation is ${drink.prep}`") {{ drink.prep }}
+        .tags-row(v-if="drink && drink.tags && drink.tags.length > 0")
+          span.tag(v-for="tag in drink.tags" :key="tag") {{ tag }}
+      .drink-hero__image(v-if="drinkImageUrl && drink")
+        img(:src="drinkImageUrl" :alt="drink.name")
+    .drink-content
+      .drink-ingredients
+        h2 Ingredients
+        ul.ingredients-list(v-if="drink")
+          li(
+            v-for="(ingredient, index) in drink.ingredients"
+            :key="index"
+            :class="{ 'available': isIngredientAvailable(ingredient.name), 'optional': ingredient.optional }"
+          )
+            span.ingredient-name 
+              | {{ ingredient.name }}
+              span.optional-label(v-if="ingredient.optional")  (optional)
+            span.ingredient-qty(v-if="ingredient.qty") {{ ingredient.qty }}
+
+      .drink-instructions
+        h2 Instructions
+        .instructions-container(v-if="drink")
+          .instruction-step(
+            v-for="(step, index) in instructionSteps"
+            :key="index"
+            class="scroll-animated"
+          )
+            .step-number {{ index + 1 }}
+            p {{ step }}
+
+// Skeleton for Drink (while loading)
+.drink-detail-page.drink-skeleton(v-else-if="isLoading || (drinkId.startsWith('cocktaildb-') && !drink && !dataReady)")
+  .container
+    .drink-hero.has-image
+      .hero-content
+        hgroup
+          h1.drink-name.skeleton-text &nbsp;
+          p.fully-available.skeleton-text &nbsp;
+        .back-navigation
+          NuxtLink.back-btn(:to="`/${tenant}/drinks`") ← Back to Drinks
+        .badge-row
+          abbr.badge.source.skeleton 
+            span.skeleton-text loading
+          abbr.badge.category.skeleton 
+            span.skeleton-text loading
+          abbr.badge.prep.skeleton 
+            span.skeleton-text loading
+        .tags-row
+          span.tag.skeleton 
+            span.skeleton-text loading
+          span.tag.skeleton 
+            span.skeleton-text loading
+      .drink-hero__image.skeleton
+        .skeleton-img
+          img(src="https://picsum.photos/800/600")
+    .drink-content
+      .drink-ingredients.skeleton
+        h2.skeleton-text Ingredients
+        ul.ingredients-list
+          li(v-for="n in 4" :key="n")
+            span.ingredient-name.skeleton-text &nbsp;
+            span.ingredient-qty.skeleton-text &nbsp;
+      .drink-instructions.skeleton
+        h2.skeleton-text Instructions
+        .instructions-container
+          .instruction-step.skeleton(v-for="n in 3" :key="n")
+            .step-number &nbsp;
+            p.skeleton-text &nbsp;
+
+// ERROR: Drink not found
+.not-found(v-else-if="dataReady && !isLoading && !drink && !isFingerDrink && !isBeerDrink && !isWineDrink")
+  .container
+    h2 {{ drinkId.startsWith('cocktaildb-') ? 'Cocktail Not Available' : 'Drink Not Found' }}
+    p(v-if="drinkId.startsWith('cocktaildb-')") 
+      | Direct links to CocktailDB drinks don't work on static hosting. 
+      br
+      | Please search for this cocktail on the 
+      NuxtLink(:to="`/${tenant}/drinks`") drinks page
+      |  instead.
+    p(v-else) The drink you're looking for doesn't exist.
+    NuxtLink.btn.btn-primary(:to="`/${tenant}/drinks`") Back to Drinks

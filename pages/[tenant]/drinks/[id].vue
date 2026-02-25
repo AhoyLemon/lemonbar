@@ -1,4 +1,4 @@
-<template lang="pug" src="./id.pug"></template>
+<template lang="pug" src="./[id].pug"></template>
 
 <style lang="scss" scoped>
   @use "sass:color";
@@ -34,7 +34,9 @@
   const tenant = computed(() => route.params.tenant as string);
   const drinkId = computed(() => route.params.id as string);
 
-  const { loadInventory, inventory, loadEssentials, loadLocalDrinks, getAllDrinks, isIngredientInStock } = useCocktails(tenant.value);
+  const { loadInventory, inventory, loadEssentials, loadLocalDrinks, getAllDrinks, isIngredientInStock } = useCocktails(
+    tenant.value,
+  );
   const { loadStarredDrinks } = useStarredDrinks();
   const { loadBeerWine, beerWineItems } = useBeerWine(tenant.value);
 
