@@ -37,6 +37,7 @@ describe("Ingredient Matching Logic", () => {
       id: "1",
       name: "Fords Gin",
       category: "Staples",
+      baseSpirit: "Gin",
       tags: ["gin", "london-dry"],
       inStock: true,
     },
@@ -44,6 +45,7 @@ describe("Ingredient Matching Logic", () => {
       id: "2",
       name: "Buffalo Trace",
       category: "Staples",
+      baseSpirit: "Whiskey",
       tags: ["whiskey", "bourbon"],
       inStock: true,
     },
@@ -51,6 +53,7 @@ describe("Ingredient Matching Logic", () => {
       id: "3",
       name: "Simple Syrup",
       category: "Mixers",
+      baseSpirit: "Other Spirit",
       tags: ["syrup", "sweetener"],
       inStock: true,
     },
@@ -138,6 +141,6 @@ describe("Recipe Filtering Logic", () => {
     );
 
     expect(alcoholic).toHaveLength(1);
-    expect(alcoholic[0].name).toBe("Gin Cocktail");
+    expect(alcoholic[0]!.name).toBe("Gin Cocktail");
   });
 });

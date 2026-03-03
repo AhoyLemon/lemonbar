@@ -612,8 +612,8 @@ export const useOmniSearch = (tenantSlug: string) => {
           // Update progress step with results
           const progressIndex = searchProgress.value.findIndex((p) => p.step === step.key);
           if (progressIndex !== -1) {
-            searchProgress.value[progressIndex].count = results.length;
-            searchProgress.value[progressIndex].status = "complete";
+            searchProgress.value[progressIndex]!.count = results.length;
+            searchProgress.value[progressIndex]!.status = "complete";
           }
 
           // ⏱️ Add delay for UX testing
@@ -624,7 +624,7 @@ export const useOmniSearch = (tenantSlug: string) => {
           console.error(`Error in ${step.key}:`, error);
           const progressIndex = searchProgress.value.findIndex((p) => p.step === step.key);
           if (progressIndex !== -1) {
-            searchProgress.value[progressIndex].status = "error";
+            searchProgress.value[progressIndex]!.status = "error";
           }
         }
       }

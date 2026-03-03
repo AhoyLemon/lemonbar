@@ -394,8 +394,8 @@ export const useSearchDrinks = (tenantSlug: string) => {
           seenIds.add(result.id);
         }
       });
-      searchProgress.value[searchProgress.value.length - 1].count = localNameResults.length;
-      searchProgress.value[searchProgress.value.length - 1].status = "complete";
+      searchProgress.value[searchProgress.value.length - 1]!.count = localNameResults.length;
+      searchProgress.value[searchProgress.value.length - 1]!.status = "complete";
 
       // Step 2: Search common drinks by name (if enabled)
       if (tenantConfig.includeCommonDrinks) {
@@ -418,8 +418,8 @@ export const useSearchDrinks = (tenantSlug: string) => {
             seenIds.add(result.id);
           }
         });
-        searchProgress.value[searchProgress.value.length - 1].count = commonNameResults.length;
-        searchProgress.value[searchProgress.value.length - 1].status = "complete";
+        searchProgress.value[searchProgress.value.length - 1]!.count = commonNameResults.length;
+        searchProgress.value[searchProgress.value.length - 1]!.status = "complete";
       }
 
       // Step 2.5: Search Cockpit drinks by category
@@ -440,14 +440,14 @@ export const useSearchDrinks = (tenantSlug: string) => {
         const existingIndex = allResults.findIndex((r) => r.id === result.id);
         if (existingIndex !== -1) {
           // Add category match score to existing score
-          allResults[existingIndex].score += result.score;
+          allResults[existingIndex]!.score += result.score;
         } else if (!seenIds.has(result.id)) {
           allResults.push(result);
           seenIds.add(result.id);
         }
       });
-      searchProgress.value[searchProgress.value.length - 1].count = localCategoryResults.length;
-      searchProgress.value[searchProgress.value.length - 1].status = "complete";
+      searchProgress.value[searchProgress.value.length - 1]!.count = localCategoryResults.length;
+      searchProgress.value[searchProgress.value.length - 1]!.status = "complete";
 
       // Search common drinks by category (if enabled)
       if (tenantConfig.includeCommonDrinks) {
@@ -456,7 +456,7 @@ export const useSearchDrinks = (tenantSlug: string) => {
         commonCategoryResults.forEach((result) => {
           const existingIndex = allResults.findIndex((r) => r.id === result.id);
           if (existingIndex !== -1) {
-            allResults[existingIndex].score += result.score;
+            allResults[existingIndex]!.score += result.score;
           } else if (!seenIds.has(result.id)) {
             allResults.push(result);
             seenIds.add(result.id);
@@ -482,15 +482,15 @@ export const useSearchDrinks = (tenantSlug: string) => {
         const existingIndex = allResults.findIndex((r) => r.id === result.id);
         if (existingIndex !== -1) {
           // Add tag match score to existing score
-          allResults[existingIndex].score += result.score;
-          allResults[existingIndex].matchDetails.tagMatches = result.matchDetails.tagMatches;
+          allResults[existingIndex]!.score += result.score;
+          allResults[existingIndex]!.matchDetails.tagMatches = result.matchDetails.tagMatches;
         } else if (!seenIds.has(result.id)) {
           allResults.push(result);
           seenIds.add(result.id);
         }
       });
-      searchProgress.value[searchProgress.value.length - 1].count = localTagResults.length;
-      searchProgress.value[searchProgress.value.length - 1].status = "complete";
+      searchProgress.value[searchProgress.value.length - 1]!.count = localTagResults.length;
+      searchProgress.value[searchProgress.value.length - 1]!.status = "complete";
 
       // Search common drinks by tags (if enabled)
       if (tenantConfig.includeCommonDrinks) {
@@ -499,8 +499,8 @@ export const useSearchDrinks = (tenantSlug: string) => {
         commonTagResults.forEach((result) => {
           const existingIndex = allResults.findIndex((r) => r.id === result.id);
           if (existingIndex !== -1) {
-            allResults[existingIndex].score += result.score;
-            allResults[existingIndex].matchDetails.tagMatches = result.matchDetails.tagMatches;
+            allResults[existingIndex]!.score += result.score;
+            allResults[existingIndex]!.matchDetails.tagMatches = result.matchDetails.tagMatches;
           } else if (!seenIds.has(result.id)) {
             allResults.push(result);
             seenIds.add(result.id);
@@ -526,16 +526,16 @@ export const useSearchDrinks = (tenantSlug: string) => {
         const existingIndex = allResults.findIndex((r) => r.id === result.id);
         if (existingIndex !== -1) {
           // Combine scores and match types
-          allResults[existingIndex].score += result.score;
-          allResults[existingIndex].matchType = "both";
-          allResults[existingIndex].matchDetails.ingredientMatches = result.matchDetails.ingredientMatches;
+          allResults[existingIndex]!.score += result.score;
+          allResults[existingIndex]!.matchType = "both";
+          allResults[existingIndex]!.matchDetails.ingredientMatches = result.matchDetails.ingredientMatches;
         } else if (!seenIds.has(result.id)) {
           allResults.push(result);
           seenIds.add(result.id);
         }
       });
-      searchProgress.value[searchProgress.value.length - 1].count = localIngredientResults.length;
-      searchProgress.value[searchProgress.value.length - 1].status = "complete";
+      searchProgress.value[searchProgress.value.length - 1]!.count = localIngredientResults.length;
+      searchProgress.value[searchProgress.value.length - 1]!.status = "complete";
 
       // Step 4: Search common drinks by ingredient (if enabled)
       if (tenantConfig.includeCommonDrinks) {
@@ -555,16 +555,16 @@ export const useSearchDrinks = (tenantSlug: string) => {
         commonIngredientResults.forEach((result) => {
           const existingIndex = allResults.findIndex((r) => r.id === result.id);
           if (existingIndex !== -1) {
-            allResults[existingIndex].score += result.score;
-            allResults[existingIndex].matchType = "both";
-            allResults[existingIndex].matchDetails.ingredientMatches = result.matchDetails.ingredientMatches;
+            allResults[existingIndex]!.score += result.score;
+            allResults[existingIndex]!.matchType = "both";
+            allResults[existingIndex]!.matchDetails.ingredientMatches = result.matchDetails.ingredientMatches;
           } else if (!seenIds.has(result.id)) {
             allResults.push(result);
             seenIds.add(result.id);
           }
         });
-        searchProgress.value[searchProgress.value.length - 1].count = commonIngredientResults.length;
-        searchProgress.value[searchProgress.value.length - 1].status = "complete";
+        searchProgress.value[searchProgress.value.length - 1]!.count = commonIngredientResults.length;
+        searchProgress.value[searchProgress.value.length - 1]!.status = "complete";
       }
 
       // Step 5: Search CocktailDB by name
@@ -586,8 +586,8 @@ export const useSearchDrinks = (tenantSlug: string) => {
           seenIds.add(result.id);
         }
       });
-      searchProgress.value[searchProgress.value.length - 1].count = cocktailDBNameResults.length;
-      searchProgress.value[searchProgress.value.length - 1].status = "complete";
+      searchProgress.value[searchProgress.value.length - 1]!.count = cocktailDBNameResults.length;
+      searchProgress.value[searchProgress.value.length - 1]!.status = "complete";
 
       // Step 6: Search CocktailDB by ingredient
       searchProgress.value.push({
@@ -605,12 +605,12 @@ export const useSearchDrinks = (tenantSlug: string) => {
       cocktailDBIngredientResults.forEach((result) => {
         const existingIndex = allResults.findIndex((r) => r.id === result.id);
         if (existingIndex !== -1) {
-          allResults[existingIndex].score += result.score;
-          allResults[existingIndex].matchType = "both";
-          if (!allResults[existingIndex].matchDetails.ingredientMatches) {
-            allResults[existingIndex].matchDetails.ingredientMatches = [];
+          allResults[existingIndex]!.score += result.score;
+          allResults[existingIndex]!.matchType = "both";
+          if (!allResults[existingIndex]!.matchDetails.ingredientMatches) {
+            allResults[existingIndex]!.matchDetails.ingredientMatches = [];
           }
-          allResults[existingIndex].matchDetails.ingredientMatches!.push(
+          allResults[existingIndex]!.matchDetails.ingredientMatches!.push(
             ...(result.matchDetails.ingredientMatches || []),
           );
         } else if (!seenIds.has(result.id)) {
@@ -618,8 +618,8 @@ export const useSearchDrinks = (tenantSlug: string) => {
           seenIds.add(result.id);
         }
       });
-      searchProgress.value[searchProgress.value.length - 1].count = cocktailDBIngredientResults.length;
-      searchProgress.value[searchProgress.value.length - 1].status = "complete";
+      searchProgress.value[searchProgress.value.length - 1]!.count = cocktailDBIngredientResults.length;
+      searchProgress.value[searchProgress.value.length - 1]!.status = "complete";
 
       // Sort by score (descending), then alphabetically by name
       allResults.sort((a, b) => {

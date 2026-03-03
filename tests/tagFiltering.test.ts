@@ -100,7 +100,7 @@ describe("Tag Filtering", () => {
     filtered = filtered.filter((b) => b.tags.includes(tagFilter));
 
     expect(filtered).toHaveLength(1);
-    expect(filtered[0].id).toBe("1");
+    expect(filtered[0]!.id).toBe("1");
   });
 
   it("should count bottles for each tag", () => {
