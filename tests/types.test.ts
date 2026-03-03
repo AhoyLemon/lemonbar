@@ -7,6 +7,7 @@ describe("Bottle Type", () => {
       id: "1",
       name: "Test Gin",
       category: "Staples",
+      baseSpirit: "Gin",
       tags: ["gin", "london-dry"],
       inStock: true,
       bottleSize: "750ml",
@@ -28,6 +29,7 @@ describe("Bottle Type", () => {
       id: "2",
       name: "Basic Bottle",
       category: "Mixers",
+      baseSpirit: "Other Spirit",
       tags: ["mixer"],
       inStock: false,
     };

@@ -116,7 +116,7 @@ export const useCocktailMatching = (tenantSlug?: string) => {
         .sort((a, b) => getAvailabilityPct(a) - getAvailabilityPct(b)); // lowest first = prune first
       const toRemoveIds = new Set<string>();
       for (let i = 0; i < Math.min(excess, candidates.length); i++) {
-        toRemoveIds.add(candidates[i].id);
+        toRemoveIds.add(candidates[i]!.id);
       }
       return drinks.filter((d) => !toRemoveIds.has(d.id));
     };

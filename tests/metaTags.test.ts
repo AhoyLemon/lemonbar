@@ -300,7 +300,7 @@ describe("Meta Tag System", () => {
         } else if (segments.length === 1) {
           pageType = "index";
         } else {
-          pageType = segments[1];
+          pageType = segments[1]!;
         }
 
         expect(pageType).toBe(expected);
