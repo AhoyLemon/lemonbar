@@ -17,16 +17,16 @@ jobs:
           node-version: 20
       - name: Install dependencies
         run: |
-          npm ci
+          bun install --frozen-lockfile
       - name: Prepare Nuxt types
         run: |
-          npx nuxi prepare
+          bun run nuxi prepare
       - name: Build
         run: |
-          npx nuxi build
+          bun run nuxi build
       - name: Typecheck
         run: |
-          npm run typecheck
+          bun run typecheck
       - name: Run tests
         run: |
-          npm run test:ci
+          bun run test:ci
