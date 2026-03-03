@@ -1,0 +1,53 @@
+.essentials-page
+  .container
+    hgroup
+      h1.with-count
+        span Essential Ingredients
+        sup.count(v-if="totalEssentials > 0") ({{ totalEssentials }})
+      p Viewing the basic ingredients and mixers currently in stock
+    
+    .loading(v-if="loading") Loading essentials...
+    
+    .error-banner.mb-3(v-if="error")
+      .error-icon ⚠️
+      .error-content
+        h3 Failed to Load Essentials
+        p {{ error }}
+        p.error-help Make sure you can access https://hirelemon.com/bar/api and check your browser's ad blocker settings.
+
+    template(v-else-if="!loading")
+
+      .essentials-grid
+        // Bitters box
+        dl.bitters-box(v-if="bitters && bitters.length > 0")
+          dt.box-title Bitters
+          dd
+            dl
+              dt.bottles-title Bottles
+              dd
+                ul.bottles-list.items-list
+                  li.item(v-for="bottle in bitters" :key="bottle.name") 
+                    .status-indicator
+                      span.checkmark ✓
+                    .item-label {{ bottle.name }}
+            dl
+              dt.flavors-title Flavors
+              dd
+                .bitters-tags.flavors
+                  span.tag(v-for="flavor in bittersFlavors" :key="flavor") {{ flavor }}
+
+        // ...existing category sections...
+        template(v-for="category in essentialCategories" :key="category.name")
+          .category-box(v-if="getCategoryItemCount(category) > 0 && category.name !== 'Bitters'")
+            dt.box-title
+              //-span.category-icon {{ category.icon }}
+              span {{ category.name }}
+              span.count ({{ getCategoryItemCount(category) }})
+            ul.items-list
+              li.item(
+                v-for="item in getItemsForCategory(category.name).filter(item => item.name !== 'bitters')"
+                :key="item.id"
+              )
+                .status-indicator
+                  span.checkmark ✓
+                .item-label {{ item.name }}

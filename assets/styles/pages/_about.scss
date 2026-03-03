@@ -43,6 +43,38 @@
     }
   }
 
+  .grid-item.admin-screens {
+    display: flex;
+    flex-direction: column;
+    .admin-screens {
+      padding: $spacing-md;
+      background-color: rgba(0, 0, 0, 0.05);
+      display: flex;
+      gap: $spacing-md;
+    }
+    h2,
+    p {
+      margin-bottom: unset;
+    }
+    button {
+      box-shadow: $shadow-sm;
+      transition: all 0.3s ease-out;
+      img {
+        border-radius: $border-radius-lg;
+        filter: grayscale(0.4);
+      }
+      &:hover,
+      &:focus {
+        box-shadow: $shadow-lg;
+        translate: 0 -10px;
+        img {
+          //outline: 5px solid blue;
+          filter: grayscale(0.01);
+        }
+      }
+    }
+  }
+
   .demo-link-wrapper {
     display: grid;
     gap: $spacing-lg;
@@ -104,6 +136,10 @@
       grid-row: 1;
       grid-column: 1;
     }
+    .grid-item.admin-screens {
+      grid-column: 1;
+      grid-row: 2;
+    }
     .grid-item.demos {
       grid-row: 1;
       grid-column: 3;
@@ -129,4 +165,83 @@
       gap: $spacing-xl;
     }
   }
+}
+
+/* Screenshot modal + admin-screens thumbnails */
+#screenshot-modal {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1200;
+}
+#screenshot-modal .modal-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+}
+#screenshot-modal .modal-content {
+  position: relative;
+  max-width: 80dvw;
+  max-height: 80dvh;
+  z-index: 1201;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+#screenshot-modal .modal-image {
+  max-width: 100%;
+  max-height: 100%;
+  border-radius: 4px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+}
+#screenshot-modal .close-button {
+  position: absolute;
+  top: -0.5rem;
+  right: -0.5rem;
+  background: #fff;
+  border-radius: 999px;
+  border: 1px solid #ccc;
+  width: 2.25rem;
+  height: 2.25rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.25rem;
+  cursor: pointer;
+}
+
+.admin-screens {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+.admin-screens a.full-link {
+  display: inline-block;
+  border: 2px solid transparent;
+  border-radius: 4px;
+  overflow: hidden;
+}
+.admin-screens a.full-link:focus {
+  outline: 3px solid #0a84ff;
+  outline-offset: 2px;
+}
+.admin-screens img {
+  display: block;
+  width: 160px;
+  height: auto;
+  object-fit: cover;
+}
+
+.sr-only {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
 }

@@ -9,20 +9,5 @@
   "arrowParens": "always",
   "vueIndentScriptAndStyle": true,
   "singleAttributePerLine": false,
-  "printWidth": 160,
-  "overrides": [
-    {
-      "files": "src/views/meeting/js/_allCards.ts",
-      "options": {
-        "printWidth": 60
-      }
-    },
-    {
-      "files": "src/views/megachurch/ts/*.ts",
-      "options": {
-        "printWidth": 80,
-        "proseWrap": "always"
-      }
-    }
-  ]
+  "printWidth": 120
 }

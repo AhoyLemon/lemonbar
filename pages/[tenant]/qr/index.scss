@@ -1,0 +1,56 @@
+.qr-page {
+  text-align: center;
+  padding: 2rem;
+}
+
+.qr-container {
+  margin: 2rem 0;
+}
+
+.qr-canvas {
+  border: 1px solid #ccc;
+  border-radius: 8px;
+}
+
+.url-section {
+  margin-top: 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+.url-input {
+  width: 100%;
+  max-width: 400px;
+  padding: 0.5rem;
+  font-family: monospace;
+  font-size: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background: #f9f9f9;
+  text-align: center;
+}
+
+.print-button {
+  padding: 0.5rem 1rem;
+  font-size: 1rem;
+  background: #007bff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.print-button:hover {
+  background: #0056b3;
+}
+
+@media print {
+  .app-header,
+  .app-footer,
+  #UrlSection {
+    display: none !important;
+  }
+}

@@ -251,17 +251,15 @@ export const usePageMeta = (
   );
 
   // Compute full OG image URL (with domain)
+  // Read runtime config here (during composable setup) to ensure Nuxt instance is available
+  const config = useRuntimeConfig();
+  const siteOriginFromConfig = config.public?.siteOrigin || "https://booz.bar";
+
   const fullOgImageUrl = computed(() => {
     const ogImage = resolvedMeta.value.ogImage;
-
-    // If the image already starts with http:// or https://, it's a full URL
-    if (ogImage.startsWith("http://") || ogImage.startsWith("https://")) {
-      return ogImage;
-    }
-
-    // Otherwise, prepend the base URL
-    const baseUrl = "https://booz.bar";
-    return `${baseUrl}${ogImage}`;
+    if (!ogImage) return "";
+    if (ogImage.startsWith("http://") || ogImage.startsWith("https://")) return ogImage;
+    return `${siteOriginFromConfig}${ogImage}`;
   });
 
   // Set head tags with complete meta information
@@ -287,13 +285,7 @@ export const usePageMeta = (
       { name: "twitter:description", content: resolvedMeta.value.description },
       { name: "twitter:image", content: fullOgImageUrl.value },
     ],
-    link: [
-      {
-        rel: "icon",
-        type: "image/png",
-        href: "/favicon.png",
-      },
-    ],
+    // Global favicons are defined in nuxt.config; page meta doesn't add favicon links.
   }));
 
   return {
