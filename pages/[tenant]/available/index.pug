@@ -20,7 +20,7 @@
       .error-content
         h3 Failed to Load Data
         p {{ error }}
-        p.error-help Make sure you can access https://hirelemon.com/bar/api and check your browser's ad blocker settings.
+        p.error-help Make sure you can access {{ $cockpitApiUrl }} and check your browser's ad blocker settings.
       
     // Finger bottles section
     section.fingers-section(v-if="availableFingerBottles.length > 0 && (filter === 'all' || filter === 'fingers')")

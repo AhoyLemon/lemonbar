@@ -10,14 +10,24 @@ Tenants are configured in `/utils/tenants.ts`:
 
 ```typescript
 export interface TenantConfig {
-  slug: string; // URL path segment (e.g., "lemon", "victor")
-  barName: string; // Display name (e.g., "Lemonhaus", "Victor's Place")
-  barData: string; // Cockpit singleton name (e.g., "sampleBar", "lemonBar", "barVictor")
-  description?: string; // SEO description for the bar
-  ogImage?: string; // OpenGraph image path
-  includeCommonDrinks: boolean; // Include common cocktails from Cockpit API
-  includeRandomCocktails: boolean; // Include random cocktails from TheCocktailDB
-  isSampleData?: boolean; // Whether this tenant contains sample/demo data
+  /** URL path segment for the tenant (e.g., "lemon", "victor") */
+  slug: string;
+  /** Display name for the bar (e.g., "Lemonhaus", "Victor's Place") */
+  barName: string;
+  /** Cockpit singleton name containing bar data (e.g., "sampleBar", "lemonBar", "barVictor") */
+  barData: string;
+  /** SEO description for the bar */
+  description?: string;
+  /** OpenGraph image path for social media sharing */
+  ogImage?: string;
+  /** Include common cocktails from shared collection */
+  includeCommonDrinks: boolean;
+  /** Include random cocktails from The Cocktail DB API */
+  includeRandomCocktails: boolean;
+  /** Whether this tenant contains sample/demo data (affects UI behavior) */
+  isSampleData?: boolean;
+  /** Page-level meta configuration for this tenant */
+  metaInfo?: TenantMetaConfig;
 }
 ```
 
@@ -62,7 +72,7 @@ Each bar (tenant) has completely separate data "trees" in Cockpit CMS - dedicate
 
 ### Data Source: Cockpit CMS
 
-All bar inventory data is fetched directly from Cockpit CMS API at **https://hirelemon.com/bar/api** on the client side when pages load.
+All bar inventory data is fetched directly from Cockpit CMS API at the URL configured in `utils/cockpitConfig.ts` on the client side when pages load.
 
 #### Tenant-Specific Data Collections
 
@@ -110,11 +120,12 @@ For backwards compatibility, the following methods are still available but now e
 API constants are defined in `/utils/cockpitConfig.ts`:
 
 ```typescript
-export const COCKPIT_API_URL = "https://hirelemon.com/bar/api";
-export const COCKPIT_API_KEY = "API-9aa5e339d0d1f948a80f410dfdc0229eac75ad84";
+export const COCKPIT_API_URL = "https://your-cockpit-instance/api";
+export const COCKPIT_IMAGE_URL = "https://your-image-host/storage/uploads";
+export const COCKPIT_API_KEY = "your-api-key-here";
 ```
 
-**Note about API Key Security**: This API key has **read-only** permissions and is safe to expose publicly. It cannot create, edit, or delete data. More sensitive API keys with write permissions should NEVER be exposed.
+This file is the **single source of truth** for all API and image URLs. To switch to a different API or image host, update only this file.
 
 #### Data Fetching Pattern
 
@@ -219,7 +230,7 @@ These items should **NOT** be stored in Cockpit CMS as they are user-specific.
 
 ### Working with Bar Inventory
 
-1. Update data directly in Cockpit CMS (https://hirelemon.com/bar)
+1. Update data directly in Cockpit CMS (URL configured in `utils/cockpitConfig.ts`)
 2. Changes are immediately reflected on the live site (no build needed!)
 3. Client-side composables fetch from Cockpit API when pages load
 4. Each tenant fetches from their configured bar data singleton
@@ -362,17 +373,17 @@ app: {
 }
 
 runtimeConfig: {
-  cockpitApiKey: process.env.COCKPIT_API_KEY || "",
+  cockpitApiKey: COCKPIT_API_KEY,
   public: {
-    cockpitApiUrl: process.env.COCKPIT_API_URL || "https://hirelemon.com/bar/api",
-    cockpitApiKey: process.env.COCKPIT_API_KEY || "",
+    cockpitApiUrl: COCKPIT_API_URL,
+    cockpitApiKey: COCKPIT_API_KEY,
   },
 }
 ```
 
 - **baseURL**: Set to `/` to match the GitHub Pages repository path
 - **buildAssetsDir**: Set to `assets` to ensure proper asset loading
-- **runtimeConfig**: Exposes Cockpit CMS API credentials to the client for live data fetching
+- **runtimeConfig**: Uses constants from `utils/cockpitConfig.ts` — update that file to change API endpoints
 
 #### Static Site Generation with Live Data
 
@@ -395,8 +406,6 @@ The `.github/workflows/deploy.yml` workflow:
    - Runs `bun install --frozen-lockfile` for clean install
    - Runs `bun run generate` with environment variables:
      - `NODE_ENV=production`
-     - `COCKPIT_API_URL` from GitHub secrets
-     - `COCKPIT_API_KEY` from GitHub secrets
    - Uploads `.output/public/` as GitHub Pages artifact
 3. **Deploy Step**:
    - Deploys the artifact to GitHub Pages
@@ -406,7 +415,7 @@ The `.github/workflows/deploy.yml` workflow:
 
 1. **Live Data Fetching**: The deployed site fetches data directly from Cockpit CMS API at runtime using client-side API calls. This means data updates in Cockpit CMS are immediately reflected on the live site without requiring a rebuild.
 
-2. **API Credentials**: The Cockpit API credentials are stored as GitHub repository secrets and embedded in the static site during build. These credentials enable client-side API calls to fetch live inventory, drinks, essentials, and beer/wine data.
+2. **API Credentials**: The Cockpit API credentials are defined in `utils/cockpitConfig.ts` and embedded in the static site at build time. These credentials enable client-side API calls to fetch live inventory, drinks, essentials, and beer/wine data.
 
 3. **Client-Side Composables**: The app uses `useCockpitAPI()` composable to fetch data directly from Cockpit CMS. All data fetching happens in the browser, not on a server.
 
@@ -414,7 +423,6 @@ The `.github/workflows/deploy.yml` workflow:
 
 5. **Repository Settings**: You must:
    - Enable GitHub Pages in repository settings and set the source to "GitHub Actions"
-   - Configure GitHub secrets for `COCKPIT_API_URL` and `COCKPIT_API_KEY`
 
 6. **Build Time**: The static generation process pre-renders all routes, making the deployed site extremely fast with no server-side rendering needed at runtime.
 
@@ -423,5 +431,5 @@ The `.github/workflows/deploy.yml` workflow:
 - **404 errors on deployed site**: Check that baseURL in `nuxt.config.ts` matches your repository name
 - **Assets not loading**: Verify buildAssetsDir is set to "assets"
 - **Workflow fails**: Check the Actions tab for detailed error logs
-- **No data showing**: Verify GitHub secrets are configured correctly with valid Cockpit API credentials
+- **No data showing**: Verify API paths in `utils/cockpitConfig.ts` are correct and the Cockpit CMS instance is accessible
 - **CORS errors**: Ensure Cockpit CMS is configured to allow requests from your GitHub Pages domain

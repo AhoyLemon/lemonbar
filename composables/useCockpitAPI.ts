@@ -1,5 +1,5 @@
 import type { Bottle, Drink, Beer, Wine, Bitter, BarData, EssentialsRawData, TenantConfig } from "~/types";
-import { COCKPIT_API_URL, COCKPIT_API_KEY } from "~/utils/cockpitConfig";
+import { COCKPIT_API_URL, COCKPIT_IMAGE_URL, COCKPIT_API_KEY } from "~/utils/cockpitConfig";
 import { getTenantConfig, getDefaultTenantConfig, COMMON_BAR } from "~/utils/tenants";
 
 interface CockpitBottle {
@@ -24,6 +24,7 @@ interface CockpitBottle {
   ginTypes?: string[];
   rumTypes?: string[];
   liqueurTypes?: string[];
+  vermouthTypes?: string[];
 }
 
 interface CockpitDrink {
@@ -107,7 +108,9 @@ export const useCockpitAPI = (tenantSlug?: string) => {
   const apiKey = COCKPIT_API_KEY;
 
   // Get tenant configuration
-  const tenantConfig: TenantConfig = tenantSlug ? getTenantConfig(tenantSlug) || getDefaultTenantConfig() : getDefaultTenantConfig();
+  const tenantConfig: TenantConfig = tenantSlug
+    ? getTenantConfig(tenantSlug) || getDefaultTenantConfig()
+    : getDefaultTenantConfig();
 
   const fetchFromCockpit = async <T>(endpoint: string): Promise<T> => {
     const url = `${apiUrl}${endpoint}`;
@@ -147,6 +150,7 @@ export const useCockpitAPI = (tenantSlug?: string) => {
         if (item.ginTypes) tags.push(...item.ginTypes);
         if (item.rumTypes) tags.push(...item.rumTypes);
         if (item.liqueurTypes) tags.push(...item.liqueurTypes);
+        if (item.vermouthTypes) tags.push(...item.vermouthTypes);
         if (item.additionalTags) {
           if (Array.isArray(item.additionalTags)) {
             tags.push(...item.additionalTags);
@@ -161,7 +165,7 @@ export const useCockpitAPI = (tenantSlug?: string) => {
           else if (state.includes("empty")) bottleState = "empty";
         }
 
-        const imageUrl = item.image?.path ? `https://hirelemon.com/bar/storage/uploads${item.image.path}` : undefined;
+        const imageUrl = item.image?.path ? `${COCKPIT_IMAGE_URL}${item.image.path}` : undefined;
 
         return {
           id: `bottle-${index + 1}`,
@@ -192,7 +196,7 @@ export const useCockpitAPI = (tenantSlug?: string) => {
 
         const instructions = Array.isArray(item.steps) ? item.steps.map((s) => s.step) : [];
 
-        const imageUrl = item.image?.path ? `https://hirelemon.com/bar/storage/uploads${item.image.path}` : undefined;
+        const imageUrl = item.image?.path ? `${COCKPIT_IMAGE_URL}${item.image.path}` : undefined;
 
         return {
           id: `drink-${index + 1}`,
@@ -207,7 +211,7 @@ export const useCockpitAPI = (tenantSlug?: string) => {
       });
 
       const beers: Beer[] = data.beers.map((item, index) => {
-        const imageUrl = item.image?.path ? `https://hirelemon.com/bar/storage/uploads${item.image.path}` : undefined;
+        const imageUrl = item.image?.path ? `${COCKPIT_IMAGE_URL}${item.image.path}` : undefined;
 
         return {
           id: `beer-${index + 1}`,
@@ -219,7 +223,7 @@ export const useCockpitAPI = (tenantSlug?: string) => {
       });
 
       const wines: Wine[] = data.wines.map((item, index) => {
-        const imageUrl = item.image?.path ? `https://hirelemon.com/bar/storage/uploads${item.image.path}` : undefined;
+        const imageUrl = item.image?.path ? `${COCKPIT_IMAGE_URL}${item.image.path}` : undefined;
 
         return {
           id: `wine-${index + 1}`,
@@ -231,7 +235,7 @@ export const useCockpitAPI = (tenantSlug?: string) => {
       });
 
       const bitters: Bitter[] = data.bitters.map((item, index) => {
-        const imageUrl = item.image?.path ? `https://hirelemon.com/bar/storage/uploads${item.image.path}` : undefined;
+        const imageUrl = item.image?.path ? `${COCKPIT_IMAGE_URL}${item.image.path}` : undefined;
 
         return {
           id: `bitter-${index + 1}`,
@@ -318,7 +322,7 @@ export const useCockpitAPI = (tenantSlug?: string) => {
 
         const instructions = Array.isArray(item.steps) ? item.steps.map((s) => s.step) : [];
 
-        const imageUrl = item.image?.path ? `https://hirelemon.com/bar/storage/uploads${item.image.path}` : item.imageUrl;
+        const imageUrl = item.image?.path ? `${COCKPIT_IMAGE_URL}${item.image.path}` : item.imageUrl;
 
         return {
           id: `common-${item._id || index + 1}`,

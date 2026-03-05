@@ -4,21 +4,17 @@
 
 After merging this PR, follow these steps to enable GitHub Pages deployment:
 
-### 1. Configure GitHub Secrets
+### 1. Verify API Configuration
 
-The deployment requires Cockpit CMS API credentials to fetch live data:
+Before deploying, make sure the API paths in `utils/cockpitConfig.ts` are correct:
 
-1. Go to your repository: `https://github.com/AhoyLemon/booz`
-2. Click on **Settings** (top navigation)
-3. In the left sidebar, click **Secrets and variables** → **Actions**
-4. Click **New repository secret**
-5. Add the following secrets:
-   - **Name**: `COCKPIT_API_URL`
-     - **Value**: `https://hirelemon.com/bar/api` (or your Cockpit CMS API URL)
-   - **Name**: `COCKPIT_API_KEY`
-     - **Value**: Your Cockpit CMS API token
+```typescript
+export const COCKPIT_API_URL = "https://your-cockpit-instance/api";
+export const COCKPIT_IMAGE_URL = "https://your-image-host/storage/uploads";
+export const COCKPIT_API_KEY = "your-api-key-here";
+```
 
-> **Note**: These secrets are necessary for the deployed site to fetch live data from your Cockpit CMS. The API key will be embedded in the static site to enable client-side API calls.
+These values are the single source of truth for all API and image URLs. No environment variables or GitHub secrets are needed for API configuration.
 
 ### 2. Enable GitHub Pages
 
@@ -87,9 +83,9 @@ The deployment workflow:
 
 ### Data Not Showing
 
-- Make sure `public/data/` contains the JSON files
-- Run `npm run sync-data` before pushing to regenerate data files
+- Verify API paths in `utils/cockpitConfig.ts` are correct
 - Check browser console for API errors
+- Make sure your Cockpit CMS instance is accessible from the browser
 
 ## Updating the Site
 

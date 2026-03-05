@@ -1,9 +1,11 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 import { TENANT_CONFIG } from "./utils/tenants";
+import { COCKPIT_API_URL, COCKPIT_API_KEY } from "./utils/cockpitConfig";
 import { promises as fs } from "fs";
 import { join } from "path";
 
-const siteOrigin = process.env.NODE_ENV === "production" ? "https://booz.bar" : `http://localhost:${process.env.PORT || 3000}`;
+const siteOrigin =
+  process.env.NODE_ENV === "production" ? "https://booz.bar" : `http://localhost:${process.env.PORT || 3000}`;
 
 export default defineNuxtConfig({
   devtools: { enabled: true },
@@ -40,7 +42,8 @@ export default defineNuxtConfig({
           const slugs = new Set(Object.values(TENANT_CONFIG).map((t) => t.slug));
           const urls = [];
           // Use configured hostname when generating URLs so generated sitemap is absolute
-          const hostnameForSitemap = process.env.NODE_ENV === "production" ? "https://booz.bar" : "http://127.0.0.1:3000";
+          const hostnameForSitemap =
+            process.env.NODE_ENV === "production" ? "https://booz.bar" : "http://127.0.0.1:3000";
 
           // Helper function to get last modified date of a Vue file
           const getFileLastMod = async (filePath: string): Promise<string> => {
@@ -136,18 +139,27 @@ export default defineNuxtConfig({
       meta: [
         { charset: "utf-8" },
         { name: "viewport", content: "width=device-width, initial-scale=1" },
-        { name: "description", content: "Manage and explore cocktail recipes, bottle inventory, and bar essentials for multiple locations." },
+        {
+          name: "description",
+          content: "Manage and explore cocktail recipes, bottle inventory, and bar essentials for multiple locations.",
+        },
         { name: "theme-color", content: "#264653" },
         // OpenGraph
         { property: "og:title", content: "BOOZ - Bar Inventory Management" },
-        { property: "og:description", content: "Manage and explore cocktail recipes, bottle inventory, and bar essentials for multiple locations." },
+        {
+          property: "og:description",
+          content: "Manage and explore cocktail recipes, bottle inventory, and bar essentials for multiple locations.",
+        },
         { property: "og:image", content: `${siteOrigin}/opengraph-generic.png` },
         { property: "og:type", content: "website" },
         { property: "og:url", content: `${siteOrigin}` },
         // Twitter Card
         { name: "twitter:card", content: "summary_large_image" },
         { name: "twitter:title", content: "BOOZ - Bar Inventory Management" },
-        { name: "twitter:description", content: "Manage and explore cocktail recipes, bottle inventory, and bar essentials for multiple locations." },
+        {
+          name: "twitter:description",
+          content: "Manage and explore cocktail recipes, bottle inventory, and bar essentials for multiple locations.",
+        },
         { name: "twitter:image", content: `${siteOrigin}/opengraph-generic.png` },
       ],
       link: [
@@ -219,12 +231,12 @@ export default defineNuxtConfig({
   // Runtime configuration for API access
   runtimeConfig: {
     // Private keys (server-side only, not exposed to client)
-    cockpitApiKey: process.env.COCKPIT_API_KEY || "",
+    cockpitApiKey: COCKPIT_API_KEY,
 
     // Public keys (exposed to client)
     public: {
-      cockpitApiUrl: process.env.COCKPIT_API_URL || "https://hirelemon.com/bar/api",
-      cockpitApiKey: process.env.COCKPIT_API_KEY || "", // Made public for client-side API calls
+      cockpitApiUrl: COCKPIT_API_URL,
+      cockpitApiKey: COCKPIT_API_KEY, // Made public for client-side API calls
       siteOrigin: siteOrigin,
     },
   },

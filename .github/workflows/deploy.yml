@@ -34,8 +34,6 @@ jobs:
         run: bun run generate
         env:
           NODE_ENV: production
-          COCKPIT_API_URL: ${{ secrets.COCKPIT_API_URL }}
-          COCKPIT_API_KEY: ${{ secrets.COCKPIT_API_KEY }}
 
       - name: Validate sitemap
         run: |

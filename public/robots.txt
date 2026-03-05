@@ -2,6 +2,6 @@ User-agent: *
 Allow: /
 
 Sitemap: https://booz.bar/sitemap.xml
-API: https://hirelemon.com/bar
+API: https://my.booz.bar/api
 By: https://ahoylemon.xyz
 Repository: https://github.com/ahoylemon/booz

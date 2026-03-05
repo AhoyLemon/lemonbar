@@ -11,8 +11,17 @@
   const router = useRouter();
   const tenant = useValidateTenant();
 
-  const { searchResults, isSearching, searchProgress, searchError, currentSearchTerm, performSearch, clearSearch, sortResults, filterResultsByType } =
-    useOmniSearch(tenant.value);
+  const {
+    searchResults,
+    isSearching,
+    searchProgress,
+    searchError,
+    currentSearchTerm,
+    performSearch,
+    clearSearch,
+    sortResults,
+    filterResultsByType,
+  } = useOmniSearch(tenant.value);
 
   // Get tenant config
   const tenantConfig = computed(() => getTenantConfig(tenant.value) || getDefaultTenantConfig());
@@ -45,8 +54,12 @@
     if (enabledSteps === 0) return 0;
 
     // Calculate percentage: (completedSteps + currentStepProgress) / totalSteps
-    const completedSteps = searchProgress.value.filter((step: OmniSearchProgress) => step.status === "complete" || step.status === "error").length;
-    const searchingSteps = searchProgress.value.filter((step: OmniSearchProgress) => step.status === "searching").length;
+    const completedSteps = searchProgress.value.filter(
+      (step: OmniSearchProgress) => step.status === "complete" || step.status === "error",
+    ).length;
+    const searchingSteps = searchProgress.value.filter(
+      (step: OmniSearchProgress) => step.status === "searching",
+    ).length;
 
     // Each step completion is worth (100 / enabledSteps) percent
     // If a step is searching, it contributes its partial progress

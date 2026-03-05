@@ -28,12 +28,21 @@
   } = useCocktails(tenant.value);
 
   const { loadStarredDrinks, isStarred } = useStarredDrinks();
-  const { searchDrinks, clearSearch, sortSearchResults, searchResults, isSearching, searchProgress, searchError, currentSearchTerm } = useSearchDrinks(
-    tenant.value,
-  );
+  const {
+    searchDrinks,
+    clearSearch,
+    sortSearchResults,
+    searchResults,
+    isSearching,
+    searchProgress,
+    searchError,
+    currentSearchTerm,
+  } = useSearchDrinks(tenant.value);
 
   const searchTerm = ref("");
-  const isSearchActive = computed(() => currentSearchTerm.value !== "" || isSearching.value || searchError.value !== null);
+  const isSearchActive = computed(
+    () => currentSearchTerm.value !== "" || isSearching.value || searchError.value !== null,
+  );
   const sortBy = ref<"relevance" | "name" | "ingredient">("relevance");
   const filter = ref<"all" | "alcoholic" | "nonAlcoholic" | "available" | "beerWine">("all");
   const tagFilter = ref<string>("all");
@@ -66,11 +75,23 @@
       text: localDrinksLoading.value ? "Fetching local drinks" : "Local drinks fetched",
     },
     {
-      status: tenantConfig.value.includeCommonDrinks ? (commonDrinksLoading.value ? "incomplete" : "complete") : "complete",
-      text: tenantConfig.value.includeCommonDrinks ? (commonDrinksLoading.value ? "Fetching common drinks" : "Common drinks fetched") : "Common drinks ignored",
+      status: tenantConfig.value.includeCommonDrinks
+        ? commonDrinksLoading.value
+          ? "incomplete"
+          : "complete"
+        : "complete",
+      text: tenantConfig.value.includeCommonDrinks
+        ? commonDrinksLoading.value
+          ? "Fetching common drinks"
+          : "Common drinks fetched"
+        : "Common drinks ignored",
     },
     {
-      status: tenantConfig.value.includeRandomCocktails ? (randomDrinksLoading.value ? "incomplete" : "complete") : "complete",
+      status: tenantConfig.value.includeRandomCocktails
+        ? randomDrinksLoading.value
+          ? "incomplete"
+          : "complete"
+        : "complete",
       text: tenantConfig.value.includeRandomCocktails
         ? randomDrinksLoading.value
           ? "Fetching random drinks from The Cocktail DB"

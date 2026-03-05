@@ -142,8 +142,14 @@ describe("Meta Tag System", () => {
         },
       };
 
-      const drinksTitle = tenantConfig.metaInfo?.pages?.drinks?.title?.replace(/\$\{tenantName\}/g, tenantConfig.barName);
-      const drinksDesc = tenantConfig.metaInfo?.pages?.drinks?.description?.replace(/\$\{tenantName\}/g, tenantConfig.barName);
+      const drinksTitle = tenantConfig.metaInfo?.pages?.drinks?.title?.replace(
+        /\$\{tenantName\}/g,
+        tenantConfig.barName,
+      );
+      const drinksDesc = tenantConfig.metaInfo?.pages?.drinks?.description?.replace(
+        /\$\{tenantName\}/g,
+        tenantConfig.barName,
+      );
 
       expect(drinksTitle).toBe("Cocktails | Test Bar");
       expect(drinksDesc).toBe("Browse the drink menu at Test Bar.");
@@ -264,14 +270,14 @@ describe("Meta Tag System", () => {
 
     it("should handle external image URLs without prepending domain", () => {
       const baseUrl = "https://booz.bar";
-      const externalImageUrl = "https://hirelemon.com/bar/storage/uploads/2026/02/13/image.webp";
+      const externalImageUrl = "https://my.booz.bar/storage/uploads/2026/02/13/image.webp";
 
       // If image already starts with http:// or https://, don't prepend baseUrl
       const isExternalUrl = externalImageUrl.startsWith("http://") || externalImageUrl.startsWith("https://");
       const finalUrl = isExternalUrl ? externalImageUrl : `${baseUrl}${externalImageUrl}`;
 
-      expect(finalUrl).toBe("https://hirelemon.com/bar/storage/uploads/2026/02/13/image.webp");
-      expect(finalUrl).not.toContain("booz.bar");
+      expect(finalUrl).toBe("https://my.booz.bar/storage/uploads/2026/02/13/image.webp");
+      expect(finalUrl).not.toContain("booz.bar/https"); // Should not have double path
     });
   });
 
