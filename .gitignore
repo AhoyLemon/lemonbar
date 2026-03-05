@@ -24,7 +24,7 @@ dist
 .build-*
 .netlify
 
-# Env
+# Env (not used in this project, but kept here as a safety measure)
 .env
 
 # Testing

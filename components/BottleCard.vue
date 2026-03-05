@@ -52,6 +52,7 @@ NuxtLink.bottle-card(:class="{ 'out-of-stock': !bottle.inStock }" :to="bottleLin
       ...(bottle.tequilaTypes || []),
       ...(bottle.ginTypes || []),
       ...(bottle.rumTypes || []),
+      ...(bottle.vermouthTypes || []),
     ];
   }
 </script>

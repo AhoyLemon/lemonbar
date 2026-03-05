@@ -42,6 +42,14 @@
 
   const normalizedPath = computed(() => route.path.replace(/\/$/, "") || "/");
 
+  // Derive a page template class from the route, e.g. "drinks", "bottles", "about"
+  const pageTemplate = computed(() => {
+    const segments = route.path.split("/").filter(Boolean);
+    if (segments.length === 0) return "home";
+    if (segments.length === 1) return segments[0]; // "about", tenant home slug
+    return segments[1]; // section: "drinks", "bottles", "essentials", etc.
+  });
+
   // Initialize meta tags using usePageMeta composable
   // This will automatically handle the fallback chain for all pages
   // Individual pages can override by calling usePageMeta with explicit values
